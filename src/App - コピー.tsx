@@ -11,7 +11,6 @@ import { laboratoryTheme } from './theme/laboratoryTheme';
 import { MainLayout } from './components/layout/MainLayout';
 import { LaboratoryLayout } from './components/layout/LaboratoryLayout';
 import { MaterialsLayout } from './components/layout/MaterialsLayout';
-import { theme } from './theme';
 
 // Pages
 import { MainPage } from './pages/MainPage';
@@ -38,13 +37,15 @@ import { ErrorPage } from './pages/ErrorPage';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
 
 
+const client = generateClient<Schema>();
+
+
 function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <BrowserRouter>
-        <ErrorBoundary>
-          <Routes>
-            {/* Main layout routes */}
+    <BrowserRouter>
+      <ErrorBoundary>
+       <Routes>
+          {/* Main layout routes */}
           <Route element={<MainLayout />}>
             <Route path="/" element={<MainPage />} />
             <Route path="/about" element={<AboutPage />} />
@@ -75,12 +76,10 @@ function App() {
             <Route path="/materials/hodemei" element={<HodemeiMaterials />} />
             <Route path="/materials/alsarejia" element={<AlsarejiaMaterials />} />
           </Route>
-            
-            
-          </Routes>
-        </ErrorBoundary>
-      </BrowserRouter>
-    </ThemeProvider>
+        </Routes>
+      </ErrorBoundary>
+    </BrowserRouter>
+           
   );
 }
 
