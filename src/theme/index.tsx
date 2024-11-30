@@ -51,11 +51,8 @@ export const theme: Theme = {
           backgroundColor: { value: '{colors.brand.primary}' },
           color: { value: 'white' }
         },
-        secondary: {
-          backgroundColor: { value: '{colors.brand.secondary}' },
-          color: { value: 'white' }
         }
       }
     }
   }
-};
+;

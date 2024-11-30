@@ -10,12 +10,9 @@ import {
 } from '@aws-amplify/ui-react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { motion } from 'framer-motion';
 
 export const AboutPage = () => {
   const { tokens } = useTheme();
-  const MotionCard = motion(Card);
-  const MotionText = motion(Text);
 
   return (
     <View>

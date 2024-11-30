@@ -1,6 +1,4 @@
 // src/theme/components.ts
-import { Theme } from '@aws-amplify/ui-react';
-
 export const components = {
   button: {
     primary: {
