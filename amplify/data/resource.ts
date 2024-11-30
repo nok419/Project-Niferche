@@ -40,16 +40,16 @@ const schema = a.schema({
       lastLoginAt: a.datetime(),
       favoriteContents: a.string().array()
     })
-    .authorization((allow) => [
-      allow.public().to(['read']),
-      allow.owner().to(['read', 'update']),
-      allow.custom()
-        .to(['create', 'update', 'delete'])
-        .when(ctx => ctx.arguments.role === UserRole.ADMIN)
+    .authorization([
+      { type: 'Public', operations: ['read'] },
+      { type: 'Owner', operations: ['read', 'update'] },
+      {
+        type: 'Custom',
+        operations: ['create', 'update', 'delete'],
+        condition: { roleEquals: 'ADMIN' }
+      }
     ])
-    .secondaryIndexes((idx) => ({
-      byEmail: idx.sortKey('email')
-    })),
+    .index(['email']),
 
   Feedback: a
     .model({
@@ -61,21 +61,18 @@ const schema = a.schema({
       metadata: a.customType({
         rating: a.integer(),
         tags: a.string().array()
-      }),
-      rating: a.integer(),
-      tags: a.string().array()
+      })
     })
-    .authorization((allow) => [
-      allow.public().to(['read']),
-      allow.owner().to(['create', 'read', 'update']),
-      allow.custom()
-        .to(['delete', 'update'])
-        .when(ctx => ctx.arguments.role === UserRole.ADMIN)
+    .authorization([
+      { type: 'Public', operations: ['read'] },
+      { type: 'Owner', operations: ['create', 'read', 'update'] },
+      {
+        type: 'Custom',
+        operations: ['delete', 'update'],
+        condition: { roleEquals: 'ADMIN' }
+      }
     ])
-    .secondaryIndexes((idx) => ({
-      byContent: idx.sortKey('contentId'),
-      byUser: idx.sortKey('userId')
-    }))
+    .index(['contentId', 'userId'])
 });
 
 export type Schema = ClientSchema<typeof schema>;
@@ -84,7 +81,6 @@ export const data = defineData({
   schema,
   authorizationModes: {
     defaultAuthorizationMode: 'userPool',
-    // API Key is used for public access
     apiKeyAuthorizationMode: {
       expiresInDays: 30
     }

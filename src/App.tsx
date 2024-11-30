@@ -1,6 +1,3 @@
-import type { Schema } from "../amplify/data/resource";
-import { generateClient } from "aws-amplify/data";
-
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider} from '@aws-amplify/ui-react';
 
