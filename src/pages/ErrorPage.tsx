@@ -13,7 +13,7 @@ export const ErrorPage = () => {
       margin="0 auto"
     >
       <Heading level={1}>エラーが発生しました</Heading>
-      <Text marginY="2rem">
+      <Text>
         申し訳ありません。予期せぬエラーが発生しました。
       </Text>
       <Button

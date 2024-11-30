@@ -85,7 +85,6 @@ export const MainPage = () => {
 
           <Text
             color={tokens.colors.white}
-            fontSize={{ base: tokens.fontSizes.medium, large: tokens.fontSizes.l }}
             textAlign="center"
             maxWidth="900px"
             padding="medium"

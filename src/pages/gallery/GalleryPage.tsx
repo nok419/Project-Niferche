@@ -147,10 +147,7 @@ export const GalleryPage = () => {
               key={item.id}
               title={item.title}
               imagePath={item.thumbnail}
-              onClick={() => {
-                // 詳細表示の処理（後で実装）
-                console.log(`Opening ${item.path}`);
-              }}
+              linkTo={item.path}
             />
           )}
         </Collection>
@@ -162,7 +159,6 @@ export const GalleryPage = () => {
             totalPages={totalPages}
             onNext={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
             onPrevious={() => setCurrentPage(p => Math.max(p - 1, 1))}
-            onChange={setCurrentPage}
           />
         )}
       </Flex>

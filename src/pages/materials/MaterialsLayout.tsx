@@ -1,4 +1,4 @@
-import { View, Tabs, TabItem, Heading } from '@aws-amplify/ui-react';
+import { View, Tabs, Heading } from '@aws-amplify/ui-react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 
 export const MaterialsLayout = () => {
@@ -28,18 +28,18 @@ export const MaterialsLayout = () => {
           }
         }}
       >
-        <TabItem title="共通設定">
+        <Tabs title="共通設定">
           {getCurrentTab() === '0' && <Outlet />}
-        </TabItem>
-        <TabItem title="Quxe">
+        </Tabs>
+        <Tabs title="Quxe">
           {getCurrentTab() === '1' && <Outlet />}
-        </TabItem>
-        <TabItem title="Hodemei">
+        </Tabs>
+        <Tabs title="Hodemei">
           {getCurrentTab() === '2' && <Outlet />}
-        </TabItem>
-        <TabItem title="Alsarejia">
+        </Tabs>
+        <Tabs title="Alsarejia">
           {getCurrentTab() === '3' && <Outlet />}
-        </TabItem>
+        </Tabs>
       </Tabs>
     </View>
   );

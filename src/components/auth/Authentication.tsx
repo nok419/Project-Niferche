@@ -5,12 +5,12 @@ import {
   useTheme,
   Text,
   Heading,
-  Button,
   TextField
 } from '@aws-amplify/ui-react';
+
 import { useNavigate, useLocation } from 'react-router-dom';
 import { fetchUserAttributes } from 'aws-amplify/auth';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 interface AuthenticationProps {
   initialState?: 'signIn' | 'signUp';

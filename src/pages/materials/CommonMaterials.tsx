@@ -7,7 +7,6 @@ import {
   Divider,
   Text
 } from '@aws-amplify/ui-react';
-import { ContentDisplay } from '../../components/content/ContentDisplay';
 import { StorageService } from '../../services/storage';
 import { ContentCard } from '../../components/common/ContentCard';
 

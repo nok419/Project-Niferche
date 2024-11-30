@@ -1,7 +1,7 @@
 // src/components/layout/NavigationHeader.tsx
 import { Flex,Button,Menu,MenuItem,
   View,Link as AmplifyLink} from '@aws-amplify/ui-react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 // ナビゲーション項目の型定義
 interface NavItem {
   label: string;
@@ -76,11 +76,9 @@ export const NavigationHeader = () => {
   return (
     <View
       backgroundColor="background.primary"
-      borderBottom="1px solid"
       borderColor="border.primary"
       position="sticky"
       top={0}
-      zIndex={100}
     >
       <Flex
         as="nav"

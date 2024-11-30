@@ -15,10 +15,12 @@ export const LaboratoryPage = () => {
         <ContentCard
           title="Main Story"
           description="メインストーリーのコレクション"
+          linkTo="/laboratory/mainstory"
         />
         <ContentCard
           title="Side Stories"
           description="サイドストーリーのコレクション"
+          linkTo="/laboratory/sidestory"
         />
         {/* 他のコンテンツカード */}
       </Grid>
