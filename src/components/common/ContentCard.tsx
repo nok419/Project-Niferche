@@ -30,7 +30,6 @@ export const ContentCard: React.FC<ContentCardProps> = ({
       variation="elevated"
       padding="medium"
       borderRadius="medium"
-      cursor="pointer"
       onClick={handleClick}
       style={{
         transition: 'transform 0.2s ease, box-shadow 0.2s ease',

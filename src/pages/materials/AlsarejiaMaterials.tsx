@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react';
 import { 
   View, 
-  Heading, 
   Flex, 
   Collection,
-  Divider,
   Text,
   SelectField
 } from '@aws-amplify/ui-react';
