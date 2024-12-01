@@ -1,7 +1,13 @@
-// src/components/layout/NavigationHeader.tsx
-import { Flex,Button,Menu,MenuItem,
-  View,Link as AmplifyLink} from '@aws-amplify/ui-react';
+import { 
+  Flex,
+  Button,
+  Menu,
+  MenuItem,
+  View,
+  Link as AmplifyLink,
+} from '@aws-amplify/ui-react';
 import { Link } from 'react-router-dom';
+
 // ナビゲーション項目の型定義
 interface NavItem {
   label: string;
@@ -41,7 +47,6 @@ const navigation: NavItem[] = [{
 ];
 
 export const NavigationHeader = () => {
-
   const renderMenuItem = (item: NavItem) => {
     if (item.children) {
       return (
@@ -79,9 +84,10 @@ export const NavigationHeader = () => {
       borderColor="border.primary"
       position="sticky"
       top={0}
+      style={{ zIndex: 100 }}
     >
       <Flex
-        as="nav"
+        direction="row"
         padding="1rem"
         justifyContent="space-between"
         alignItems="center"
@@ -96,7 +102,16 @@ export const NavigationHeader = () => {
         </Link>
 
         {/* ナビゲーションメニュー */}
-        <Flex as="ul" gap="1rem" alignItems="center" listStyleType="none">
+        <Flex
+          direction="row"
+          gap="1rem"
+          alignItems="center"
+          style={{
+            listStyle: 'none',
+            padding: 0,
+            margin: 0
+          }}
+        >
           {navigation.map(renderMenuItem)}
           <Button
             as={Link}

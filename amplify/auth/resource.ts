@@ -2,21 +2,29 @@ import { defineAuth } from '@aws-amplify/backend';
 
 export const auth = defineAuth({
   loginWith: {
-    email: true,
-    // username: false, // メールアドレスのみを使用
+    email: {
+      verificationEmailSubject: 'ようこそProject Nifercheへ',
+      verificationEmailBody: (code) => `認証コード: ${code}`,
+    }
   },
   userAttributes: {
     nickname: {
       required: true,
       mutable: true,
     },
-    userRole: {
+    email: {
       required: true,
-      mutable: false,
-      default: 'user'
+      mutable: true,
     }
   },
   multiFactor: {
-    mode: 'OFF'  // 必要に応じてOPTIONALまたはREQUIREDに変更可能
+    mode: 'OFF',
+  },
+  passwordPolicy: {
+    minLength: 8,
+    requireLowercase: true,
+    requireUppercase: true,
+    requireNumbers: true,
+    requireSpecialCharacters: true
   }
 });

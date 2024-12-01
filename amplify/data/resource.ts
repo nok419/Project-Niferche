@@ -1,78 +1,52 @@
 import { type ClientSchema, a, defineData } from '@aws-amplify/backend';
 
-// Enumの定義
-const UserRole = {
-  ADMIN: 'ADMIN',
-  USER: 'USER'
-} as const;
-
-const UserStatus = {
-  ACTIVE: 'ACTIVE',
-  SUSPENDED: 'SUSPENDED',
-  DELETED: 'DELETED'
-} as const;
-
-const FeedbackType = {
-  COMMENT: 'COMMENT',
-  REVIEW: 'REVIEW',
-  SUGGESTION: 'SUGGESTION'
-} as const;
-
-const FeedbackStatus = {
-  ACTIVE: 'ACTIVE',
-  HIDDEN: 'HIDDEN',
-  DELETED: 'DELETED'
-} as const;
+const ContentTypes = ['NOVEL', 'IMAGE', 'AUDIO', 'VIDEO', 'MERCHANDISE', 'SETTING', 'THEORY'] as const;
+const ContentCategories = ['MAIN_STORY', 'SIDE_STORY', 'SETTING_MATERIAL', 'GALLERY', 'SHOP', 'THEORY_DOCUMENT'] as const;
+const WorldCategories = ['COMMON', 'QUXE', 'HODEMEI', 'ALSAREJIA'] as const;
+const Attributions = ['OFFICIAL', 'SHARED'] as const;
+const Visibilities = ['PUBLIC', 'RESTRICTED', 'PRIVATE'] as const;
+const ReferenceTypes = ['BASED_ON', 'INSPIRED_BY', 'EXTENDS', 'REFERENCES', 'VERSION_OF'] as const;
+const StatusTypes = ['DRAFT', 'PUBLISHED', 'ARCHIVED'] as const;
 
 const schema = a.schema({
-  User: a
-    .model({
-      email: a.string().required(),
-      role: a.enum(Object.values(UserRole)),
-      profile: a.customType({
-        displayName: a.string(),
-        avatar: a.string(),
-        biography: a.string()
-      }),
-      status: a.enum(Object.values(UserStatus)),
-      createdAt: a.datetime(),
-      updatedAt: a.datetime(),
-      lastLoginAt: a.datetime(),
-      favoriteContents: a.string().array()
-    })
-    .authorization([
-      { type: 'Public', operations: ['read'] },
-      { type: 'Owner', operations: ['read', 'update'] },
-      {
-        type: 'Custom',
-        operations: ['create', 'update', 'delete'],
-        condition: { roleEquals: 'ADMIN' }
-      }
-    ])
-    .index(['email']),
+  Content: a.model({
+    id: a.id(),
+    type: a.enum(ContentTypes),
+    category: a.enum(ContentCategories),
+    world: a.enum(WorldCategories),
+    attribution: a.enum(Attributions),
+    visibility: a.enum(Visibilities),
+    status: a.enum(StatusTypes),
+    title: a.string(),
+    description: a.string(),
+    tags: a.string().array(),
+    s3Key: a.string(),
+    versions: a.string().array(),
+    ownerId: a.string(),
+    createdAt: a.datetime(),
+    updatedAt: a.datetime(),
+    metadata: a.string()
+  })
+  .authorization(allow => [
+    allow.public().to(['read']),
+    allow.owner().to(['read', 'update', 'delete']),
+    allow.authenticated().to(['create'])
+  ]),
 
-  Feedback: a
-    .model({
-      contentId: a.string().required(),
-      userId: a.string().required(),
-      type: a.enum(Object.values(FeedbackType)),
-      content: a.string().required(),
-      status: a.enum(Object.values(FeedbackStatus)),
-      metadata: a.customType({
-        rating: a.integer(),
-        tags: a.string().array()
-      })
-    })
-    .authorization([
-      { type: 'Public', operations: ['read'] },
-      { type: 'Owner', operations: ['create', 'read', 'update'] },
-      {
-        type: 'Custom',
-        operations: ['delete', 'update'],
-        condition: { roleEquals: 'ADMIN' }
-      }
-    ])
-    .index(['contentId', 'userId'])
+  ContentReference: a.model({
+    id: a.id(),
+    sourceId: a.string(),
+    targetId: a.string(),
+    referenceType: a.enum(ReferenceTypes),
+    strength: a.integer(),
+    description: a.string(),
+    metadata: a.string()
+  })
+  .authorization(allow => [
+    allow.public().to(['read']),
+    allow.authenticated().to(['create']),
+    allow.owner().to(['update', 'delete'])
+  ])
 });
 
 export type Schema = ClientSchema<typeof schema>;

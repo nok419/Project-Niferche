@@ -5,8 +5,10 @@ import {
   useTheme,
   Text,
   Heading,
-  TextField
+  TextField,
+  useAuthenticator
 } from '@aws-amplify/ui-react';
+import { signUp, type SignUpInput, type SignUpOutput } from 'aws-amplify/auth';
 
 import { useNavigate, useLocation } from 'react-router-dom';
 import { fetchUserAttributes } from 'aws-amplify/auth';
@@ -16,11 +18,16 @@ interface AuthenticationProps {
   initialState?: 'signIn' | 'signUp';
 }
 
+interface ValidationError {
+  [key: string]: string;
+}
+
 export const Authentication = ({ initialState = 'signIn' }: AuthenticationProps) => {
   const { tokens } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const [error, setError] = useState<string | null>(null);
+  const { submitForm } = useAuthenticator();
 
   // サインイン後のリダイレクト処理
   const handleAuthSuccess = async () => {
@@ -79,7 +86,7 @@ export const Authentication = ({ initialState = 'signIn' }: AuthenticationProps)
           }
         }}
         services={{
-          async validateCustomSignUp(formData) {
+          async validateCustomSignUp(formData: Record<string, any>): Promise<ValidationError> {
             if (!formData.nickname || formData.nickname.length < 2) {
               return {
                 nickname: 'ニックネームは2文字以上で入力してください',
@@ -87,13 +94,20 @@ export const Authentication = ({ initialState = 'signIn' }: AuthenticationProps)
             }
             return {};
           },
+          async handleSignUp(formData: SignUpInput): Promise<SignUpOutput> {
+            try {
+              const signUpResult = await signUp(formData);
+              await handleAuthSuccess();
+              submitForm();
+              return signUpResult;
+            } catch (error) {
+              console.error('Error signing up:', error);
+              setError(error instanceof Error ? error.message : 'サインアップに失敗しました');
+              throw error;
+            }
+          }
         }}
         signUpAttributes={['email', 'nickname']}
-        onSuccess={handleAuthSuccess}
-        onError={(err) => {
-          setError(err.message);
-          console.error('Auth Error:', err);
-        }}
       />
       {error && (
         <View 
