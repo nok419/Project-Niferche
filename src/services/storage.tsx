@@ -1,43 +1,45 @@
-// 1. StorageServiceの作成
 // src/services/storage.tsx
-import { getUrl, uploadData, downloadData } from 'aws-amplify/storage';
+import { getUrl,downloadData, list } from 'aws-amplify/storage';
 
 export class StorageService {
-  // コンテンツの取得
-  async getContent(path: string) {
+  // 既存メソッドの改善
+  static async getFileUrl(path: string): Promise<string> {
     try {
       const result = await getUrl({
-        path: path,
-        options: {
-          validateObjectExistence: true
-        }
+        path,
+        options: { validateObjectExistence: true }
       });
-      return result;
+      return result.url.toString();
     } catch (error) {
-      console.error('Error fetching content:', error);
+      console.error('Error getting file URL:', error);
       throw error;
     }
   }
 
-  // コンテンツのアップロード
-  async uploadContent(path: string, file: File, metadata?: Record<string, string>) {
+  // ファイル一覧の取得を追加
+  static async listFiles(path: string) {
     try {
-      const result = await uploadData({
-        path: path,
-        data: file,
-        options: {
-          metadata
-        }
-      }).result;
-      return result;
+      const items = await list({
+        path,
+        options: { listAll: true }
+      });
+      return items.items;
     } catch (error) {
-      console.error('Error uploading content:', error);
+      console.error('Error listing files:', error);
       throw error;
     }
   }
 
-  // カスタムフックの作成
-  async listContents(prefix: string) {
-    // 実装予定
+  // コンテンツの取得（テキストファイル用）
+  static async getTextContent(path: string): Promise<string> {
+    try {
+      const response = await downloadData({
+        path,
+      }).result;
+      return await response.body.text();
+    } catch (error) {
+      console.error('Error downloading text content:', error);
+      throw error;
+    }
   }
 }

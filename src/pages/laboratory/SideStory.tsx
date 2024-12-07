@@ -1,53 +1,58 @@
+// src/pages/laboratory/SideStory.tsx
 import { useEffect, useState } from 'react';
 import { 
-  Heading, 
-  Collection, 
   View, 
+  Heading, 
   SelectField,
+  Collection,
+  Text,
   Flex,
-  Text
+  Button
 } from '@aws-amplify/ui-react';
-import { ContentDisplay } from '../../components/content/ContentDisplay';
+import { StoryViewer } from '../../components/content/StoryViewer';
 import { StorageService } from '../../services/storage';
+import { ContentCard } from '../../components/common/ContentCard';
 
-interface StoryItem {
-  path: string;
+interface StoryMetadata {
+  id: string;
   title: string;
   type: 'official' | 'shared';
+  chapterCount: number;
 }
 
 export const SideStory = () => {
-  const [stories, setStories] = useState<StoryItem[]>([]);
+  const [stories, setStories] = useState<StoryMetadata[]>([]);
+  const [selectedStory, setSelectedStory] = useState<StoryMetadata | null>(null);
+  const [currentChapter, setCurrentChapter] = useState(1);
   const [filter, setFilter] = useState<'all' | 'official' | 'shared'>('all');
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadStories = async () => {
       try {
         setLoading(true);
         // 公式とsharedの両方のストーリーを取得
-        const officialItems = await StorageService.listFiles('laboratory/sidestory/official/');
-        const sharedItems = await StorageService.listFiles('laboratory/sidestory/shared/');
+        const officialItems = await StorageService.listFiles('laboratory/sidestory/official');
+        const sharedItems = await StorageService.listFiles('laboratory/sidestory/shared');
 
-        const formattedStories: StoryItem[] = [
+        const formattedStories = [
           ...officialItems.map(item => ({
-            path: item.path,
-            title: item.path.split('/').pop()?.replace(/\.[^/.]+$/, '') || 'Untitled',
-            type: 'official' as const
+            id: item.key,
+            title: item.key.split('/').pop()?.replace(/\.txt$/, '') || 'Untitled',
+            type: 'official' as const,
+            chapterCount: 1, // 実際のチャプター数を取得する処理が必要
           })),
           ...sharedItems.map(item => ({
-            path: item.path,
-            title: item.path.split('/').pop()?.replace(/\.[^/.]+$/, '') || 'Untitled',
-            type: 'shared' as const
+            id: item.key,
+            title: item.key.split('/').pop()?.replace(/\.txt$/, '') || 'Untitled',
+            type: 'shared' as const,
+            chapterCount: 1,
           }))
         ];
 
         setStories(formattedStories);
-        setError(null);
-      } catch (err) {
-        setError('ストーリーの読み込みに失敗しました');
-        console.error('Error loading stories:', err);
+      } catch (error) {
+        console.error('Error loading stories:', error);
       } finally {
         setLoading(false);
       }
@@ -60,45 +65,55 @@ export const SideStory = () => {
     filter === 'all' ? true : story.type === filter
   );
 
-  if (loading) {
-    return <View padding="medium">Loading...</View>;
-  }
-
-  if (error) {
-    return <View padding="medium">{error}</View>;
-  }
-
   return (
     <View padding="medium">
-      <Heading level={1} marginBottom="large">サイドストーリー</Heading>
+      <Heading level={1}>サイドストーリー</Heading>
       
-      <Flex direction="column" gap="large">
-        <Flex justifyContent="space-between" alignItems="center">
-          <SelectField
-            label="表示フィルター"
-            value={filter}
-            onChange={e => setFilter(e.target.value as typeof filter)}
-          >
-            <option value="all">すべて表示</option>
-            <option value="official">公式ストーリー</option>
-            <option value="shared">共有ストーリー</option>
-          </SelectField>
-        </Flex>
+      <Flex direction="column" gap="medium">
+        <SelectField
+          label="表示フィルター"
+          value={filter}
+          onChange={e => setFilter(e.target.value as typeof filter)}
+        >
+          <option value="all">すべて表示</option>
+          <option value="official">公式ストーリー</option>
+          <option value="shared">共有ストーリー</option>
+        </SelectField>
 
-        {filteredStories.length === 0 ? (
-          <Text>表示するストーリーがありません</Text>
+        {loading ? (
+          <Text>Loading...</Text>
+        ) : selectedStory ? (
+          <>
+            <Button onClick={() => setSelectedStory(null)}>
+              ストーリー一覧に戻る
+            </Button>
+            <StoryViewer
+              storyPath={`laboratory/sidestory/${selectedStory.type}/${selectedStory.id}`}
+              currentChapter={currentChapter}
+              totalChapters={selectedStory.chapterCount}
+              onChapterChange={setCurrentChapter}
+            />
+          </>
         ) : (
           <Collection
-            type="list"
+            type="grid"
             items={filteredStories}
             gap="medium"
+            templateColumns={{
+              base: "1fr",
+              medium: "1fr 1fr",
+              large: "1fr 1fr 1fr"
+            }}
           >
             {(story) => (
-              <ContentDisplay
-                key={story.path}
-                path={story.path}
-                type="novel"
-                title={`${story.title} (${story.type === 'official' ? '公式' : '共有'})`}
+              <ContentCard
+                key={story.id}
+                title={story.title}
+                description={`${story.type === 'official' ? '公式' : '共有'}ストーリー`}
+                onClick={() => {
+                  setSelectedStory(story);
+                  setCurrentChapter(1);
+                }}
               />
             )}
           </Collection>

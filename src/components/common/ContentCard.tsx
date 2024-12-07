@@ -7,6 +7,8 @@ interface ContentCardProps {
   imagePath?: string;
   linkTo: string;
   onClick?: () => void;
+  size?: 'small' | 'medium' | 'large'; // サイズ設定を追加
+  variant?: 'story' | 'material' | 'info'; // 用途別のスタイル
 }
 
 export const ContentCard: React.FC<ContentCardProps> = ({
