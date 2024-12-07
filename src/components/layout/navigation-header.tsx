@@ -4,7 +4,6 @@ import {
   Menu,
   MenuItem,
   View,
-  Link as AmplifyLink,
 } from '@aws-amplify/ui-react';
 import { Link } from 'react-router-dom';
 
@@ -84,7 +83,11 @@ export const NavigationHeader = () => {
       borderColor="border.primary"
       position="sticky"
       top={0}
-      style={{ zIndex: 100 }}
+      style={{ 
+        zIndex: 100,
+        height: 'var(--header-height)',
+        borderBottom: '1px solid var(--amplify-colors-border-primary)' // styleの中で指定
+      }}
     >
       <Flex
         direction="row"
@@ -96,9 +99,9 @@ export const NavigationHeader = () => {
       >
         {/* ロゴ / ホームリンク */}
         <Link to="/" style={{ textDecoration: 'none' }}>
-          <AmplifyLink color="font.primary" fontWeight="bold">
+          <span style={{ color: 'var(--amplify-colors-font-primary)', fontWeight: 'bold' }}>
             Project Niferche
-          </AmplifyLink>
+          </span>
         </Link>
 
         {/* ナビゲーションメニュー */}
@@ -115,7 +118,7 @@ export const NavigationHeader = () => {
           {navigation.map(renderMenuItem)}
           <Button
             as={Link}
-            to="/signin"
+            to="auth/signin"
             variation="primary"
           >
             ログイン

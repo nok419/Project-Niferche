@@ -1,51 +1,43 @@
-import { getUrl, uploadData, remove, list } from 'aws-amplify/storage';
+// 1. StorageServiceの作成
+// src/services/storage.tsx
+import { getUrl, uploadData, downloadData } from 'aws-amplify/storage';
 
 export class StorageService {
-  static async uploadFile(path: string, file: File) {
+  // コンテンツの取得
+  async getContent(path: string) {
+    try {
+      const result = await getUrl({
+        path: path,
+        options: {
+          validateObjectExistence: true
+        }
+      });
+      return result;
+    } catch (error) {
+      console.error('Error fetching content:', error);
+      throw error;
+    }
+  }
+
+  // コンテンツのアップロード
+  async uploadContent(path: string, file: File, metadata?: Record<string, string>) {
     try {
       const result = await uploadData({
         path: path,
         data: file,
+        options: {
+          metadata
+        }
       }).result;
       return result;
     } catch (error) {
-      console.error('Error uploading file:', error);
+      console.error('Error uploading content:', error);
       throw error;
     }
   }
 
-  static async getFileUrl(path: string) {
-    try {
-      const result = await getUrl({
-        path: path,
-      });
-      return result.url.toString();
-    } catch (error) {
-      console.error('Error getting file URL:', error);
-      throw error;
-    }
-  }
-
-  static async listFiles(path: string) {
-    try {
-      const result = await list({
-        path: path,
-      });
-      return result.items;
-    } catch (error) {
-      console.error('Error listing files:', error);
-      throw error;
-    }
-  }
-
-  static async deleteFile(path: string) {
-    try {
-      await remove({
-        path: path,
-      });
-    } catch (error) {
-      console.error('Error deleting file:', error);
-      throw error;
-    }
+  // カスタムフックの作成
+  async listContents(prefix: string) {
+    // 実装予定
   }
 }

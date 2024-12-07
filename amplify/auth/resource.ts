@@ -1,30 +1,27 @@
+// File: amplify/auth/resource.ts
 import { defineAuth } from '@aws-amplify/backend';
 
 export const auth = defineAuth({
   loginWith: {
     email: {
+      // メール認証のカスタマイズ
       verificationEmailSubject: 'ようこそProject Nifercheへ',
-      verificationEmailBody: (code) => `認証コード: ${code}`,
+      verificationEmailBody: (createCode: () => string) => 
+        `認証コード: ${createCode()}\nこのコードは15分間有効です。`
     }
   },
+  // ユーザー属性の定義
   userAttributes: {
-    nickname: {
-      required: true,
-      mutable: true,
+    nickname: { 
+      mutable: true 
     },
-    email: {
-      required: true,
-      mutable: true,
+    email: { 
+      mutable: true 
     }
   },
-  multiFactor: {
-    mode: 'OFF',
-  },
-  passwordPolicy: {
-    minLength: 8,
-    requireLowercase: true,
-    requireUppercase: true,
-    requireNumbers: true,
-    requireSpecialCharacters: true
+  // 追加の設定
+  accountRecovery: 'EMAIL_ONLY',
+  multifactor: {
+    mode: 'OFF'  // 初期段階ではMFAをオフに
   }
 });
