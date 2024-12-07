@@ -1,133 +1,181 @@
-import { useEffect, useState } from 'react';
+// src/pages/materials/CommonSetting.tsx
 import { 
   View, 
-  Flex, 
+  Heading, 
+  Tabs, 
   Collection,
+  Card,
   Text,
-  SelectField
+  Flex,
+  Alert,
+  Button,
+  Loader
 } from '@aws-amplify/ui-react';
-import { StorageService } from '../../services/storage';
 import { ContentCard } from '../../components/common/ContentCard';
+import { useEffect, useState } from 'react';
+import { StorageService } from '../../services/storage';
+import { useNavigate } from 'react-router-dom';
 
-interface MaterialItem {
-  path: string;
+type AlsarejiaContentType = 'facility' | 'idea' | 'technology' | 'character' | 'history';
+interface ContentItem {
+  id: string;
   title: string;
-  category: string;
-  type: 'room' | 'item' | 'technology' | 'character' | 'history';
+  description: string;
+  imagePath?: string;
+  contentPath: string;
+  isAvailable: boolean;
+  type: AlsarejiaContentType
 }
 
+// Alsarejia用
+const sections: ContentItem[] = [
+  {
+    id: 'facility-overview',
+    title: '研究施設概要',
+    description: 'アルサレジア研究施設の基本構造と機能',
+    contentPath: 'materials/alsarejia/facility/overview',
+    type: 'facility',
+    isAvailable: false
+  },
+  // ...他のセクション
+];
+
 export const AlsarejiaMaterials = () => {
-  const [materials, setMaterials] = useState<MaterialItem[]>([]);
-  const [filter, setFilter] = useState<MaterialItem['type'] | 'all'>('all');
-  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('theory');
+  const [contents, setContents] = useState<ContentItem[]>(sections);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const loadMaterials = async () => {
+    const loadContents = async () => {
+      setIsLoading(true);
+      setError(null);
       try {
-        setLoading(true);
+        const items = await StorageService.listFiles('materials/alsarejia/');
         
-        const basePath = 'materials/official/unique/alsarejia';
-        const categories = {
-          room: 'rooms',
-          item: 'items',
-          technology: 'atechs',
-          character: 'characters',
-          history: 'history'
-        };
+        // 存在するコンテンツのパスを取得
+        const availablePaths = items.map(item => item.path);
 
-        let allMaterials: MaterialItem[] = [];
+        // セクション定義を更新（存在するコンテンツをマーク）
+        const updatedContents = sections.map(section => ({
+          ...section,
+          isAvailable: availablePaths.includes(section.contentPath)
+        }));
 
-        for (const [type, folder] of Object.entries(categories)) {
-          const items = await StorageService.listFiles(`${basePath}/${folder}/`);
-          const formatted = items.map(item => ({
-            path: item.path,
-            title: item.path.split('/').pop()?.replace(/\.[^/.]+$/, '') || 'Untitled',
-            category: getCategoryName(type as MaterialItem['type']),
-            type: type as MaterialItem['type']
-          }));
-          allMaterials = [...allMaterials, ...formatted];
-        }
-
-        setMaterials(allMaterials);
-        setError(null);
-      } catch (err) {
-        setError('設定資料の読み込みに失敗しました');
-        console.error('Error loading materials:', err);
+        setContents(updatedContents);
+      } catch (error) {
+        console.error('Error loading contents:', error);
+        setError('コンテンツの読み込み中にエラーが発生しました');
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
 
-    loadMaterials();
+    loadContents();
   }, []);
 
-  const getCategoryName = (type: MaterialItem['type']): string => {
-    const categoryNames = {
-      room: '研究室・施設',
-      item: 'アイデア体',
-      technology: '特殊技術',
-      character: 'キャラクター',
-      history: '歴史'
-    };
-    return categoryNames[type];
-  };
+  const filteredContents = contents.filter(content => content.type === activeTab);
 
-  const filteredMaterials = materials.filter(
-    material => filter === 'all' || material.type === filter
-  );
-
-  if (loading) {
-    return <View padding="medium">Loading...</View>;
-  }
-
-  if (error) {
-    return <View padding="medium">{error}</View>;
+  if (isLoading) {
+    return (
+      <View padding="2rem">
+        <Flex direction="column" alignItems="center">
+          <Loader size="large" />
+          <Text>コンテンツを読み込んでいます...</Text>
+        </Flex>
+      </View>
+    );
   }
 
   return (
-    <View padding="medium">
-      <Flex direction="column" gap="large">
-        <SelectField
-          label="カテゴリーフィルター"
-          value={filter}
-          onChange={e => setFilter(e.target.value as typeof filter)}
-        >
-          <option value="all">すべて表示</option>
-          <option value="room">研究室・施設</option>
-          <option value="item">アイデア体</option>
-          <option value="technology">特殊技術</option>
-          <option value="character">キャラクター</option>
-          <option value="history">歴史</option>
-        </SelectField>
+    <View padding="2rem">
+      <Card variation="elevated" padding="2rem" marginBottom="2rem">
+      <Heading level={1}>Alsarejia 設定資料</Heading>
+        <Text marginTop="1rem">
+        全ての物語が交差する不思議な研究施設、Alsarejiaの資料を整理しています。
+        </Text>
+      </Card>
 
-        {filteredMaterials.length === 0 ? (
-          <Text>表示する設定資料がありません</Text>
-        ) : (
-          <Collection
-            type="grid"
-            items={filteredMaterials}
-            gap="medium"
-            templateColumns={{
-              base: "1fr",
-              medium: "1fr 1fr",
-              large: "1fr 1fr 1fr"
-            }}
-          >
-            {(material) => (
-              <ContentCard
-                key={material.path}
-                title={material.title}
-                description={`${material.category}の設定資料`}
-                onClick={() => {
-                  // ここで設定資料の詳細表示処理を実装
-                  console.log(`Opening ${material.path}`);
+      {error && (
+        <Alert
+          variation="error"
+          isDismissible={true}
+          hasIcon={true}
+          heading="エラー"
+          marginBottom="2rem"
+        >
+          {error}
+        </Alert>
+      )}
+
+      <Tabs
+        spacing="equal"
+        marginBottom="2rem"
+        value={activeTab}
+        onChange={(e) => {
+          const target = e.target as HTMLButtonElement;
+          if (target.value) {
+            setActiveTab(target.value);
+          }
+        }}
+      >
+        <Tabs.List>
+          <Tabs.Item value="facility">研究施設</Tabs.Item>
+          <Tabs.Item value="idea">アイデア体</Tabs.Item>
+          <Tabs.Item value="technology">特殊技術</Tabs.Item>
+          <Tabs.Item value="character">キャラクター</Tabs.Item>
+          <Tabs.Item value="history">歴史</Tabs.Item>
+        </Tabs.List>
+
+        {['theory', 'language'].map(tabValue => (
+          <Tabs.Panel key={tabValue} value={tabValue}>
+            {filteredContents.length > 0 ? (
+              <Collection
+                type="grid"
+                items={filteredContents}
+                gap="medium"
+                templateColumns={{
+                  base: "1fr",
+                  medium: "1fr 1fr",
+                  large: "1fr 1fr"
                 }}
-              />
+              >
+                {(content) => (
+                  <ContentCard
+                    key={content.id}
+                    title={content.title}
+                    description={content.description}
+                    imagePath={content.imagePath || `/images/materials/${content.id}.jpg`}
+                    linkTo={content.isAvailable ? `/materials/common/${content.id}` : '#'}
+                    onClick={() => {
+                      if (!content.isAvailable) {
+                        alert('このコンテンツは現在準備中です');
+                      }
+                    }}
+                  />
+                )}
+              </Collection>
+            ) : (
+              <Card padding="2rem">
+                <Flex direction="column" alignItems="center" gap="1rem">
+                  <Text>このカテゴリのコンテンツは現在準備中です</Text>
+                  <Button onClick={() => navigate('/materials')}>
+                    戻る
+                  </Button>
+                </Flex>
+              </Card>
             )}
-          </Collection>
-        )}
-      </Flex>
+          </Tabs.Panel>
+        ))}
+
+        <Tabs.Panel value="reference">
+          <Card padding="2rem">
+            <Heading level={2}>参考文献・資料</Heading>
+            <Text>※ 参考資料リストは現在準備中です</Text>
+          </Card>
+        </Tabs.Panel>
+      </Tabs>
     </View>
   );
 };

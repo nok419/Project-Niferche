@@ -21,7 +21,8 @@ import { LaboratoryPage } from './pages/laboratory/LaboratoryPage';
 import { MainStory } from './pages/laboratory/MainStory';
 import { SideStory } from './pages/laboratory/SideStory';
 
-import { CommonMaterials } from './pages/materials/CommonMaterials';
+import { MaterialsAbout } from './pages/materials/MaterialsAbout';
+import { CommonSettings } from './pages/materials/CommonSettings';
 import { QuxeMaterials } from './pages/materials/QuxeMaterials';
 import { HodemeiMaterials } from './pages/materials/HodemeiMaterials';
 import { AlsarejiaMaterials } from './pages/materials/AlsarejiaMaterials';
@@ -73,7 +74,8 @@ function App() {
 
             {/* Materials layout routes */}
             <Route element={<MaterialsLayout />}>
-              <Route path="/materials/common" element={<CommonMaterials />} />
+              <Route path="/materials/about" element={<MaterialsAbout />} />
+              <Route path="/materials/common" element={<CommonSettings />} />
               <Route path="/materials/quxe" element={<QuxeMaterials />} />
               <Route path="/materials/hodemei" element={<HodemeiMaterials />} />
               <Route path="/materials/alsarejia" element={<AlsarejiaMaterials />} />

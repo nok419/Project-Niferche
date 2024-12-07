@@ -16,30 +16,30 @@ import { useEffect, useState } from 'react';
 import { StorageService } from '../../services/storage';
 import { useNavigate } from 'react-router-dom';
 
-type HodemeiContentType = 'technology' | 'organization' | 'character' | 'location' | 'history';
 interface ContentItem {
   id: string;
   title: string;
   description: string;
   imagePath?: string;
   contentPath: string;
+  type: 'theory' | 'language';
   isAvailable: boolean;
-  type: HodemeiContentType
 }
 
+// 基本セクション定義（常に表示されるべき構造）
 const sections: ContentItem[] = [
   {
-    id: 'tech-system',
-    title: '科学技術体系',
-    description: 'Hodemeiにおける科学技術の発展と分類',
-    contentPath: 'materials/hodemei/technology/system',
-    type: 'technology',
+    id: 'ideaspace',
+    title: 'アイデア空間理論',
+    description: '存在の構造と意味論的定義の曖昧性に関する示唆、技術・哲学の融合',
+    contentPath: 'materials/common/ideaspace',
+    type: 'theory',
     isAvailable: false
   },
-  // ...他のセクション
+  // ...他のセクション定義
 ];
 
-export const HodemeiMaterials = () => {
+export const CommonSettings = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('theory');
   const [contents, setContents] = useState<ContentItem[]>(sections);
@@ -51,7 +51,7 @@ export const HodemeiMaterials = () => {
       setIsLoading(true);
       setError(null);
       try {
-        const items = await StorageService.listFiles('materials/hodemei/');
+        const items = await StorageService.listFiles('materials/common/');
         
         // 存在するコンテンツのパスを取得
         const availablePaths = items.map(item => item.path);
@@ -90,9 +90,10 @@ export const HodemeiMaterials = () => {
   return (
     <View padding="2rem">
       <Card variation="elevated" padding="2rem" marginBottom="2rem">
-      <Heading level={1}>Hodemei 設定資料</Heading>
+        <Heading level={1}>共通設定資料</Heading>
         <Text marginTop="1rem">
-        科学技術の発展が人類の未来を切り開く、Hodemeiの設定資料を整理しています。
+          Project Nifercheの基盤となる理論体系と言語システムについて解説します。
+          各概念は厳密に定義され、世界観全体を支える重要な要素となっています。
         </Text>
       </Card>
 
@@ -120,11 +121,9 @@ export const HodemeiMaterials = () => {
         }}
       >
         <Tabs.List>
-          <Tabs.Item value="technology">科学技術</Tabs.Item>
-          <Tabs.Item value="organization">組織</Tabs.Item>
-          <Tabs.Item value="character">キャラクター</Tabs.Item>
-          <Tabs.Item value="location">地理</Tabs.Item>
-          <Tabs.Item value="history">歴史</Tabs.Item>
+          <Tabs.Item value="theory">基礎理論</Tabs.Item>
+          <Tabs.Item value="language">Lefi言語</Tabs.Item>
+          <Tabs.Item value="reference">参考資料</Tabs.Item>
         </Tabs.List>
 
         {['theory', 'language'].map(tabValue => (

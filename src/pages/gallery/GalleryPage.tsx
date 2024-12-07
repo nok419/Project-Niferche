@@ -1,167 +1,114 @@
-import { useEffect, useState } from 'react';
-import {
-  View,
-  Heading,
-  Flex,
-  Collection,
+// src/pages/gallery/GalleryPage.tsx
+import { useState } from 'react';
+import { 
+  View, 
+  Heading, 
+  Tabs, 
+  Collection, 
   SelectField,
-  SearchField,
-  Pagination,
-  Grid
+  Card,
+  Text,
+  Flex
 } from '@aws-amplify/ui-react';
-import { StorageService } from '../../services/storage';
 import { ContentCard } from '../../components/common/ContentCard';
 
 interface GalleryItem {
-  id: string;
   path: string;
   title: string;
-  type: 'image' | 'story' | 'music' | 'other';
+  author: string;
+  description?: string;
+  category: 'illustration' | 'comment' | 'fanart' | 'concept';
   tags: string[];
-  thumbnail?: string;
+  createdAt: string;
 }
 
 export const GalleryPage = () => {
-  const [items, setItems] = useState<GalleryItem[]>([]);
-  const [filter, setFilter] = useState<GalleryItem['type'] | 'all'>('all');
-  const [search, setSearch] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<string>('illustration');
+  const [selectedTag, setSelectedTag] = useState<string>('all');
 
-  const itemsPerPage = 12;
+  const categories = [
+    { value: 'illustration', label: '公式イラスト', description: 'キャラクターやシーンの公式イラスト' },
+    { value: 'concept', label: 'コンセプトアート', description: '世界観やデザインのコンセプトアート' },
+    { value: 'fanart', label: 'ファンアート', description: 'ユーザーによる創作イラスト' },
+    { value: 'comment', label: '注目コメント', description: '重要な考察や印象的なコメント' }
+  ];
 
-  useEffect(() => {
-    const loadGalleryItems = async () => {
-      try {
-        setLoading(true);
-        const galleryItems = await StorageService.listFiles('gallery/');
-        
-        // ファイル名から情報を抽出してGalleryItemを構築
-        const formattedItems: GalleryItem[] = galleryItems.map(item => ({
-          id: item.path.split('/').pop() || '',
-          path: item.path,
-          title: item.path.split('/').pop()?.replace(/\.[^/.]+$/, '') || 'Untitled',
-          type: getTypeFromPath(item.path),
-          tags: [], // タグシステムは後で実装
-          thumbnail: getThumbnailPath(item.path)
-        }));
+  const tags = [
+    'キャラクター', '風景', '設定資料', '考察',
+    'アルサレジア', 'キュクセ', 'ホーデメイ'
+  ];
 
-        setItems(formattedItems);
-        setError(null);
-      } catch (err) {
-        setError('ギャラリーアイテムの読み込みに失敗しました');
-        console.error('Error loading gallery items:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadGalleryItems();
-  }, []);
-
-  // パスからアイテムタイプを判定
-  const getTypeFromPath = (path: string): GalleryItem['type'] => {
-    const ext = path.split('.').pop()?.toLowerCase() || '';
-    if (['jpg', 'jpeg', 'png', 'gif'].includes(ext)) return 'image';
-    if (['md', 'txt'].includes(ext)) return 'story';
-    if (['mp3', 'wav'].includes(ext)) return 'music';
-    return 'other';
+  const handleTabChange = (event: React.FormEvent<HTMLDivElement>) => {
+    // event.target の value を取得してセット
+    const target = event.target as HTMLButtonElement;
+    setActiveTab(target.value);
   };
-
-  // サムネイルパスを生成
-  const getThumbnailPath = (path: string): string => {
-    const type = getTypeFromPath(path);
-    if (type === 'image') return path;
-    // 他のタイプのデフォルトサムネイル
-    return `/images/thumbnails/${type}-default.jpg`;
-  };
-
-  // フィルタリングと検索を適用
-  const filteredItems = items.filter(item => {
-    const matchesFilter = filter === 'all' || item.type === filter;
-    const matchesSearch = search === '' || 
-      item.title.toLowerCase().includes(search.toLowerCase());
-    return matchesFilter && matchesSearch;
-  });
-
-  // ページネーション
-  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
-  const currentItems = filteredItems.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
-  if (loading) {
-    return <View padding="medium">Loading...</View>;
-  }
-
-  if (error) {
-    return <View padding="medium">{error}</View>;
-  }
 
   return (
-    <View padding="medium">
-      <Heading level={1} marginBottom="large">ギャラリー</Heading>
+    <View padding="2rem">
+      <Heading level={1}>ギャラリー</Heading>
+      
+      <Tabs
+        spacing="equal"
+        marginTop="2rem"
+        marginBottom="2rem"
+        value={activeTab}
+        onChange={handleTabChange}
+      >
+        <Tabs.List>
+        {categories.map(category => (
+            <Tabs.Item 
+              key={category.value} 
+              value={category.value}
+              onClick={() => setActiveTab(category.value)} // こちらでも状態を更新
+            >
+              {category.label}
+            </Tabs.Item>
+          ))}
+        </Tabs.List>
 
-      <Flex direction="column" gap="large">
-        {/* フィルターとサーチ */}
-        <Grid
-          templateColumns={{ base: "1fr", medium: "1fr 1fr" }}
-          gap="medium"
-        >
-          <SelectField
-            label="フィルター"
-            value={filter}
-            onChange={e => setFilter(e.target.value as GalleryItem['type'] | 'all')}
-          >
-            <option value="all">すべて</option>
-            <option value="image">画像</option>
-            <option value="story">ストーリー</option>
-            <option value="music">音楽</option>
-            <option value="other">その他</option>
-          </SelectField>
+        {categories.map(category => (
+          <Tabs.Panel key={category.value} value={category.value}>
+            <Card padding="1rem" marginBottom="2rem">
+              <Text>{category.description}</Text>
+            </Card>
+            
+            <Flex direction="column" gap="medium">
+              <SelectField
+                label="タグでフィルター"
+                value={selectedTag}
+                onChange={e => setSelectedTag(e.target.value)}
+              >
+                <option value="all">すべてのタグ</option>
+                {tags.map(tag => (
+                  <option key={tag} value={tag}>{tag}</option>
+                ))}
+              </SelectField>
 
-          <SearchField
-            label="検索"
-            placeholder="タイトルで検索..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-          />
-        </Grid>
-
-        {/* ギャラリーグリッド */}
-        <Collection
-          type="grid"
-          items={currentItems}
-          gap="medium"
-          templateColumns={{
-            base: "1fr",
-            small: "1fr 1fr",
-            medium: "1fr 1fr 1fr",
-            large: "repeat(4, 1fr)"
-          }}
-        >
-          {(item) => (
-            <ContentCard
-              key={item.id}
-              title={item.title}
-              imagePath={item.thumbnail}
-              linkTo={item.path}
-            />
-          )}
-        </Collection>
-
-        {/* ページネーション */}
-        {totalPages > 1 && (
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onNext={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
-            onPrevious={() => setCurrentPage(p => Math.max(p - 1, 1))}
-          />
-        )}
-      </Flex>
+              <Collection
+                type="grid"
+                items={[]} // StorageServiceから取得したアイテム
+                gap="medium"
+                templateColumns={{
+                  base: "1fr",
+                  medium: "1fr 1fr",
+                  large: "1fr 1fr 1fr"
+                }}
+              >
+                {(item: GalleryItem) => (
+                  <ContentCard
+                    key={item.path}
+                    title={item.title}
+                    description={`by ${item.author}\n${item.description || ''}`}
+                    imagePath={item.path}
+                    linkTo={`/gallery/view/${item.path}`}
+                  />
+                )}
+              </Collection>
+            </Flex>
+          </Tabs.Panel>
+        ))}
+      </Tabs>
     </View>
   );
 };

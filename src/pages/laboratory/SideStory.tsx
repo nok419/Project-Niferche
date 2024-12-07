@@ -14,11 +14,12 @@ import { StorageService } from '../../services/storage';
 import { ContentCard } from '../../components/common/ContentCard';
 
 interface StoryMetadata {
-  id: string;
+  path: string;  // keyをpathに変更
   title: string;
   type: 'official' | 'shared';
   chapterCount: number;
 }
+
 
 export const SideStory = () => {
   const [stories, setStories] = useState<StoryMetadata[]>([]);
@@ -31,20 +32,19 @@ export const SideStory = () => {
     const loadStories = async () => {
       try {
         setLoading(true);
-        // 公式とsharedの両方のストーリーを取得
         const officialItems = await StorageService.listFiles('laboratory/sidestory/official');
         const sharedItems = await StorageService.listFiles('laboratory/sidestory/shared');
 
         const formattedStories = [
           ...officialItems.map(item => ({
-            id: item.key,
-            title: item.key.split('/').pop()?.replace(/\.txt$/, '') || 'Untitled',
+            path: item.path,  // keyをpathに変更
+            title: item.path.split('/').pop()?.replace(/\.txt$/, '') || 'Untitled',
             type: 'official' as const,
-            chapterCount: 1, // 実際のチャプター数を取得する処理が必要
+            chapterCount: 1,
           })),
           ...sharedItems.map(item => ({
-            id: item.key,
-            title: item.key.split('/').pop()?.replace(/\.txt$/, '') || 'Untitled',
+            path: item.path,  // keyをpathに変更
+            title: item.path.split('/').pop()?.replace(/\.txt$/, '') || 'Untitled',
             type: 'shared' as const,
             chapterCount: 1,
           }))
@@ -88,7 +88,7 @@ export const SideStory = () => {
               ストーリー一覧に戻る
             </Button>
             <StoryViewer
-              storyPath={`laboratory/sidestory/${selectedStory.type}/${selectedStory.id}`}
+              storyPath={`laboratory/sidestory/${selectedStory.type}/${selectedStory.path}`}
               currentChapter={currentChapter}
               totalChapters={selectedStory.chapterCount}
               onChapterChange={setCurrentChapter}
@@ -107,9 +107,10 @@ export const SideStory = () => {
           >
             {(story) => (
               <ContentCard
-                key={story.id}
+                key={story.path}
                 title={story.title}
                 description={`${story.type === 'official' ? '公式' : '共有'}ストーリー`}
+                linkTo={`#${story.path}`} // 仮のリンク先を設定
                 onClick={() => {
                   setSelectedStory(story);
                   setCurrentChapter(1);

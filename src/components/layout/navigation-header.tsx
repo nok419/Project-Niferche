@@ -33,6 +33,7 @@ const navigation: NavItem[] = [{
     label: '設定資料集',
     path: '/materials',
     children: [
+      { label: '資料室', path: '/materials/about' },
       { label: '共通設定', path: '/materials/common' },
       { label: 'Quxe', path: '/materials/quxe' },
       { label: 'Hodemei', path: '/materials/hodemei' },
