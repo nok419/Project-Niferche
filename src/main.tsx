@@ -5,23 +5,23 @@ import { HelmetProvider } from 'react-helmet-async';
 import '@aws-amplify/ui-react/styles.css';
 import App from './App';
 
-// aws-exportsの存在を確認してからインポート
-let awsconfig;
-try {
-  awsconfig = require('../aws-exports').default;
-  console.log('AWS Config loaded:', awsconfig);
-} catch (error) {
-  console.error('Error loading aws-exports:', error);
-  awsconfig = {};
-}
+const config = await import('../amplify_outputs.json');
+Amplify.configure(config.default);
 
-// Amplify設定
-try {
-  Amplify.configure(awsconfig);
-  console.log('Amplify configured successfully');
-} catch (error) {
-  console.error('Error configuring Amplify:', error);
-}
+const loadConfig = async () => {
+  try {
+    const awsconfig = await import('../amplify_outputs.json');
+    
+    // まずそのままの設定で試してみる
+    Amplify.configure(awsconfig.default);
+    
+    console.log('Loaded config:', awsconfig.default);
+  } catch (error) {
+    console.error('Error loading amplify config:', error);
+  }
+};
+
+loadConfig();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

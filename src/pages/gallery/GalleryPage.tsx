@@ -35,7 +35,7 @@ export const GalleryPage = () => {
 
   const tags = [
     'キャラクター', '風景', '設定資料', '考察',
-    'アルサレジア', 'キュクセ', 'ホーデメイ'
+    'Alsarejia', 'Quxe', 'hodemei'
   ];
 
   const handleTabChange = (event: React.FormEvent<HTMLDivElement>) => {
