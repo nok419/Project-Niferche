@@ -1,3 +1,4 @@
+// src/theme/laboratoryTheme.tsx
 import { Theme } from '@aws-amplify/ui-react';
 
 export const laboratoryTheme: Theme = {
@@ -5,35 +6,48 @@ export const laboratoryTheme: Theme = {
   tokens: {
     colors: {
       background: {
-        primary: '#1E293B',   // より落ち着いたダークブルー
-        secondary: '#2D3748', // 少し明るめの背景色
-        tertiary: '#4A5568',  // アクセントとして使用
+        primary: '#1a1f2e',
+        secondary: '#242938',
+        tertiary: '#2d334a',
       },
       font: {
-        primary: '#e94560',
-        secondary: '#ffffff',
-        tertiary: '#cccccc',
-        interactive: '#e94560',
+        primary: '#e2678a',
+        secondary: '#eaeaea',
+        tertiary: '#b8b8b8',
+        interactive: '#ff8fa3',
       },
       border: {
-        primary: '#e94560',
-        secondary: '#16213e',
+        primary: '#e2678a',
+        secondary: '#2d334a',
       },
+      accent: {
+        purple: '#9f7aea',
+        blue: '#4299e1',
+        pink: '#ed64a6'
+      }
     },
     components: {
       button: {
         primary: {
-          backgroundColor: '#e94560',
-          color: '#ffffff',
-          _hover: {
-            backgroundColor: '#cf3d54',
-          },
+          backgroundColor: { value: '#e2678a' },
+          color: { value: '#ffffff' },
+          // hover状態はスタイルで制御
         },
       },
       card: {
-        backgroundColor: '#16213e',
-        borderColor: '#e94560',
+        backgroundColor: { value: '#242938' },
+        borderColor: { value: '#2d334a' },
+        // hover状態はスタイルで制御
       },
+      heading: {
+        color: { value: '#e2678a' },
+        // その他のスタイルはCSSで制御
+      },
+    },
+    shadows: {
+      small: { value: '0 2px 4px rgba(0, 0, 0, 0.1)' },
+      medium: { value: '0 4px 6px rgba(0, 0, 0, 0.1)' },
+      large: { value: '0 8px 12px rgba(0, 0, 0, 0.1)' },
     },
   },
 };
