@@ -5,10 +5,10 @@ interface ContentCardProps {
   title: string;
   description?: string;
   imagePath?: string;
-  linkTo: string;
+  linkTo?: string;  // linkToをオプショナルに変更
   onClick?: () => void;
-  size?: 'small' | 'medium' | 'large'; // サイズ設定を追加
-  variant?: 'story' | 'material' | 'info'; // 用途別のスタイル
+  size?: 'small' | 'medium' | 'large';
+  variant?: 'story' | 'material' | 'info';
 }
 
 export const ContentCard: React.FC<ContentCardProps> = ({
@@ -24,7 +24,9 @@ export const ContentCard: React.FC<ContentCardProps> = ({
     if (onClick) {
       onClick();
     }
-    navigate(linkTo);
+    if (linkTo) {  // linkToが存在する場合のみナビゲート
+      navigate(linkTo);
+    }
   };
 
   return (
