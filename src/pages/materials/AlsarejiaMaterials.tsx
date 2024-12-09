@@ -1,196 +1,119 @@
 // src/pages/materials/AlsarejiaMaterials.tsx
-import { 
-  View, 
-  Heading, 
-  Tabs, 
-  Collection,
-  Card,
-  Text,
-  Flex,
-  Alert,
-  Button,
-  Loader,
-  ToggleButton,
-  ToggleButtonGroup
-} from '@aws-amplify/ui-react';
-import { ContentCard } from '../../components/common/ContentCard';
-import { useEffect, useState, useCallback } from 'react';
-import { StorageService } from '../../services/storage';
-import { useNavigate } from 'react-router-dom';
+import { MaterialsLayout } from '../../components/materials/MaterialsLayout';
+import { Collection, View, ToggleButtonGroup, ToggleButton, Tabs } from '@aws-amplify/ui-react';
+import { DocumentCard } from '../../components/materials/DocumentCard';
+import { DocumentFilter } from '../../components/materials/DocumentFilter';
+import { useState } from 'react';
+import { MaterialDocument } from '../../types/materials';
 
-type AlsarejiaContentType = 'facility' | 'idea' | 'technology' | 'character' | 'history';
+// カテゴリの定義
+export type AlsarejiaContentCategory = 
+  'FACILITY' | 'IDEA' | 'TECH' | 'CHARACTER' | 'HISTORY';
 
-interface ContentItem {
-  id: string;
-  title: string;
-  description: string;
-  imagePath?: string;
-  contentPath: string;
-  isAvailable: boolean;
-  type: AlsarejiaContentType;
-}
-
-const sections: ContentItem[] = [
+// ベースとなるコンテンツ定義
+const alsarejiaContents: MaterialDocument[] = [
   {
     id: 'facility-overview',
     title: '研究施設概要',
-    description: 'アルサレジア研究施設の基本構造と機能',
-    contentPath: 'facility/overview',
-    type: 'facility',
-    isAvailable: false
-  }
-  // 他のセクションもここに追加
+    description: '「Laboratory Alsarejia」の全体構造と主要施設',
+    category: 'FACILITY',
+    reference: 'ALS-001',
+    linkTo: '/materials/alsarejia/facility-overview',
+    isAvailable: true,
+    variant: 'document',
+    imagePath: '/images/materials/facility-overview.jpg',
+  },
+  {
+    id: 'idea-basics',
+    title: 'アイデア体の基礎',
+    description: 'アイデア体の定義と基本的な性質',
+    category: 'IDEA',
+    reference: 'ALS-002',
+    linkTo: '/materials/alsarejia/idea-basics',
+    isAvailable: true,
+    variant: 'manuscript',
+    imagePath: '/images/materials/idea-basics.jpg',
+  },
+  // ... 他のコンテンツ定義
 ];
 
 export const AlsarejiaMaterials = () => {
-  const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<AlsarejiaContentType>('facility');
-  const [contentType, setContentType] = useState<'official' | 'shared'>('official');
-  const [contents, setContents] = useState<ContentItem[]>(sections);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<AlsarejiaContentCategory>('FACILITY');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [attribution, setAttribution] = useState<'official' | 'shared'>('official');
 
-  const loadContents = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      const basePath = `materials/alsarejia/${contentType}/`;
-      console.log('Loading contents from path:', basePath);
+  const filteredContent = alsarejiaContents.filter((item: MaterialDocument) => {
+    const matchesSearch = searchTerm === '' || 
+      item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.description.toLowerCase().includes(searchTerm.toLowerCase());
       
-      const items = await StorageService.listFiles(basePath);
-      console.log('Loaded items:', items);
+    const matchesCategory = item.category === selectedCategory;
 
-      const availablePaths = items.map(item => item.path);
-      
-      const updatedContents = sections.map(section => ({
-        ...section,
-        contentPath: `${basePath}${section.contentPath}`,
-        isAvailable: availablePaths.some(path => 
-          path.includes(section.contentPath.replace(`${basePath}`, ''))
-        )
-      }));
-
-      setContents(updatedContents);
-    } catch (error) {
-      console.error('Detailed error:', error);
-      setError(error instanceof Error ? error.message : 'コンテンツの読み込み中にエラーが発生しました');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [contentType]);
-
-  useEffect(() => {
-    loadContents();
-  }, [loadContents]);
-
-  const filteredContents = contents.filter(content => content.type === activeTab);
-
-  if (isLoading) {
-    return (
-      <View padding="2rem">
-        <Flex direction="column" alignItems="center">
-          <Loader size="large" />
-          <Text>コンテンツを読み込んでいます...</Text>
-        </Flex>
-      </View>
-    );
-  }
+    return matchesSearch && matchesCategory;
+  });
 
   return (
-    <View padding="2rem">
-      <Card variation="elevated" padding="2rem" marginBottom="2rem">
-        <Heading level={1}>Alsarejia 設定資料</Heading>
-        <Text marginTop="1rem">
-          全ての物語が交差する不思議な研究施設、Alsarejiaの資料を整理しています。
-        </Text>
-      </Card>
-
-      <Flex direction="column" gap="medium">
+    <MaterialsLayout
+      title="Alsarejia 設定資料"
+      description="全ての物語が交差する不思議な研究施設、Alsarejiaの資料を整理しています。"
+    >
+      <View padding="1rem">
         <ToggleButtonGroup
-          value={contentType}
+          value={attribution}
           isExclusive
-          onChange={(value) => setContentType(value as 'official' | 'shared')}
+          onChange={(value) => setAttribution(value as 'official' | 'shared')}
+          marginBottom="1rem"
         >
           <ToggleButton value="official">公式設定</ToggleButton>
           <ToggleButton value="shared">共有設定</ToggleButton>
         </ToggleButtonGroup>
 
-        {error && (
-          <Alert
-            variation="error"
-            isDismissible={true}
-            hasIcon={true}
-            heading="エラー"
-          >
-            {error}
-          </Alert>
-        )}
+        <DocumentFilter
+          onSearch={setSearchTerm}
+          onCategoryChange={(category) => setSelectedCategory(category as AlsarejiaContentCategory)}
+          onViewChange={setViewMode}
+          onSortChange={() => {}}
+        />
 
         <Tabs
           spacing="equal"
-          value={activeTab}
+          value={selectedCategory}
           onChange={(e) => {
             const target = e.target as HTMLButtonElement;
             if (target.value) {
-              setActiveTab(target.value as AlsarejiaContentType);
+              setSelectedCategory(target.value as AlsarejiaContentCategory);
             }
           }}
         >
           <Tabs.List>
-            <Tabs.Item value="facility">研究施設</Tabs.Item>
-            <Tabs.Item value="idea">アイデア体</Tabs.Item>
-            <Tabs.Item value="technology">特殊技術</Tabs.Item>
-            <Tabs.Item value="character">キャラクター</Tabs.Item>
-            <Tabs.Item value="history">歴史</Tabs.Item>
+            <Tabs.Item value="FACILITY">研究施設</Tabs.Item>
+            <Tabs.Item value="IDEA">アイデア体</Tabs.Item>
+            <Tabs.Item value="TECH">特殊技術</Tabs.Item>
+            <Tabs.Item value="CHARACTER">キャラクター</Tabs.Item>
+            <Tabs.Item value="HISTORY">歴史</Tabs.Item>
           </Tabs.List>
-
-          <Tabs.Panel value={activeTab}>
-            {filteredContents.length > 0 ? (
-              <Collection
-                type="grid"
-                items={filteredContents}
-                gap="medium"
-                templateColumns={{
-                  base: "1fr",
-                  medium: "1fr 1fr",
-                  large: "1fr 1fr 1fr"
-                }}
-              >
-                {(content) => (
-                  <ContentCard
-                    key={content.id}
-                    title={content.title}
-                    description={content.description}
-                    imagePath={content.imagePath || `/images/materials/${content.id}.jpg`}
-                    linkTo={content.isAvailable ? 
-                      `/materials/${contentType}/alsarejia/${content.id}` : 
-                      '#'
-                    }
-                    onClick={() => {
-                      if (!content.isAvailable) {
-                        alert('このコンテンツは現在準備中です');
-                      }
-                    }}
-                  />
-                )}
-              </Collection>
-            ) : (
-              <Card padding="2rem">
-                <Flex direction="column" alignItems="center" gap="1rem">
-                  <Text>このカテゴリのコンテンツは現在準備中です</Text>
-                  <Button 
-                    variation="primary"
-                    onClick={() => navigate('/materials')}
-                  >
-                    戻る
-                  </Button>
-                </Flex>
-              </Card>
-            )}
-          </Tabs.Panel>
         </Tabs>
-      </Flex>
-    </View>
+        
+        <Collection
+          type={viewMode}
+          items={filteredContent}
+          gap="medium"
+          templateColumns={viewMode === 'grid' ? {
+            base: "1fr",
+            medium: "1fr 1fr",
+            large: "1fr 1fr 1fr"
+          } : undefined}
+        >
+          {(item: MaterialDocument) => (
+            <DocumentCard 
+              {...item} 
+              key={item.id}
+              linkTo={`/materials/${attribution}/alsarejia/${item.id}`}
+            />
+          )}
+        </Collection>
+      </View>
+    </MaterialsLayout>
   );
 };

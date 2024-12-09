@@ -20,6 +20,8 @@ import { PhilosophyPage } from './pages/niferche/PhilosophyPage';
 import { LaboratoryPage } from './pages/laboratory/LaboratoryPage';
 import { MainStory } from './pages/laboratory/MainStory';
 import { SideStory } from './pages/laboratory/SideStory';
+import { IdeaLibrary } from './pages/laboratory/IdeaLibrary';
+import { FacilityGuide } from './pages/laboratory/FacilityGuide';
 
 import { MaterialsAbout } from './pages/materials/MaterialsAbout';
 import { CommonSettings } from './pages/materials/CommonSettings';
@@ -70,6 +72,8 @@ function App() {
               <Route path="/laboratory/about" element={<LaboratoryPage />} />
               <Route path="/laboratory/mainstory" element={<MainStory />} />
               <Route path="/laboratory/sidestory" element={<SideStory />} />
+              <Route path="/laboratory/IdeaLibrary" element={<IdeaLibrary />} />
+              <Route path="/laboratory/FacilityGuide" element={<FacilityGuide />} />
             </Route>
 
             {/* Materials layout routes */}

@@ -1,7 +1,6 @@
-import { View, Flex ,Button} from '@aws-amplify/ui-react';
-import { Outlet } from 'react-router-dom';
+import { View, Flex, Button } from '@aws-amplify/ui-react';
+import { Outlet, Link } from 'react-router-dom';
 import { NavigationHeader } from './navigation-header';
-import { Link } from 'react-router-dom';
 
 export const LaboratoryLayout = () => {
   return (
@@ -29,49 +28,48 @@ export const LaboratoryLayout = () => {
         <Outlet />
       </View>
 
-      {/* フッターを下部に固定 */}
       <View
-          as="footer"
-          backgroundColor="background.secondary"
-          padding="small"
-          width="100%"
+        as="footer"
+        backgroundColor="background.secondary"
+        padding="small"
+        width="100%"
+      >
+        <Flex
+          direction="row"
+          alignItems="center"
+          justifyContent="center"
+          gap="small"
+          height="40px"
         >
-          <Flex
-            direction="row"
-            alignItems="center"
-            justifyContent="center"
-            gap="small"
-            height="40px"
+          <View fontSize="small">
+            &copy; 2024 Project Niferche. All rights reserved.
+          </View>
+          <View
+            backgroundColor="border.primary"
+            width="1px"
+            height="20px"
+            margin="0 8px"
+          />
+          <Button
+            as={Link}
+            to="/niferche/rights"
+            variation="link"
+            size="small"
+            padding="0"
           >
-            <View fontSize="small">
-              &copy; 2024 Project Niferche. All rights reserved.
-            </View>
-            <View
-              backgroundColor="border.primary"
-              width="1px"
-              height="20px"
-              margin="0 8px"
-            />
-            <Button
-              as={Link}
-              to="/niferche/rights"
-              variation="link"
-              size="small"
-              padding="0"
-            >
-              権利情報
-            </Button>
-            <Button
-              as={Link}
-              to="/terms"
-              variation="link"
-              size="small"
-              padding="0"
-            >
-              利用規約
-            </Button>
-          </Flex>
-        </View>
+            権利情報
+          </Button>
+          <Button
+            as={Link}
+            to="/terms"
+            variation="link"
+            size="small"
+            padding="0"
+          >
+            利用規約
+          </Button>
+        </Flex>
+      </View>
     </Flex>
   );
 };

@@ -27,7 +27,9 @@ const navigation: NavItem[] = [{
     children: [
       { label: 'About', path: '/laboratory/about' },
       { label: 'Main Story', path: '/laboratory/mainstory' },
-      { label: 'Side Story', path: '/laboratory/sidestory' }
+      { label: 'Side Story', path: '/laboratory/sidestory' },
+      { label: 'IdeaLibrary', path: '/laboratory/IdeaLibrary' },
+      { label: 'FacilityGuide', path: '/laboratory/FacilityGuide' }
     ]
   },{
     label: '設定資料集',
