@@ -6,6 +6,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import '@aws-amplify/ui-react/styles.css';
 import App from './App';
 import type { ResourcesConfig } from 'aws-amplify';
+import outputs from "../amplify_outputs.json";
 
 // Amplifyの設定を型安全に定義
 const getAmplifyConfig = (): ResourcesConfig => ({
@@ -26,21 +27,13 @@ const getAmplifyConfig = (): ResourcesConfig => ({
 
 // 開発環境とビルド環境の両方で動作するように条件分岐
 const configureAmplify = async () => {
-  try {
-    if (import.meta.env.DEV) {
-      // 開発環境では amplify_outputs.json を読み込む
-      const outputs = await import('../amplify_outputs.json');
-      Amplify.configure(outputs.default);
-    } else {
-      // 本番環境では環境変数から設定を読み込む
-      Amplify.configure(getAmplifyConfig());
-    }
+  
     console.log('Amplify configuration loaded successfully');
   } catch (error) {
     console.warn('Using fallback configuration:', error);
     // エラー時は環境変数の設定を使用
     Amplify.configure(getAmplifyConfig());
-  }
+  
 };
 
 configureAmplify();
