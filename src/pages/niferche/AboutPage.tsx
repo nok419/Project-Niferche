@@ -5,10 +5,8 @@ import {
   View,
   Divider,
   Flex,
-  Button,
   useTheme
 } from '@aws-amplify/ui-react';
-import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { ContentCard } from '../../components/common/ContentCard';
 

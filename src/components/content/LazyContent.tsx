@@ -2,7 +2,7 @@
 import { Suspense } from 'react';
 import { View, Loader } from '@aws-amplify/ui-react';
 
-const LazyContent = ({ children }: { children: React.ReactNode }) => {
+export const LazyContent = ({ children }: { children: React.ReactNode }) => {
   return (
     <Suspense 
       fallback={

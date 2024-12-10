@@ -1,14 +1,6 @@
 // File: amplify/data/resource.ts
 import { type ClientSchema, a, defineData } from '@aws-amplify/backend';
 
-// Enumの定義
-const ContentType = {
-  TEXT: 'TEXT',
-  IMAGE: 'IMAGE',
-  AUDIO: 'AUDIO',
-  VIDEO: 'VIDEO'
-} as const;
-
 const ContentCategory = {
   MAIN_STORY: 'MAIN_STORY',
   SIDE_STORY: 'SIDE_STORY',

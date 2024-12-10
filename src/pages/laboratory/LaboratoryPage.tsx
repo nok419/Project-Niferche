@@ -9,7 +9,7 @@ import {
 } from '@aws-amplify/ui-react';
 import { ContentCard } from '../../components/common/ContentCard';
 import { ContentSection } from '../../components/common/ContentSection';
-import { LaboratoryLayout } from '../../components/layout/LaboratoryLayout';
+
 
 const mainSections = [
   {
