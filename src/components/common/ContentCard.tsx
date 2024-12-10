@@ -9,6 +9,7 @@ interface ContentCardProps {
   onClick?: () => void;
   size?: 'small' | 'medium' | 'large';
   variant?: 'story' | 'material' | 'info';
+  footer?: React.ReactNode;
 }
 
 export const ContentCard: React.FC<ContentCardProps> = ({
@@ -39,6 +40,7 @@ export const ContentCard: React.FC<ContentCardProps> = ({
         transition: 'transform 0.2s ease, box-shadow 0.2s ease',
       }}
       className="clickable-card"
+      
     >
       <Flex direction="column" gap="medium">
         {imagePath && (
@@ -58,6 +60,7 @@ export const ContentCard: React.FC<ContentCardProps> = ({
           <Text>{description}</Text>
         )}
       </Flex>
+      
     </Card>
   );
 };
