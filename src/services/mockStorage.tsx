@@ -1,10 +1,37 @@
 // src/services/mockStorage.ts
 import type { LabDocument } from '../types/laboratory';
+
 export interface ContentData {
   body: string;
   metadata?: Record<string, any>;
 }
 
+interface ImageContent {
+  path: string;
+  fallback: string;
+}
+
+// イメージのモックデータ
+const MOCK_IMAGES: Record<string, ImageContent> = {
+  'main-story': {
+    path: '/images/main-story.jpg',
+    fallback: '/images/fallback.jpg'
+  },
+  'worlds': {
+    path: '/images/worlds.jpg',
+    fallback: '/images/fallback.jpg'
+  },
+  'laboratory': {
+    path: '/images/laboratory.jpg',
+    fallback: '/images/fallback.jpg'
+  },
+  'facility-map': {
+    path: '/images/laboratory/facility-map.jpg',
+    fallback: '/images/fallback.jpg'
+  }
+};
+
+// アイデアドキュメントのモックデータ
 const MOCK_IDEA_DOCS: Record<string, LabDocument[]> = {
   'basic': [
     {
@@ -59,6 +86,7 @@ const MOCK_IDEA_DOCS: Record<string, LabDocument[]> = {
   ]
 };
 
+// 施設ドキュメントのモックデータ
 const MOCK_FACILITY_DOCS: Record<string, LabDocument[]> = {
   'overview': [
     {
@@ -105,23 +133,26 @@ const MOCK_FACILITY_DOCS: Record<string, LabDocument[]> = {
   ]
 };
 
+// テキストコンテンツのモックデータ
 const MOCK_CONTENT: Record<string, ContentData> = {
   'stories/main/chapter1.txt': {
-    body: '第1章のサンプルテキスト...',
+    body: '第1章のサンプルテキスト...\nここに本文が入ります。\n\n詳細な内容はこれから追加されます。',
     metadata: {
       title: '第1章',
-      author: 'サレジア'
+      author: 'サレジア',
+      version: '1.0.0'
     }
   },
   'stories/main/chapter2.txt': {
-    body: '第2章のサンプルテキスト...',
+    body: '第2章のサンプルテキスト...\nここに本文が入ります。\n\n詳細な内容はこれから追加されます。',
     metadata: {
       title: '第2章',
-      author: 'サレジア'
+      author: 'サレジア',
+      version: '1.0.0'
     }
   },
   'laboratory/ideas/basic-concept.md': {
-    body: 'アイデア体の基本概念に関する説明...',
+    body: 'アイデア体の基本概念に関する説明...\n\n1. アイデア体とは\n2. 基本的な性質\n3. 観測方法\n\n詳細な内容はこれから追加されます。',
     metadata: {
       title: 'アイデア体の基本概念',
       category: 'IDEA',
@@ -129,7 +160,7 @@ const MOCK_CONTENT: Record<string, ContentData> = {
     }
   },
   'laboratory/facility/rules.md': {
-    body: '研究所の利用規約と注意事項...',
+    body: '研究所の利用規約と注意事項...\n\n1. 一般的な注意事項\n2. セキュリティ規則\n3. 緊急時の対応\n\n詳細な内容はこれから追加されます。',
     metadata: {
       title: '研究所利用規約',
       category: 'RULES',
@@ -138,6 +169,7 @@ const MOCK_CONTENT: Record<string, ContentData> = {
   }
 };
 
+// MockStorageServiceクラス
 export class MockStorageService {
   static async getText(path: string): Promise<string> {
     const content = MOCK_CONTENT[path];
@@ -146,6 +178,20 @@ export class MockStorageService {
     }
     return content.body;
   }
+
+  static async getImage(path: string): Promise<string> {
+    const image = MOCK_IMAGES[path];
+    if (!image) {
+      return '/images/fallback.jpg';
+    }
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => resolve(image.path);
+      img.onerror = () => resolve(image.fallback);
+      img.src = image.path;
+    });
+  }
+
   static async getFacilityDocuments(section: string): Promise<LabDocument[]> {
     const docs = MOCK_FACILITY_DOCS[section];
     if (!docs) {
@@ -153,6 +199,15 @@ export class MockStorageService {
     }
     return docs;
   }
+
+  static async getIdeaDocuments(category: string): Promise<LabDocument[]> {
+    const docs = MOCK_IDEA_DOCS[category];
+    if (!docs) {
+      return [];
+    }
+    return docs;
+  }
+
   static async getMetadata(path: string): Promise<Record<string, any>> {
     const content = MOCK_CONTENT[path];
     if (!content || !content.metadata) {
@@ -174,11 +229,16 @@ export class MockStorageService {
   static async isContentAvailable(path: string): Promise<boolean> {
     return path in MOCK_CONTENT;
   }
-  static async getIdeaDocuments(category: string): Promise<LabDocument[]> {
-    const docs = MOCK_IDEA_DOCS[category];
-    if (!docs) {
-      return [];
-    }
-    return docs;
+
+  static async isImageAvailable(path: string): Promise<boolean> {
+    return path in MOCK_IMAGES;
+  }
+
+  static getFallbackImage(): string {
+    return '/images/fallback.jpg';
+  }
+
+  static simulateNetworkError(): Promise<never> {
+    return Promise.reject(new Error('Network error'));
   }
 }
