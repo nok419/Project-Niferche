@@ -1,4 +1,7 @@
+// components/common/ErrorBoundary.tsx
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { View, Heading, Text } from '@aws-amplify/ui-react';
 
 interface Props {
   children: React.ReactNode;
@@ -24,17 +27,31 @@ export class ErrorBoundary extends React.Component<Props, State> {
 
   public render() {
     if (this.state.hasError) {
-      return (
-        <div style={{ padding: '20px', textAlign: 'center' }}>
-          <h1>申し訳ありません。エラーが発生しました。</h1>
-          <p>{this.state.error?.message}</p>
-          <button onClick={() => window.location.href = '/'}>
-            ホームに戻る
-          </button>
-        </div>
-      );
+      return <ErrorFallback error={this.state.error} />;
     }
 
     return this.props.children;
   }
 }
+
+// エラー表示用のコンポーネント
+const ErrorFallback = ({ error }: { error?: Error }) => {
+  const navigate = useNavigate();
+
+  React.useEffect(() => {
+    // エラーページへリダイレクト
+    navigate('/error', { 
+      state: { 
+        errorMessage: error?.message || 'An unexpected error occurred.'
+      }
+    });
+  }, [error, navigate]);
+
+  // リダイレクト中の表示
+  return (
+    <View padding="medium" textAlign="center">
+      <Heading level={2}>エラーが発生しました</Heading>
+      <Text>ページを移動しています...</Text>
+    </View>
+  );
+};
