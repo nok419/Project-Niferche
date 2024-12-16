@@ -44,6 +44,16 @@ const ContentStatus = {
   ARCHIVED: 'ARCHIVED'
 } as const;
 
+
+// バッジ関連
+const BadgeRequirementType = {
+  LOGIN: 'LOGIN',
+  READ_CONTENT: 'READ_CONTENT',
+  VISIT_PAGE: 'VISIT_PAGE',
+  CLICK_ACTION: 'CLICK_ACTION'
+} as const;
+
+
 const schema = a.schema({
   Content: a.model({
     id: a.id(),
@@ -114,6 +124,55 @@ const schema = a.schema({
     allow.publicApiKey().to(['read']),
     allow.owner().to(['create', 'update']),
     allow.group('admin').to(['delete'])
+  ]),
+
+  // ユーザープロファイルモデル
+  UserProfile: a.model({
+    id: a.id(),
+    userId: a.string().required(),
+    nickname: a.string(),
+    email: a.string(),
+    badges: a.string().array().required(),
+    favorites: a.customType({
+      contentId: a.string().required(),
+      addedAt: a.datetime().required(),
+      contentType: a.string().required()
+    }),
+    lastLoginAt: a.datetime(),
+    createdAt: a.datetime().required(),
+    updatedAt: a.datetime().required()
+  }).authorization(allow => [
+    allow.owner(),
+    allow.authenticated().to(['read'])
+  ]),
+
+  // バッジモデル
+  Badge: a.model({
+    id: a.id(),
+    name: a.string().required(),
+    description: a.string().required(),
+    requirementType: a.enum(Object.values(BadgeRequirementType)),
+    requirement: a.string().required(),
+    createdAt: a.datetime().required(),
+    priority: a.integer().required(),
+    isSecret: a.boolean().required()
+  }).authorization(allow => [
+    allow.authenticated().to(['read']),
+    allow.owner().to(['create', 'update', 'delete'])
+  ]),
+
+  // バッジ進捗モデル
+  BadgeProgress: a.model({
+    id: a.id(),
+    userId: a.string().required(),
+    badgeId: a.string().required(),
+    progress: a.integer().required(),
+    isCompleted: a.boolean().required(),
+    completedAt: a.datetime(),
+    lastUpdatedAt: a.datetime().required()
+  }).authorization(allow => [
+    allow.owner(),
+    allow.authenticated().to(['read'])
   ])
 });
 

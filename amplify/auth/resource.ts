@@ -4,24 +4,25 @@ import { defineAuth } from '@aws-amplify/backend';
 export const auth = defineAuth({
   loginWith: {
     email: {
-      // メール認証のカスタマイズ
-      verificationEmailSubject: 'ようこそProject Nifercheへ',
-      verificationEmailBody: (createCode: () => string) => 
-        `認証コード: ${createCode()}\nこのコードは15分間有効です。`
+      verificationEmailSubject: 'Project Niferche - メールアドレス確認',
+      verificationEmailBody: (code) => 
+        `Project Nifercheへようこそ。\n認証コード：${code}\nこのコードの有効期限は15分です。`,
+      verificationEmailStyle: 'CODE'
     }
   },
-  // ユーザー属性の定義
   userAttributes: {
-    nickname: { 
-      mutable: true 
+    nickname: {
+      mutable: true,
+      required: false
     },
-    email: { 
-      mutable: true 
+    email: {
+      mutable: true,
+      required: true
     }
+  },
+  multifactor: {
+    mode: 'OFF'
   },
   // 追加の設定
   accountRecovery: 'EMAIL_ONLY',
-  multifactor: {
-    mode: 'OFF'  // 初期段階ではMFAをオフに
-  }
 });
