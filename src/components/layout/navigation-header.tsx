@@ -4,8 +4,11 @@ import {
   Menu,
   MenuItem,
   View,
+  useBreakpointValue,
+  Divider
 } from '@aws-amplify/ui-react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import { useState } from 'react';
 
 // ナビゲーション項目の型定義
 interface NavItem {
@@ -49,20 +52,97 @@ const navigation: NavItem[] = [{
 ];
 
 export const NavigationHeader = () => {
-  const renderMenuItem = (item: NavItem) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
+  const isMobile = useBreakpointValue({
+    base: true,
+    medium: false
+  });
+
+  const isActive = (path: string) => {
+    return location.pathname.startsWith(path);
+  };
+
+  // モバイルメニュー用のコンポーネント
+  const MobileMenuItem = ({ item }: { item: NavItem }) => {
+    const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
+    
+    return (
+      <View width="100%">
+        {item.children ? (
+          <View width="100%">
+            <Button
+              width="100%"
+              variation="link"
+              onClick={() => setIsSubMenuOpen(!isSubMenuOpen)}
+              backgroundColor={isActive(item.path) ? "background.secondary" : "transparent"}
+            >
+              {item.label}
+            </Button>
+            {isSubMenuOpen && (
+              <View paddingLeft="medium">
+                {item.children.map((child) => (
+                  <Link
+                    key={child.path}
+                    to={child.path}
+                    style={{ textDecoration: 'none', width: '100%' }}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <Button
+                      width="100%"
+                      variation="link"
+                      backgroundColor={isActive(child.path) ? "background.secondary" : "transparent"}
+                    >
+                      {child.label}
+                    </Button>
+                  </Link>
+                ))}
+              </View>
+            )}
+          </View>
+        ) : (
+          <Link
+            to={item.path}
+            style={{ textDecoration: 'none', width: '100%' }}
+            onClick={() => setIsOpen(false)}
+          >
+            <Button
+              width="100%"
+              variation="link"
+              backgroundColor={isActive(item.path) ? "background.secondary" : "transparent"}
+            >
+              {item.label}
+            </Button>
+          </Link>
+        )}
+      </View>
+    );
+  };
+
+  // デスクトップメニュー用のコンポーネント
+  const DesktopMenuItem = ({ item }: { item: NavItem }) => {
     if (item.children) {
       return (
         <Menu 
           key={item.path}
           trigger={
-            <Button variation="link">
+            <Button 
+              variation="link"
+              backgroundColor={isActive(item.path) ? "background.secondary" : "transparent"}
+            >
               {item.label}
             </Button>
           }
         >
           {item.children.map((child) => (
-            <MenuItem key={child.path}>
-              <Link to={child.path} style={{ textDecoration: 'none', color: 'inherit' }}>
+            <MenuItem 
+              key={child.path}
+              backgroundColor={isActive(child.path) ? "background.secondary" : "transparent"}
+            >
+              <Link 
+                to={child.path} 
+                style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}
+              >
                 {child.label}
               </Link>
             </MenuItem>
@@ -72,8 +152,15 @@ export const NavigationHeader = () => {
     }
 
     return (
-      <Link key={item.path} to={item.path} style={{ textDecoration: 'none' }}>
-        <Button variation="link">
+      <Link 
+        key={item.path} 
+        to={item.path} 
+        style={{ textDecoration: 'none' }}
+      >
+        <Button 
+          variation="link"
+          backgroundColor={isActive(item.path) ? "background.secondary" : "transparent"}
+        >
           {item.label}
         </Button>
       </Link>
@@ -88,45 +175,91 @@ export const NavigationHeader = () => {
       top={0}
       style={{ 
         zIndex: 100,
-        height: 'var(--header-height)',
-        borderBottom: '1px solid var(--amplify-colors-border-primary)' // styleの中で指定
+        height: isMobile ? '50px' : 'var(--header-height)',
+        borderBottom: '1px solid var(--amplify-colors-border-primary)'
       }}
     >
       <Flex
         direction="row"
-        padding="1rem"
+        padding={isMobile ? "0.5rem" : "1rem"}
         justifyContent="space-between"
         alignItems="center"
         maxWidth="1200px"
         margin="0 auto"
       >
-        {/* ロゴ / ホームリンク */}
         <Link to="/" style={{ textDecoration: 'none' }}>
-          <span style={{ color: 'var(--amplify-colors-font-primary)', fontWeight: 'bold' }}>
+          <span style={{ 
+            color: 'var(--amplify-colors-font-primary)', 
+            fontWeight: 'bold',
+            fontSize: isMobile ? '1rem' : '1.2rem' 
+          }}>
             Project Niferche
           </span>
         </Link>
 
-        {/* ナビゲーションメニュー */}
-        <Flex
-          direction="row"
-          gap="1rem"
-          alignItems="center"
-          style={{
-            listStyle: 'none',
-            padding: 0,
-            margin: 0
-          }}
-        >
-          {navigation.map(renderMenuItem)}
-          <Button
-            as={Link}
-            to="auth/signin"
-            variation="primary"
+        {isMobile ? (
+          <>
+            <Button
+              size="small"
+              variation="link"
+              onClick={() => setIsOpen(!isOpen)}
+              style={{
+                padding: '0.5rem',
+                minWidth: 'auto'
+              }}
+            >
+              ☰
+            </Button>
+            {isOpen && (
+              <View
+                position="fixed"
+                top="50px"
+                left="0"
+                right="0"
+                bottom="0"
+                backgroundColor="background.primary"
+                padding="1rem"
+                style={{
+                  overflowY: 'auto',
+                  zIndex: 1000
+                }}
+              >
+                <Flex direction="column" gap="0.5rem">
+                  {navigation.map((item) => (
+                    <MobileMenuItem key={item.path} item={item} />
+                  ))}
+                  <Divider />
+                  <Link 
+                    to="/auth/signin" 
+                    style={{ textDecoration: 'none', width: '100%' }}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <Button width="100%" variation="primary">
+                      ログイン
+                    </Button>
+                  </Link>
+                </Flex>
+              </View>
+            )}
+          </>
+        ) : (
+          <Flex
+            direction="row"
+            gap="1rem"
+            alignItems="center"
           >
-            ログイン
-          </Button>
-        </Flex>
+            {navigation.map((item) => (
+              <DesktopMenuItem key={item.path} item={item} />
+            ))}
+            <Button
+              as={Link}
+              to="/auth/signin"
+              variation="primary"
+            >
+              ログイン
+            </Button>
+          </Flex>
+        )}
       </Flex>
     </View>
   );
