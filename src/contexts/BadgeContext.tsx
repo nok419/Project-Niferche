@@ -1,9 +1,11 @@
 // File: src/contexts/BadgeContext.tsx
 import { createContext, useContext, ReactNode,useEffect } from 'react';
-import { Badge, UserBadgeProgress } from '../types/badges';
+import { Badge, UserBadgeProgress,BadgeRequirementType } from '../types/badges';
 import { useBadges } from '../hooks/useBadges';
+
 interface BadgeContextType {
-  checkBadgeProgress: (type: string, value: string) => Promise<void>;
+  // string型をBadgeRequirementTypeに変更
+  checkBadgeProgress: (type: BadgeRequirementType, value: string) => Promise<void>;
   userBadges: Badge[];
   badgeProgress: UserBadgeProgress[];
   isLoading: boolean;
@@ -32,8 +34,8 @@ export const BadgeProvider = ({ children }: BadgeProviderProps) => {
     } = useBadges();
   
     useEffect(() => {
-      // 初回ログイン時のバッジチェック
-      checkBadgeProgress('LOGIN', 'FIRST_TIME');
+      // BadgeRequirementType.LOGINを使用
+      checkBadgeProgress(BadgeRequirementType.LOGIN, 'FIRST_TIME');
     }, []);
   
     const value = {
