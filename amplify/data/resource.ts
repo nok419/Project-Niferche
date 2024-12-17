@@ -132,18 +132,25 @@ const schema = a.schema({
     userId: a.string().required(),
     nickname: a.string(),
     email: a.string(),
+    role: a.enum(['user', 'admin']),           // .required()を削除
+    groups: a.string().array(),                 // groupsに修正
     badges: a.string().array().required(),
     favorites: a.customType({
       contentId: a.string().required(),
       addedAt: a.datetime().required(),
       contentType: a.string().required()
     }),
+    profileVisibility: a.enum(['public', 'private']),
     lastLoginAt: a.datetime(),
     createdAt: a.datetime().required(),
     updatedAt: a.datetime().required()
   }).authorization(allow => [
-    allow.owner(),
-    allow.authenticated().to(['read'])
+    // 認証済みユーザーは閲覧可能
+    allow.authenticated().to(['read']),
+    // 所有者は全ての操作が可能
+    allow.owner().to(['create', 'read', 'update', 'delete']),
+    // admin グループのユーザーは全ての操作が可能
+    allow.groups(['admin']).to(['create', 'read', 'update', 'delete'])
   ]),
 
   // バッジモデル
