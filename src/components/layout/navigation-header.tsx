@@ -18,21 +18,33 @@ interface NavItem {
 }
 
 // ナビゲーション構造の定義
-const navigation: NavItem[] = [{
-    label: 'はじめに',
-    path: '/about'
-  },{
-    label: '理念',
-    path: '/niferche/philosophy'
-  },{
+const navigation: NavItem[] = [
+  {
+    label: 'Call',
+    path: '/call',
+    children: [
+      { label: 'はじめに', path: '/call/about' },
+      { label: '理念', path: '/call/philosophy' },
+      { label: 'お知らせ', path: '/call/news' }
+    ]
+  },
+  {
+    label: 'Library',
+    path: '/library',
+    children: [
+      { label: 'メインストーリー', path: '/library/mainstory' },
+      { label: 'サイドストーリー', path: '/library/sidestory' },
+      { label: '研究記録集', path: '/library/records' }
+    ]
+  },
+  {
     label: 'Laboratory',
     path: '/laboratory',
     children: [
-      { label: 'About', path: '/laboratory/about' },
-      { label: 'Main Story', path: '/laboratory/mainstory' },
-      { label: 'Side Story', path: '/laboratory/sidestory' },
-      { label: 'IdeaLibrary', path: '/laboratory/IdeaLibrary' },
-      { label: 'FacilityGuide', path: '/laboratory/FacilityGuide' }
+      { label: '研究概要', path: '/laboratory/about' },
+      { label: 'アイデア体観測', path: '/laboratory/observation' },
+      { label: '研究アーカイブ', path: '/laboratory/archive' },
+      { label: '施設案内', path: '/laboratory/guide' }
     ]
   },{
     label: '設定資料集',
