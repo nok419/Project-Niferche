@@ -165,25 +165,31 @@ export const ObservationPage = () => {
       </ContentSection>
 
       <DetailModal
-        isOpen={!!selectedEntity}
-        onClose={() => setSelectedEntity(null)}
-        data={selectedEntity ? {
-          id: selectedEntity.id,
-          title: selectedEntity.name,
-          description: selectedEntity.description,
-          category: selectedEntity.category,
-          details: selectedEntity.details,
-          metadata: {
-            '現実性強度': `${selectedEntity.realityStrength * 100}%`,
-            '安定性指数': `${selectedEntity.stabilityIndex * 100}%`,
-            '観測回数': selectedEntity.observationCount.toString(),
-            '初回観測': selectedEntity.firstObservedAt,
-            '最終観測': selectedEntity.lastObservedAt
-          },
-          tags: selectedEntity.tags
-        } : null}
-        entityType="idea"
-      />
+  isOpen={!!selectedEntity}
+  onClose={() => setSelectedEntity(null)}
+  data={selectedEntity ? {
+    id: selectedEntity.id,
+    title: selectedEntity.name,
+    description: selectedEntity.description,
+    category: selectedEntity.category,
+    details: selectedEntity.details || [],
+    metadata: {
+      '現実性強度': `${selectedEntity.realityStrength * 100}%`,
+      '安定性指数': `${selectedEntity.stabilityIndex * 100}%`,
+      '観測回数': selectedEntity.observationCount.toString(),
+      '初回観測': selectedEntity.firstObservedAt,
+      '最終観測': selectedEntity.lastObservedAt
+    },
+    tags: selectedEntity.tags
+  } : {
+    id: '',
+    title: '',
+    description: '',
+    category: '',
+    tags: []
+  }} // デフォルト値を提供
+  entityType="idea"
+/>
     </View>
   );
 };

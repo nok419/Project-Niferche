@@ -5,16 +5,18 @@ import {
   Collection, 
   Text, 
   Heading,
-  Button,
   Image,
   Flex,
   useTheme,
-  ToggleButtonGroup, ToggleButton
-} from '@aws-amplify/ui-react';
-import { ContentSection } from '../../components/common/ContentSection';
-import { useState } from 'react';
-
-interface FacilityArea {
+  ToggleButtonGroup, 
+  ToggleButton,
+  Badge
+ } from '@aws-amplify/ui-react';
+ import { ContentSection } from '../../components/common/ContentSection';
+ import { DetailModal } from '../../components/common/DetailModal';
+ import { useState } from 'react';
+ 
+ interface FacilityArea {
   id: string;
   name: string;
   description: string;
@@ -22,9 +24,13 @@ interface FacilityArea {
   accessLevel: 'all' | 'authorized' | 'restricted';
   features: string[];
   imagePath?: string;
-}
-
-const facilityAreas: FacilityArea[] = [
+  details?: {
+    title: string;
+    content: string;
+  }[];
+ }
+ 
+ const facilityAreas: FacilityArea[] = [
   {
     id: 'central-lab',
     name: '中央研究室',
@@ -36,7 +42,17 @@ const facilityAreas: FacilityArea[] = [
       'データ記録システム',
       'リアルタイムモニタリング'
     ],
-    imagePath: '/images/facility/central-lab.jpg'
+    imagePath: '/images/facility/central-lab.jpg',
+    details: [
+      {
+        title: '設備概要',
+        content: '最新の観測機器を備えた総合研究施設です。24時間体制で運営されています。'
+      },
+      {
+        title: '利用方法',
+        content: '基本的な利用は予約制となっています。緊急時は管理者に直接連絡してください。'
+      }
+    ]
   },
   {
     id: 'analysis-center',
@@ -49,26 +65,36 @@ const facilityAreas: FacilityArea[] = [
       '理論研究支援AI',
       '共同研究スペース'
     ],
-    imagePath: '/images/facility/analysis-center.jpg'
+    imagePath: '/images/facility/analysis-center.jpg',
+    details: [
+      {
+        title: '主要設備',
+        content: '大規模計算機システムと共同研究スペースを完備しています。'
+      },
+      {
+        title: 'アクセス制限',
+        content: '許可された研究者のみが利用できます。申請は管理部門で受け付けています。'
+      }
+    ]
   }
-  // ... 他の施設データ
-];
-
-export const GuidePage = () => {
+ ];
+ 
+ export const GuidePage = () => {
   const [activeCategory, setActiveCategory] = useState<FacilityArea['category']>('research');
+  const [selectedFacility, setSelectedFacility] = useState<FacilityArea | null>(null);
   const { tokens } = useTheme();
-
-  const getAccessLevelBadgeProps = (level: FacilityArea['accessLevel']) => {
+ 
+  const getAccessLevelConfig = (level: FacilityArea['accessLevel']): { variation: "info" | "warning" | "success", label: string } => {
     switch (level) {
       case 'all':
-        return { backgroundColor: tokens.colors.green[60], label: '一般利用可' };
+        return { variation: 'success', label: '一般利用可' };
       case 'authorized':
-        return { backgroundColor: tokens.colors.blue[60], label: '許可制' };
+        return { variation: 'info', label: '許可制' };
       case 'restricted':
-        return { backgroundColor: tokens.colors.red[60], label: '制限区域' };
+        return { variation: 'warning', label: '制限区域' };
     }
   };
-
+ 
   return (
     <View padding={tokens.space.large}>
       <ContentSection
@@ -88,7 +114,7 @@ export const GuidePage = () => {
           <ToggleButton value="analysis">解析施設</ToggleButton>
           <ToggleButton value="common">共用施設</ToggleButton>
         </ToggleButtonGroup>
-
+ 
         <Collection
           type="grid"
           items={facilityAreas.filter(area => area.category === activeCategory)}
@@ -103,6 +129,8 @@ export const GuidePage = () => {
               key={area.id}
               padding={tokens.space.medium}
               variation="elevated"
+              onClick={() => setSelectedFacility(area)}
+              style={{ cursor: 'pointer' }}
             >
               <Flex direction="column" gap="medium">
                 {area.imagePath && (
@@ -115,37 +143,54 @@ export const GuidePage = () => {
                     borderRadius="medium"
                   />
                 )}
-
+ 
                 <Flex justifyContent="space-between" alignItems="center">
                   <Heading level={3}>{area.name}</Heading>
-                  <View
-                    backgroundColor={getAccessLevelBadgeProps(area.accessLevel).backgroundColor}
-                    padding="xs"
-                    borderRadius="small"
+                  <Badge 
+                    variation={getAccessLevelConfig(area.accessLevel).variation}
                   >
-                    <Text color="white" fontSize="small">
-                      {getAccessLevelBadgeProps(area.accessLevel).label}
-                    </Text>
-                  </View>
+                    {getAccessLevelConfig(area.accessLevel).label}
+                  </Badge>
                 </Flex>
-
+ 
                 <Text>{area.description}</Text>
-
+ 
                 <View backgroundColor={tokens.colors.background.secondary} padding="medium" borderRadius="small">
                   <Text fontWeight="bold" marginBottom="small">主要設備:</Text>
                   {area.features.map((feature, index) => (
                     <Text key={index} fontSize="small">• {feature}</Text>
                   ))}
                 </View>
-
-                <Button variation="link">
-                  詳細情報を表示
-                </Button>
               </Flex>
             </Card>
           )}
         </Collection>
       </ContentSection>
+ 
+      <DetailModal
+        isOpen={!!selectedFacility}
+        onClose={() => setSelectedFacility(null)}
+        data={selectedFacility ? {
+          id: selectedFacility.id,
+          title: selectedFacility.name,
+          description: selectedFacility.description,
+          category: selectedFacility.category,
+          imagePath: selectedFacility.imagePath,
+          details: selectedFacility.details,
+          metadata: {
+            'アクセスレベル': getAccessLevelConfig(selectedFacility.accessLevel).label,
+            '設備数': selectedFacility.features.length.toString()
+          },
+          tags: selectedFacility.features
+        } : {
+          id: '',
+          title: '',
+          description: '',
+          category: '',
+          tags: []
+        }}
+        entityType="facility"
+      />
     </View>
   );
-};
+ };
