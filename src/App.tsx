@@ -40,6 +40,7 @@ import { AlsarejiaMaterials } from './pages/materials/AlsarejiaMaterials';
 import { GalleryPage } from './pages/gallery/GalleryPage';
 
 // System Pages
+import { MainPage } from './pages/MainPage';
 import { RightsPage } from './pages/system/RightsPage';
 import { SignInPage } from './pages/system/auth/SignInPage';
 import { SignUpPage } from './pages/system/auth/SignUpPage';
@@ -80,7 +81,7 @@ function App() {
                   <LaboratoryLayout />
                 </ThemeProvider>
               }>
-                <Route path="/laboratory" element={<LaboratoryPage />} />
+                <Route path="/laboratory/about" element={<LaboratoryPage />} />
                 <Route path="/laboratory/observation" element={<ObservationPage />} />
                 <Route path="/laboratory/archive" element={<ArchivePage />} />
                 <Route path="/laboratory/guide" element={<GuidePage />} />
@@ -97,6 +98,7 @@ function App() {
 
               {/* Gallery Section */}
               <Route element={<MainLayout />}>
+                <Route path="/" element={<MainPage />} />
                 <Route path="/gallery" element={<GalleryPage />} />
                 <Route path="/rights" element={<RightsPage />} />
               </Route>

@@ -7,8 +7,7 @@ import {
   Button, 
   Heading,
   Flex,
-  Badge,
-  useTheme 
+  Badge
 } from '@aws-amplify/ui-react';
 import { StoryViewer } from '../../components/content/StoryViewer';
 import { useState } from 'react';
@@ -17,43 +16,52 @@ import { ContentSection } from '../../components/common/ContentSection';
 interface StoryChapter {
   id: string;
   title: string;
-  description: string;
-  hasInteractiveContent: boolean;
+  summary: string;
   chapterNumber: number;
-  releaseDate: string;
   status: 'published' | 'coming_soon';
-  readingTime: number; // 分単位
+  releaseDate: string;
+  readingTime: number;
+  hasInteractiveContent: boolean;
 }
 
 const mainStoryChapters: StoryChapter[] = [
   {
     id: 'prologue',
     title: '研究記録0: 記憶の欠損',
-    description: '全ての始まり。研究所の構内で目覚めた私は自分の記憶を失っていた...',
-    hasInteractiveContent: true,
+    summary: '全ての始まり。研究所の構内で目覚めた私は自分の記憶を失っていた。\nそこで出会った不思議な存在、ニファーシェ。',
     chapterNumber: 0,
-    releaseDate: '2024-01-01',
     status: 'published',
-    readingTime: 15
+    releaseDate: '2024-01-01',
+    readingTime: 15,
+    hasInteractiveContent: true
   },
   {
     id: 'chapter1',
     title: '研究記録1: アイデア体の観測',
-    description: 'アイデア体の観測開始。創発的な世界の姿が少しずつ見えてくる...',
-    hasInteractiveContent: true,
+    summary: 'アイデア体の観測を開始する。創発的な世界の姿が少しずつ見えてきた。\n私たちが目指すべきものとは一体...？',
     chapterNumber: 1,
-    releaseDate: '2024-02-01',
     status: 'published',
-    readingTime: 20
+    releaseDate: '2024-02-01',
+    readingTime: 20,
+    hasInteractiveContent: true
+  },
+  {
+    id: 'chapter2',
+    title: '研究記録2: 境界の探索',
+    summary: '現実と想像の境界線上で、私たちは何を見出すのか。\n研究は新たな段階へと進む...',
+    chapterNumber: 2,
+    status: 'coming_soon',
+    releaseDate: '2024-04-01',
+    readingTime: 25,
+    hasInteractiveContent: true
   }
 ];
 
 export const MainStory = () => {
   const [selectedChapter, setSelectedChapter] = useState<StoryChapter | null>(null);
-  const { tokens } = useTheme();
 
-  const StoryMetadata = ({ chapter }: { chapter: StoryChapter }) => (
-    <Flex gap="small" wrap="wrap">
+  const ChapterStatus = ({ chapter }: { chapter: StoryChapter }) => (
+    <Flex gap="small" wrap="wrap" alignItems="center">
       <Badge variation={chapter.status === 'published' ? 'success' : 'warning'}>
         {chapter.status === 'published' ? '公開中' : '近日公開'}
       </Badge>
@@ -61,8 +69,11 @@ export const MainStory = () => {
         {`読了時間: 約${chapter.readingTime}分`}
       </Text>
       {chapter.hasInteractiveContent && (
-        <Badge variation="info">インタラクティブコンテンツ</Badge>
+        <Badge variation="info">対話型コンテンツ</Badge>
       )}
+      <Text fontSize="small" color="font.tertiary">
+        公開日: {chapter.releaseDate}
+      </Text>
     </Flex>
   );
 
@@ -75,7 +86,7 @@ export const MainStory = () => {
             marginBottom="1rem"
             variation="link"
           >
-            ← チャプター選択に戻る
+            ← チャプター一覧に戻る
           </Button>
           <StoryViewer
             storyPath={`library/mainstory/${selectedChapter.id}`}
@@ -83,20 +94,20 @@ export const MainStory = () => {
             totalChapters={mainStoryChapters.length}
             onChapterChange={(chapter) => {
               const nextChapter = mainStoryChapters.find(c => c.chapterNumber === chapter);
-              if (nextChapter) setSelectedChapter(nextChapter);
+              if (nextChapter && nextChapter.status === 'published') {
+                setSelectedChapter(nextChapter);
+              }
             }}
             metadata={{
               title: selectedChapter.title,
-              description: selectedChapter.description,
-              releaseDate: selectedChapter.releaseDate
+              reference: `MST-${selectedChapter.chapterNumber.toString().padStart(3, '0')}`
             }}
           />
         </View>
       ) : (
         <ContentSection
           title="メインストーリー"
-          description="記憶を失った研究者サレジアと、彼が想像/創造した不思議な存在ニファーシェ。
-            二人の出会いが織りなす、現実と想像の境界を超えた物語。"
+          description="サレジアとニファーシェが紡ぐ物語。現実と想像の境界で、私たちは何を見出すのか。"
         >
           <Collection
             type="grid"
@@ -120,8 +131,13 @@ export const MainStory = () => {
               >
                 <Flex direction="column" gap="medium">
                   <Heading level={3}>{chapter.title}</Heading>
-                  <Text color="font.secondary">{chapter.description}</Text>
-                  <StoryMetadata chapter={chapter} />
+                  <Text 
+                    color="font.secondary"
+                    style={{ whiteSpace: 'pre-line' }}
+                  >
+                    {chapter.summary}
+                  </Text>
+                  <ChapterStatus chapter={chapter} />
                 </Flex>
               </Card>
             )}
