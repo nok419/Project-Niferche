@@ -1,98 +1,113 @@
-// File: components/auth/AuthContext.tsx
+// src/components/auth/AuthContext.tsx
 import { createContext, useContext, useState, useEffect } from 'react';
-import { getCurrentUser, signIn as amplifySignIn, signOut as amplifySignOut } from 'aws-amplify/auth';
-import { type AuthUser } from '@aws-amplify/auth';
+import { 
+  getCurrentUser,
+  fetchAuthSession,
+  signIn,
+  signUp,
+  signOut,
+  confirmSignUp
+} from 'aws-amplify/auth';
 
 interface AuthContextType {
-  user: AuthUser | null;
-  isLoading: boolean;
-  error: Error | null;
+  user: any | null;
   isAuthenticated: boolean;
+  isLoading: boolean;
   signIn: (username: string, password: string) => Promise<void>;
+  signUp: (username: string, password: string, email: string) => Promise<void>;
   signOut: () => Promise<void>;
-  checkUser: () => Promise<void>;
+  confirmSignUp: (username: string, code: string) => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | null>(null);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [mounted, setMounted] = useState(false);
-  const [user, setUser] = useState<AuthUser | null>(null);
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const [user, setUser] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-    checkUser();
+    checkAuthState();
   }, []);
 
-  async function checkUser() {
+  const checkAuthState = async () => {
     try {
-      setIsLoading(true);
       const currentUser = await getCurrentUser();
+      await fetchAuthSession(); // sessionの使用が必要ない場合は認証チェックのみ
       setUser(currentUser);
-      setError(null);
-    } catch (err) {
+      setIsAuthenticated(true);
+    } catch (error) {
       setUser(null);
-      setError(err instanceof Error ? err : new Error('Authentication error'));
+      setIsAuthenticated(false);
     } finally {
       setIsLoading(false);
     }
-  }
+  };
 
-  async function signIn(username: string, password: string) {
+  const authSignIn = async (username: string, password: string) => {
     try {
-      setIsLoading(true);
-      await amplifySignIn({ username, password });
-      await checkUser();
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Sign in failed'));
-      throw err;
-    } finally {
-      setIsLoading(false);
+      await signIn({ username, password });
+      await checkAuthState();
+    } catch (error) {
+      throw error;
     }
-  }
+  };
 
-  async function signOut() {
+  const authSignUp = async (username: string, password: string, email: string) => {
     try {
-      setIsLoading(true);
-      await amplifySignOut();
+      await signUp({
+        username,
+        password,
+        options: {
+          userAttributes: {
+            email
+          }
+        }
+      });
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const authSignOut = async () => {
+    try {
+      await signOut();
       setUser(null);
-      setError(null);
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Sign out failed'));
-      throw err;
-    } finally {
-      setIsLoading(false);
+      setIsAuthenticated(false);
+    } catch (error) {
+      throw error;
     }
-  }
+  };
+
+  const authConfirmSignUp = async (username: string, code: string) => {
+    try {
+      await confirmSignUp({ username, confirmationCode: code });
+    } catch (error) {
+      throw error;
+    }
+  };
 
   const value = {
     user,
+    isAuthenticated,
     isLoading,
-    error,
-    isAuthenticated: !!user,
-    signIn,
-    signOut,
-    checkUser
+    signIn: authSignIn,
+    signUp: authSignUp,
+    signOut: authSignOut,
+    confirmSignUp: authConfirmSignUp
   };
-
-  // 初期マウント時は何もレンダリングしない
-  if (!mounted) {
-    return null;
-  }
 
   return (
     <AuthContext.Provider value={value}>
-      {children}
+      {!isLoading && children}
     </AuthContext.Provider>
   );
-}
+};
 
-export function useAuth() {
+export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-}
+};

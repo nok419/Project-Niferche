@@ -1,4 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './components/auth/AuthContext';
+import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { ThemeProvider } from '@aws-amplify/ui-react';
 
 // themes
@@ -52,8 +54,6 @@ import { ErrorPage } from './pages/ErrorPage';
 
 // Components
 import { ErrorBoundary } from './components/common/ErrorBoundary';
-import { AuthProvider } from './components/auth/AuthContext';
-
 function App() {
   return (
     <BrowserRouter>
@@ -61,6 +61,14 @@ function App() {
         <ThemeProvider theme={theme}>
           <ErrorBoundary>
             <Routes>
+
+              {/* 認証関連ルート */}
+              <Route path="/auth">
+                <Route path="signin" element={<SignInPage />} />
+                <Route path="signup" element={<SignUpPage />} />
+                <Route path="confirm" element={<ConfirmSignUpPage />} />
+              </Route>
+
               {/* Call Section */}
               <Route element={<CallLayout />}>
                 <Route path="/call/about" element={<AboutPage />} />
@@ -89,7 +97,7 @@ function App() {
 
               {/* Materials Section */}
               <Route element={<MaterialsLayout />}>
-                <Route path="/materials/about" element={<MaterialsAbout />} />
+                <Route path="/materials/about" element={<ProtectedRoute accessLevel="stem"><MaterialsAbout /></ProtectedRoute>} />
                 <Route path="/materials/common" element={<CommonSettings />} />
                 <Route path="/materials/quxe" element={<QuxeMaterials />} />
                 <Route path="/materials/hodemei" element={<HodemeiMaterials />} />

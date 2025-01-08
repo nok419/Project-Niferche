@@ -1,94 +1,75 @@
-// src/pages/auth/ConfirmSignUpPage.tsx
-import { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { confirmSignUp, resendSignUpCode } from 'aws-amplify/auth';
-import {
-  Button,
-  TextField,
-  View,
-  Heading,
-  Text,
-  Flex
-} from '@aws-amplify/ui-react';
 
-export function ConfirmSignUpPage() {
-  const [searchParams] = useSearchParams();
-  const username = searchParams.get('username') || '';
-  const navigate = useNavigate();
+// src/pages/system/auth/ConfirmSignUpPage.tsx
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { 
+  View, 
+  Heading, 
+  TextField, 
+  Button, 
+  Text,
+  Alert
+} from '@aws-amplify/ui-react';
+import { useAuth } from '../../../components/auth/AuthContext';
+
+export const ConfirmSignUpPage = () => {
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
-  const [resendSuccess, setResendSuccess] = useState(false);
+  const [username, setUsername] = useState('');
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { confirmSignUp } = useAuth();
 
-  async function handleSubmit(e: React.FormEvent) {
+  useEffect(() => {
+    // location.stateからusernameを取得
+    const state = location.state as { username?: string };
+    if (!state?.username) {
+      navigate('/auth/signup');
+    } else {
+      setUsername(state.username);
+    }
+  }, [location, navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-
     try {
-      await confirmSignUp({
-        username,
-        confirmationCode: code
+      await confirmSignUp(username, code);
+      navigate('/auth/signin', {
+        state: { message: 'アカウントが確認されました。サインインしてください。' }
       });
-      navigate('/auth/signin');
-    } catch (error) {
-      console.error('Error confirming sign up:', error);
-      setError('確認コードの検証に失敗しました');
+    } catch (error: any) {
+      setError(error.message);
     }
-  }
-
-  async function handleResendCode() {
-    try {
-      await resendSignUpCode({ username });
-      setResendSuccess(true);
-      setTimeout(() => setResendSuccess(false), 3000);
-    } catch (error) {
-      console.error('Error resending code:', error);
-      setError('確認コードの再送信に失敗しました');
-    }
-  }
+  };
 
   return (
     <View padding="medium">
+      <Heading level={2}>アカウント確認</Heading>
+      <Text>
+        確認コードをメールアドレスに送信しました。
+        コードを入力してアカウントを有効化してください。
+      </Text>
+      {error && <Alert variation="error">{error}</Alert>}
       <form onSubmit={handleSubmit}>
-        <Flex direction="column" gap="medium">
-          <Heading level={3}>アカウント確認</Heading>
-
-          {error && (
-            <Text color="red" fontSize="medium">
-              {error}
-            </Text>
-          )}
-
-          {resendSuccess && (
-            <Text color="green" fontSize="medium">
-              確認コードを再送信しました
-            </Text>
-          )}
-
-          <Text>
-            {username}宛に確認コードを送信しました。
-            メールをご確認の上、確認コードを入力してください。
-          </Text>
-
-          <TextField
-            label="確認コード"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            required
-          />
-
-          <Button type="submit" variation="primary">
-            確認
-          </Button>
-
-          <Button
-            onClick={handleResendCode}
-            variation="link"
-            isDisabled={resendSuccess}
-          >
-            確認コードを再送信
-          </Button>
-        </Flex>
+        <TextField
+          label="確認コード"
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
+          required
+        />
+        <Button type="submit" variation="primary">
+          確認
+        </Button>
       </form>
+      <Text>
+        コードが届かない場合は
+        <Button
+          variation="link"
+          onClick={() => navigate('/auth/signup')}
+        >
+          アカウント作成をやり直す
+        </Button>
+      </Text>
     </View>
   );
-}
+};

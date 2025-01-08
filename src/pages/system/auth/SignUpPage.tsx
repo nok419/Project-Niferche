@@ -1,136 +1,87 @@
-// src/pages/auth/SignUpPage.tsx
+// src/pages/system/auth/SignUpPage.tsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { signUp } from 'aws-amplify/auth';
-import {
-  Button,
-  TextField,
-  View,
-  Heading,
+import { 
+  View, 
+  Heading, 
+  TextField, 
+  Button, 
   Text,
-  Flex
+  Alert
 } from '@aws-amplify/ui-react';
+import { useAuth } from '../../../components/auth/AuthContext';
 
-export function SignUpPage() {
-  const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    nickname: ''
-  });
+export const SignUpPage = () => {
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
+  const navigate = useNavigate();
+  const { signUp } = useAuth();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }));
-  };
-
-  async function handleSubmit(e: React.FormEvent) {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-
-    if (formData.password !== formData.confirmPassword) {
+    if (password !== confirmPassword) {
       setError('パスワードが一致しません');
       return;
     }
 
     try {
-      await signUp({
-        username: formData.username,
-        password: formData.password,
-        options: {
-          userAttributes: {
-            email: formData.email,
-            nickname: formData.nickname
-          },
-          autoSignIn: true
-        }
+      await signUp(username, password, email);
+      navigate('/auth/confirm', { 
+        state: { username, email } 
       });
-      
-      // 確認コード入力ページへ遷移
-      navigate(`/auth/confirm?username=${formData.username}`);
-    } catch (error) {
-      console.error('Error in sign up:', error);
-      setError('アカウント作成に失敗しました');
+    } catch (error: any) {
+      setError(error.message);
     }
-  }
+  };
 
   return (
     <View padding="medium">
+      <Heading level={2}>アカウント作成</Heading>
+      {error && <Alert variation="error">{error}</Alert>}
       <form onSubmit={handleSubmit}>
-        <Flex direction="column" gap="medium">
-          <Heading level={3}>アカウント作成</Heading>
-          
-          {error && (
-            <Text color="red" fontSize="medium">
-              {error}
-            </Text>
-          )}
-
-          <TextField
-            label="ユーザー名"
-            name="username"
-            placeholder="ユーザー名を入力"
-            value={formData.username}
-            onChange={handleChange}
-            required
-          />
-
-          <TextField
-            label="メールアドレス"
-            name="email"
-            type="email"
-            placeholder="メールアドレスを入力"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-
-          <TextField
-            label="ニックネーム"
-            name="nickname"
-            placeholder="ニックネームを入力"
-            value={formData.nickname}
-            onChange={handleChange}
-            required
-          />
-
-          <TextField
-            label="パスワード"
-            name="password"
-            type="password"
-            placeholder="パスワードを入力"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
-
-          <TextField
-            label="パスワード (確認)"
-            name="confirmPassword"
-            type="password"
-            placeholder="パスワードを再入力"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            required
-          />
-
-          <Button type="submit" variation="primary">
-            アカウント作成
-          </Button>
-
-          <Button
-            onClick={() => navigate('/auth/signin')}
-            variation="link"
-          >
-            すでにアカウントをお持ちの方
-          </Button>
-        </Flex>
+        <TextField
+          label="ユーザー名"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          required
+        />
+        <TextField
+          label="メールアドレス"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <TextField
+          label="パスワード"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+        <TextField
+          label="パスワード（確認）"
+          type="password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          required
+        />
+        <Button type="submit" variation="primary">
+          アカウント作成
+        </Button>
       </form>
+      <Text>
+        すでにアカウントをお持ちの方は
+        <Button
+          variation="link"
+          onClick={() => navigate('/auth/signin')}
+        >
+          サインイン
+        </Button>
+      </Text>
     </View>
   );
-}
+};

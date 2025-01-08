@@ -9,6 +9,8 @@ import {
 } from '@aws-amplify/ui-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useState } from 'react';
+import { useAuth } from '../auth/AuthContext';
+import { UserMenu } from '../user/UserMenu';
 
 // ナビゲーション項目の型定義
 interface NavItem {
@@ -46,7 +48,8 @@ const navigation: NavItem[] = [
       { label: '研究アーカイブ', path: '/laboratory/archive' },
       { label: '施設案内', path: '/laboratory/guide' }
     ]
-  },{
+  },
+  {
     label: '設定資料集',
     path: '/materials',
     children: [
@@ -66,6 +69,7 @@ const navigation: NavItem[] = [
 export const NavigationHeader = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const { isAuthenticated, signOut, user } = useAuth();
   const isMobile = useBreakpointValue({
     base: true,
     medium: false
@@ -179,6 +183,27 @@ export const NavigationHeader = () => {
     );
   };
 
+  // モバイル用認証済みメニュー項目
+  const AuthenticatedMobileMenu = () => (
+    <>
+      <Divider />
+      <Link to="/profile" style={{ textDecoration: 'none', width: '100%' }}>
+        <Button width="100%" variation="link">プロフィール</Button>
+      </Link>
+      <Link to="/favorites" style={{ textDecoration: 'none', width: '100%' }}>
+        <Button width="100%" variation="link">お気に入り</Button>
+      </Link>
+      {user?.attributes?.['custom:role'] === 'admin' && (
+        <Link to="/admin" style={{ textDecoration: 'none', width: '100%' }}>
+          <Button width="100%" variation="link">管理画面</Button>
+        </Link>
+      )}
+      <Button width="100%" variation="link" onClick={signOut}>
+        ログアウト
+      </Button>
+    </>
+  );
+
   return (
     <View
       backgroundColor="background.primary"
@@ -240,16 +265,16 @@ export const NavigationHeader = () => {
                   {navigation.map((item) => (
                     <MobileMenuItem key={item.path} item={item} />
                   ))}
-                  <Divider />
-                  <Link 
-                    to="/auth/signin" 
-                    style={{ textDecoration: 'none', width: '100%' }}
-                    onClick={() => setIsOpen(false)}
-                  >
-                    <Button width="100%" variation="primary">
-                      ログイン
-                    </Button>
-                  </Link>
+                  {isAuthenticated ? (
+                    <AuthenticatedMobileMenu />
+                  ) : (
+                    <>
+                      <Divider />
+                      <Link to="/auth/signin" style={{ textDecoration: 'none', width: '100%' }}>
+                        <Button width="100%" variation="primary">ログイン</Button>
+                      </Link>
+                    </>
+                  )}
                 </Flex>
               </View>
             )}
@@ -263,13 +288,17 @@ export const NavigationHeader = () => {
             {navigation.map((item) => (
               <DesktopMenuItem key={item.path} item={item} />
             ))}
-            <Button
-              as={Link}
-              to="/auth/signin"
-              variation="primary"
-            >
-              ログイン
-            </Button>
+            {isAuthenticated ? (
+              <UserMenu />
+            ) : (
+              <Button
+                as={Link}
+                to="/auth/signin"
+                variation="primary"
+              >
+                ログイン
+              </Button>
+            )}
           </Flex>
         )}
       </Flex>
