@@ -9,22 +9,26 @@ import {
   Text,
   Alert
 } from '@aws-amplify/ui-react';
-import { useAuth } from '../../../components/auth/AuthContext';
+// 旧: import { useAuth } from '../../../components/auth/AuthContext';
+import { useSession } from '../../../contexts/SessionContext';
 
 export const SignInPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const { signIn } = useAuth();
+
+  // 旧: const { signIn } = useAuth();
+  const { signIn } = useSession();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       await signIn(username, password);
+      // 成功時トップページへ or 任意の遷移先
       navigate('/');
     } catch (error: any) {
-      setError(error.message);
+      setError(error.message || 'Unknown error');
     }
   };
 

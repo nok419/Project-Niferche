@@ -1,46 +1,42 @@
 // src/components/auth/ProtectedRoute.tsx
 import { Navigate } from 'react-router-dom';
-import { useAuth } from './AuthContext';
+import { useSession } from '../../contexts/SessionContext';
+import React from 'react';
 
-type AccessLevel = 'admin' | 'stem' | 'branch';
+type AccessLevel = 'admin' | 'branch'; // 必要に応じてカスタム
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  accessLevel: AccessLevel;
-  creatorId?: string; // branchレベルでの作成者ID確認用
+  accessLevel?: AccessLevel;
+  creatorId?: string;
 }
 
-export const ProtectedRoute = ({ 
-  children, 
+/**
+ * 認証が必要なルート用。サインインしていなければ /auth/signin へ。
+ * さらにaccessLevelがadminなら、ユーザー属性 custom:role=admin をチェックする例。
+ */
+export const ProtectedRoute = ({
+  children,
   accessLevel,
-  creatorId 
+  creatorId,
 }: ProtectedRouteProps) => {
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const { isSignedIn, user } = useSession();
 
-  if (isLoading) {
-    return <div>Loading...</div>;
+  if (!isSignedIn) {
+    return <Navigate to="/auth/signin" replace />;
   }
 
-  // stemレベルは誰でもアクセス可能
-  if (accessLevel === 'stem') {
-    return <>{children}</>;
+  if (accessLevel === 'admin') {
+    const role = user?.attributes?.['custom:role'];
+    if (role !== 'admin') {
+      return <Navigate to="/" />;
+    }
   }
 
-  // 未認証ユーザーはサインインページへリダイレクト
-  if (!isAuthenticated) {
-    return <Navigate to="/auth/signin" />;
-  }
-
-  // adminレベルの確認
-  if (accessLevel === 'admin' && user?.attributes?.['custom:role'] !== 'admin') {
-    return <Navigate to="/" />;
-  }
-
-  // branchレベルの確認（作成者または管理者のみ編集可能）
   if (accessLevel === 'branch') {
+    const role = user?.attributes?.['custom:role'];
     const isCreator = creatorId === user?.username;
-    const isAdmin = user?.attributes?.['custom:role'] === 'admin';
-    
+    const isAdmin = role === 'admin';
     if (!isCreator && !isAdmin) {
       return <Navigate to="/" />;
     }
@@ -48,3 +44,4 @@ export const ProtectedRoute = ({
 
   return <>{children}</>;
 };
+

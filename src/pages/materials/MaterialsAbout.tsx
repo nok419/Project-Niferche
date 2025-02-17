@@ -1,97 +1,129 @@
 // src/pages/materials/MaterialsAbout.tsx
-import { Collection, View } from '@aws-amplify/ui-react';
-import { DocumentCard } from '../../components/materials/DocumentCard';
-import { DocumentFilter } from '../../components/materials/DocumentFilter';
+import { useEffect, useState } from 'react';
 import { MaterialsLayout } from '../../components/materials/MaterialsLayout';
-import { useState } from 'react';
+import {
+  View,
+  ToggleButtonGroup,
+  ToggleButton,
+  Collection,
+  Button,
+} from '@aws-amplify/ui-react';
+
+import { AdvancedFilterPanel } from '../../components/common/AdvancedFilterPanel';
+import { SkeletonList } from '../../components/common/SkeletonList';
+import { ErrorAlert } from '../../components/common/ErrorAlert';
+import { LibraryListViewItem } from '../../components/common/LibraryListViewItem';
+import { DocumentCard } from '../../components/materials/DocumentCard';
+
+import { useInfiniteContents } from '../../hooks/useInfiniteContents';
 import { MaterialDocument } from '../../types/materials';
 
-const mainSections: MaterialDocument[] = [
-  {
-    id: 'common',
-    title: '共通設定資料',
-    description: '全ての世界に共通する基本法則や概念について',
-    category: 'THEORY',
-    reference: 'REF-001',
-    linkTo: '/materials/common',
-    isAvailable: true,
-    variant: 'manuscript'
-  },
-  {
-    id: 'quxe',
-    title: 'Quxe World',
-    description: '魔法と精霊の世界に関する設定資料',
-    category: 'WORLD',
-    reference: 'REF-002',
-    linkTo: '/materials/quxe',
-    isAvailable: true,
-    variant: 'book'
-  },
-  {
-    id: 'hodemei',
-    title: 'Hodemei World',
-    description: '科学と技術の未来世界に関する設定資料',
-    category: 'WORLD',
-    reference: 'REF-003',
-    linkTo: '/materials/hodemei',
-    isAvailable: true,
-    variant: 'book'
-  },
-  {
-    id: 'alsarejia',
-    title: 'Alsarejia Research Facility',
-    description: '研究施設に関する設定資料',
-    category: 'WORLD',
-    reference: 'REF-004',
-    linkTo: '/materials/alsarejia',
-    isAvailable: true,
-    variant: 'document'
-  }
-];
-
 export const MaterialsAbout = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [filterCondition, setFilterCondition] = useState({
+    keyword: '',
+    world: 'all',
+    tags: [] as string[],
+  });
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
-  const filteredContent = mainSections.filter((item: MaterialDocument) => {
-    const matchesSearch = searchTerm === '' || 
-      item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.description.toLowerCase().includes(searchTerm.toLowerCase());
-      
-    const matchesCategory = selectedCategory === 'all' || 
-      item.category === selectedCategory;
+  const {
+    items,
+    loadMore,
+    hasMore,
+    loading,
+    error,
+    resetItems,
+  } = useInfiniteContents();
 
-    return matchesSearch && matchesCategory;
-  });
+  useEffect(() => {
+    resetItems();
+    loadMore({
+      filter: {
+        // 例: "SETTING_MATERIAL" など
+      },
+      limit: 6,
+    });
+  }, [filterCondition, resetItems, loadMore]);
+
+  const mappedItems: MaterialDocument[] = items.map((item) => ({
+    id: item.id,
+    title: item.title ?? 'Materials Title',
+    description: item.description ?? 'No description',
+    category: 'WORLD',
+    reference: 'REF-xxx',
+    linkTo: `/materials/about/${item.id}`,
+    isAvailable: true,
+    variant: 'document',
+    imagePath: '',
+  }));
 
   return (
     <MaterialsLayout
       title="設定資料室"
-      description="Project Nifercheの設定資料をご覧いただけます。各項目は整理・分類されており、体系的に閲覧することができます。"
+      description="Project Nifercheの設定資料をご覧いただけます。"
     >
       <View padding="1rem">
-      <DocumentFilter
-        onSearch={setSearchTerm}
-        onCategoryChange={setSelectedCategory}
-        onViewChange={setViewMode}  // onViewModeからonViewChangeに修正
-        onSortChange={() => {}}
-      />
-        
-        <Collection
-          type={viewMode}
-          items={filteredContent}
-          gap="medium"
-          templateColumns={viewMode === 'grid' ? {
-            base: "1fr",
-            medium: "1fr 1fr",
-            large: "1fr 1fr 1fr"
-          } : undefined}
+        <AdvancedFilterPanel
+          availableTags={['共通', 'Quxe', 'Hodemei', 'Alsarejia']}
+          availableWorlds={['COMMON', 'QUXE', 'HODEMEI', 'ALSAREJIA']}
+          onChange={(newFilter) => setFilterCondition(newFilter)}
+        />
+
+        <ToggleButtonGroup
+          value={viewMode}
+          isExclusive
+          onChange={(value) => setViewMode(value as 'grid' | 'list')}
+          margin="1rem 0"
         >
-          {(item: MaterialDocument) => (
-            <DocumentCard {...item} key={item.id} />
-          )}
-        </Collection>
+          <ToggleButton value="grid">グリッド</ToggleButton>
+          <ToggleButton value="list">リスト</ToggleButton>
+        </ToggleButtonGroup>
+
+        {error && <ErrorAlert errorMessage={error} onDismiss={() => {}} />}
+
+        {loading && items.length === 0 ? (
+          <SkeletonList count={4} />
+        ) : (
+          <>
+            {viewMode === 'grid' && (
+              <Collection
+                type="grid"
+                items={mappedItems}
+                gap="medium"
+                templateColumns={{
+                  base: '1fr',
+                  medium: '1fr 1fr',
+                  large: '1fr 1fr 1fr',
+                }}
+              >
+                {(item) => <DocumentCard key={item.id} {...item} />}
+              </Collection>
+            )}
+            {viewMode === 'list' && (
+              <Collection type="list" items={mappedItems} gap="small">
+                {(item) => (
+                  <LibraryListViewItem
+                    key={item.id}
+                    id={item.id}
+                    title={item.title}
+                    description={item.description}
+                    isAvailable={item.isAvailable}
+                    reference={item.reference}
+                    linkTo={item.linkTo}
+                    category={item.category}
+                  />
+                )}
+              </Collection>
+            )}
+          </>
+        )}
+
+        {hasMore && !loading && (
+          <Button onClick={() => loadMore()} marginTop="1rem">
+            さらに読み込む
+          </Button>
+        )}
+        {loading && items.length > 0 && <SkeletonList count={2} />}
       </View>
     </MaterialsLayout>
   );

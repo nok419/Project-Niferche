@@ -9,6 +9,10 @@ interface MaterialsLayoutProps {
   children: ReactNode;
 }
 
+/**
+ * 設定資料ページ専用の「見出し＆背景付きラッパ」コンポーネント。
+ * MaterialsRootLayout とは別物：RootLayoutは <Outlet> 用 ルート機構。
+ */
 export const MaterialsLayout = ({ title, description, children }: MaterialsLayoutProps) => {
   const tokens = getThemeTokens();
 

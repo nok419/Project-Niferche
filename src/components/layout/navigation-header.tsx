@@ -1,3 +1,4 @@
+// src/components/layout/navigation-header.tsx
 import { 
   Flex,
   Button,
@@ -9,7 +10,7 @@ import {
 } from '@aws-amplify/ui-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useState } from 'react';
-import { useAuth } from '../auth/AuthContext';
+import { useSession } from '../../contexts/SessionContext';
 import { UserMenu } from '../user/UserMenu';
 
 // ナビゲーション項目の型定義
@@ -19,7 +20,7 @@ interface NavItem {
   children?: NavItem[];
 }
 
-// ナビゲーション構造の定義
+// サンプル: ナビゲーション構造
 const navigation: NavItem[] = [
   {
     label: 'Call',
@@ -36,7 +37,6 @@ const navigation: NavItem[] = [
     children: [
       { label: 'メインストーリー', path: '/library/mainstory' },
       { label: 'サイドストーリー', path: '/library/sidestory' },
-      { label: '研究記録集', path: '/library/records' }
     ]
   },
   {
@@ -44,17 +44,17 @@ const navigation: NavItem[] = [
     path: '/laboratory',
     children: [
       { label: '研究概要', path: '/laboratory/about' },
-      { label: 'アイデア体観測', path: '/laboratory/observation' },
+      { label: 'アイデア観測', path: '/laboratory/observation' },
       { label: '研究アーカイブ', path: '/laboratory/archive' },
       { label: '施設案内', path: '/laboratory/guide' }
     ]
   },
   {
-    label: '設定資料集',
+    label: 'Materials',
     path: '/materials',
     children: [
       { label: '資料室', path: '/materials/about' },
-      { label: '共通設定', path: '/materials/common' },
+      { label: 'Common', path: '/materials/common' },
       { label: 'Quxe', path: '/materials/quxe' },
       { label: 'Hodemei', path: '/materials/hodemei' },
       { label: 'Alsarejia', path: '/materials/alsarejia' }
@@ -69,17 +69,14 @@ const navigation: NavItem[] = [
 export const NavigationHeader = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
-  const { isAuthenticated, signOut, user } = useAuth();
-  const isMobile = useBreakpointValue({
-    base: true,
-    medium: false
-  });
+  const { isSignedIn, signOut, user } = useSession();
+  const isMobile = useBreakpointValue({ base: true, medium: false });
 
   const isActive = (path: string) => {
     return location.pathname.startsWith(path);
   };
 
-  // モバイルメニュー用のコンポーネント
+  // ▼ モバイル用メニューItem（サブメニュー展開）
   const MobileMenuItem = ({ item }: { item: NavItem }) => {
     const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
     
@@ -135,7 +132,7 @@ export const NavigationHeader = () => {
     );
   };
 
-  // デスクトップメニュー用のコンポーネント
+  // ▼ PC用のドロップダウンメニューItem
   const DesktopMenuItem = ({ item }: { item: NavItem }) => {
     if (item.children) {
       return (
@@ -183,7 +180,7 @@ export const NavigationHeader = () => {
     );
   };
 
-  // モバイル用認証済みメニュー項目
+  // ▼ モバイルでログイン済みの場合のメニュー追記例
   const AuthenticatedMobileMenu = () => (
     <>
       <Divider />
@@ -265,7 +262,7 @@ export const NavigationHeader = () => {
                   {navigation.map((item) => (
                     <MobileMenuItem key={item.path} item={item} />
                   ))}
-                  {isAuthenticated ? (
+                  {isSignedIn ? (
                     <AuthenticatedMobileMenu />
                   ) : (
                     <>
@@ -280,15 +277,11 @@ export const NavigationHeader = () => {
             )}
           </>
         ) : (
-          <Flex
-            direction="row"
-            gap="1rem"
-            alignItems="center"
-          >
+          <Flex direction="row" gap="1rem" alignItems="center">
             {navigation.map((item) => (
               <DesktopMenuItem key={item.path} item={item} />
             ))}
-            {isAuthenticated ? (
+            {isSignedIn ? (
               <UserMenu />
             ) : (
               <Button
@@ -305,3 +298,4 @@ export const NavigationHeader = () => {
     </View>
   );
 };
+

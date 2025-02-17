@@ -1,57 +1,65 @@
 // src/pages/materials/AlsarejiaMaterials.tsx
+import { useEffect, useState } from 'react';
 import { MaterialsLayout } from '../../components/materials/MaterialsLayout';
-import { Collection, View, ToggleButtonGroup, ToggleButton, Tabs } from '@aws-amplify/ui-react';
+import {
+  View,
+  ToggleButtonGroup,
+  ToggleButton,
+  Tabs,
+  Collection,
+  Button,
+} from '@aws-amplify/ui-react';
+
+import { AdvancedFilterPanel } from '../../components/common/AdvancedFilterPanel';
+import { SkeletonList } from '../../components/common/SkeletonList';
+import { ErrorAlert } from '../../components/common/ErrorAlert';
+import { LibraryListViewItem } from '../../components/common/LibraryListViewItem';
 import { DocumentCard } from '../../components/materials/DocumentCard';
-import { DocumentFilter } from '../../components/materials/DocumentFilter';
-import { useState } from 'react';
+
+import { useInfiniteContents } from '../../hooks/useInfiniteContents';
 import { MaterialDocument } from '../../types/materials';
 
-// カテゴリの定義
-export type AlsarejiaContentCategory = 
-  'FACILITY' | 'IDEA' | 'TECH' | 'CHARACTER' | 'HISTORY';
+export const AlsarejiaMaterials = () => {
+  const [filterCondition, setFilterCondition] = useState({
+    keyword: '',
+    world: 'all',
+    tags: [] as string[],
+  });
 
-// ベースとなるコンテンツ定義
-const alsarejiaContents: MaterialDocument[] = [
-  {
-    id: 'facility-overview',
-    title: '研究施設概要',
-    description: '「Laboratory Alsarejia」の全体構造と主要施設',
-    category: 'FACILITY',
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [attribution, setAttribution] = useState<'official' | 'shared'>('official');
+  const [selectedCategory, setSelectedCategory] = useState('FACILITY');
+
+  const {
+    items,
+    loadMore,
+    hasMore,
+    loading,
+    error,
+    resetItems,
+  } = useInfiniteContents();
+
+  useEffect(() => {
+    resetItems();
+    loadMore({
+      filter: {
+        // 例: ALSAREJIAフィルタ
+      },
+      limit: 6,
+    });
+  }, [filterCondition, attribution, selectedCategory, resetItems, loadMore]);
+
+  const mappedItems: MaterialDocument[] = items.map((item) => ({
+    id: item.id,
+    title: item.title ?? 'Untitled Alsarejia',
+    description: item.description ?? 'No description',
+    category: selectedCategory as any,
     reference: 'ALS-001',
-    linkTo: '/materials/alsarejia/facility-overview',
+    linkTo: `/materials/${attribution}/alsarejia/${item.id}`,
     isAvailable: true,
     variant: 'document',
     imagePath: '/images/materials/facility-overview.jpg',
-  },
-  {
-    id: 'idea-basics',
-    title: 'アイデア体の基礎',
-    description: 'アイデア体の定義と基本的な性質',
-    category: 'IDEA',
-    reference: 'ALS-002',
-    linkTo: '/materials/alsarejia/idea-basics',
-    isAvailable: true,
-    variant: 'manuscript',
-    imagePath: '/images/materials/idea-basics.jpg',
-  },
-  // ... 他のコンテンツ定義
-];
-
-export const AlsarejiaMaterials = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<AlsarejiaContentCategory>('FACILITY');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [attribution, setAttribution] = useState<'official' | 'shared'>('official');
-
-  const filteredContent = alsarejiaContents.filter((item: MaterialDocument) => {
-    const matchesSearch = searchTerm === '' || 
-      item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.description.toLowerCase().includes(searchTerm.toLowerCase());
-      
-    const matchesCategory = item.category === selectedCategory;
-
-    return matchesSearch && matchesCategory;
-  });
+  }));
 
   return (
     <MaterialsLayout
@@ -69,21 +77,28 @@ export const AlsarejiaMaterials = () => {
           <ToggleButton value="shared">共有設定</ToggleButton>
         </ToggleButtonGroup>
 
-        <DocumentFilter
-          onSearch={setSearchTerm}
-          onCategoryChange={(category) => setSelectedCategory(category as AlsarejiaContentCategory)}
-          onViewChange={setViewMode}
-          onSortChange={() => {}}
+        <AdvancedFilterPanel
+          availableTags={['施設', '実験', '特殊技術', '歴史']}
+          availableWorlds={['ALSAREJIA', 'QUXE', 'HODEMEI']}
+          onChange={(newFilter) => setFilterCondition(newFilter)}
         />
+
+        <ToggleButtonGroup
+          value={viewMode}
+          isExclusive
+          onChange={(value) => setViewMode(value as 'grid' | 'list')}
+          margin="1rem 0"
+        >
+          <ToggleButton value="grid">グリッド</ToggleButton>
+          <ToggleButton value="list">リスト</ToggleButton>
+        </ToggleButtonGroup>
 
         <Tabs
           spacing="equal"
           value={selectedCategory}
           onChange={(e) => {
             const target = e.target as HTMLButtonElement;
-            if (target.value) {
-              setSelectedCategory(target.value as AlsarejiaContentCategory);
-            }
+            setSelectedCategory(target.value);
           }}
         >
           <Tabs.List>
@@ -94,25 +109,52 @@ export const AlsarejiaMaterials = () => {
             <Tabs.Item value="HISTORY">歴史</Tabs.Item>
           </Tabs.List>
         </Tabs>
-        
-        <Collection
-          type={viewMode}
-          items={filteredContent}
-          gap="medium"
-          templateColumns={viewMode === 'grid' ? {
-            base: "1fr",
-            medium: "1fr 1fr",
-            large: "1fr 1fr 1fr"
-          } : undefined}
-        >
-          {(item: MaterialDocument) => (
-            <DocumentCard 
-              {...item} 
-              key={item.id}
-              linkTo={`/materials/${attribution}/alsarejia/${item.id}`}
-            />
-          )}
-        </Collection>
+
+        {error && <ErrorAlert errorMessage={error} onDismiss={() => {}} />}
+
+        {loading && items.length === 0 ? (
+          <SkeletonList count={4} />
+        ) : (
+          <>
+            {viewMode === 'grid' && (
+              <Collection
+                type="grid"
+                items={mappedItems}
+                gap="medium"
+                templateColumns={{
+                  base: '1fr',
+                  medium: '1fr 1fr',
+                  large: '1fr 1fr 1fr',
+                }}
+              >
+                {(item) => <DocumentCard key={item.id} {...item} />}
+              </Collection>
+            )}
+            {viewMode === 'list' && (
+              <Collection type="list" items={mappedItems} gap="small">
+                {(item) => (
+                  <LibraryListViewItem
+                    key={item.id}
+                    id={item.id}
+                    title={item.title}
+                    description={item.description}
+                    isAvailable={item.isAvailable}
+                    reference={item.reference}
+                    linkTo={item.linkTo}
+                    category={item.category}
+                  />
+                )}
+              </Collection>
+            )}
+          </>
+        )}
+
+        {hasMore && !loading && (
+          <Button onClick={() => loadMore()} marginTop="1rem">
+            さらに読み込む
+          </Button>
+        )}
+        {loading && items.length > 0 && <SkeletonList count={2} />}
       </View>
     </MaterialsLayout>
   );
