@@ -1,4 +1,5 @@
-import { 
+// src/pages/MainPage.tsx
+import {
   Heading,
   View,
   Text,
@@ -10,26 +11,22 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { ContentCard } from '../components/common/ContentCard';
 
-  // 更新情報の登録
-  const newsItems = [
-    {
-      date: '2024.11.24',
-      text: 'Webサイトをリニューアルしました'
-    },
-    {
-      date: '2024.11.23',
-      text: 'メインストーリー第一章を公開しました'
-    },
-    {
-      date: '2024.11.22',
-      text: 'Laboratory Alsarejiaの設定資料を追加しました'
-    }
-  ];
+// ニュース例
+const newsItems = [
+  {
+    date: '2024.11.24',
+    text: 'Webサイトをリニューアルしました'
+  },
+  {
+    date: '2024.11.23',
+    text: 'メインストーリー第一章を公開しました'
+  },
+  {
+    date: '2024.11.22',
+    text: 'Laboratory Alsarejiaの設定資料を追加しました'
+  }
+];
 
-
-
-
-//出力
 export const MainPage = () => {
   const { tokens } = useTheme();
 
@@ -37,7 +34,10 @@ export const MainPage = () => {
     <>
       <Helmet>
         <title>Project Niferche</title>
-        <meta name="description" content="Project Nifercheは、アイデアの共有を通して新しい物語を紡ぎ出す創発的な創作プロジェクトです。" />
+        <meta
+          name="description"
+          content="Project Nifercheは、アイデアの共有を通して新しい物語を紡ぎ出す創発的な創作プロジェクトです。"
+        />
       </Helmet>
 
       {/* ヒーローセクション */}
@@ -48,7 +48,6 @@ export const MainPage = () => {
         padding={{ base: 'medium', large: 'xxl' }}
         height="80vh"
         style={{
-          zIndex:'5',
           backgroundImage: 'url("../images/sc.jpg")',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
@@ -89,15 +88,15 @@ export const MainPage = () => {
             maxWidth="900px"
             padding="medium"
           >
-            「人類は高度な情報交換システムを有する情報社会に到達しました。<br/>
-            しかし、急速な技術の発展に対し、文化・精神の成熟は非常に緩やかなものです。<br/>
+            「人類は高度な情報交換システムを有する情報社会に到達しました。<br />
+            しかし、急速な技術の発展に対し、文化・精神の成熟は非常に緩やかなものです。<br />
             皆様の精神の充実と輝かしい個性の発現を願い、我々は灯火を掲げます。」
           </Text>
 
           <Flex direction="row" gap="medium">
             <Button
               as={Link}
-              to="/about"
+              to="/call/about" // 修正箇所: もともと "/about" を "/call/about" に
               variation="primary"
               size="large"
             >
@@ -106,7 +105,7 @@ export const MainPage = () => {
             <Button
               as={Link}
               to="/laboratory/about"
-              variation="primary"//スタイル指定
+              variation="primary"
               size="large"
             >
               Laboratory へ
@@ -129,7 +128,9 @@ export const MainPage = () => {
                 direction="row"
                 gap="medium"
                 padding="small"
-                backgroundColor={index === 0 ? tokens.colors.background.primary : undefined}
+                backgroundColor={
+                  index === 0 ? tokens.colors.background.primary : undefined
+                }
                 borderRadius="small"
               >
                 <Text fontWeight="bold">{item.date}</Text>
@@ -144,8 +145,8 @@ export const MainPage = () => {
       <View padding={{ base: 'medium', large: 'xl' }}>
         <Flex direction="column" maxWidth="1200px" margin="0 auto" gap="xl">
           <Heading level={2}>主なコンテンツ</Heading>
-          
-          <Flex 
+
+          <Flex
             direction={{ base: 'column', large: 'row' }}
             gap="large"
             alignItems="stretch"
@@ -154,7 +155,7 @@ export const MainPage = () => {
               title="メインストーリー"
               description="記憶を失った研究者サレジアと、不思議な存在ニファーシェの物語"
               imagePath="/images/main-story.jpg"
-              linkTo="/laboratory/mainstory"
+              linkTo="/library/mainstory"
             />
 
             <ContentCard
@@ -179,18 +180,21 @@ export const MainPage = () => {
         backgroundColor={tokens.colors.background.secondary}
         padding={{ base: 'medium', large: 'xl' }}
       >
-        <Flex direction="column" maxWidth="1200px" margin="0 auto" gap="large" alignItems="center">
-          <Heading level={2} textAlign="center">創作の輪に参加しませんか？</Heading>
+        <Flex
+          direction="column"
+          maxWidth="1200px"
+          margin="0 auto"
+          gap="large"
+          alignItems="center"
+        >
+          <Heading level={2} textAlign="center">
+            創作の輪に参加しませんか？
+          </Heading>
           <Text textAlign="center" maxWidth="600px">
             Laboratory Alsarejiaでは、あなたのアイデアや創作物を共有し、
             新しい物語を一緒に紡ぎ出すことができます。
           </Text>
-          <Button
-            as={Link}
-            to="/about"
-            variation="primary"
-            size="large"
-          >
+          <Button as={Link} to="/call/about" variation="primary" size="large">
             参加方法を確認する
           </Button>
         </Flex>

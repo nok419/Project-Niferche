@@ -10,13 +10,13 @@ import {
 import { ContentCard } from '../../components/common/ContentCard';
 import { ContentSection } from '../../components/common/ContentSection';
 
-
 const mainSections = [
   {
     id: 'mainstory',
     title: 'Main Story',
     description: '記憶を失った研究者サレジアと、ニファーシェが織りなす物語',
-    linkTo: '/laboratory/mainstory',
+    // 修正: linkToを "/library/mainstory" へ変更
+    linkTo: '/library/mainstory',
     imageUrl: '/images/main-story.jpg',
     isAvailable: true
   },
@@ -24,7 +24,8 @@ const mainSections = [
     id: 'sidestory',
     title: 'Side Stories',
     description: '様々な視点から描かれる物語',
-    linkTo: '/laboratory/sidestory',
+    // 同じく修正(サイドストーリーは /library/sidestory)
+    linkTo: '/library/sidestory',
     imageUrl: '/images/side-story.jpg',
     isAvailable: true
   }
@@ -52,7 +53,8 @@ const facilitySections = [
 const todaysResearch = {
   id: 'sample-research',
   title: 'サンプル研究報告書',
-  content: '研究報告: #2024-001\n本日のアイデア体の観測により、興味深い現象が確認されました...',
+  content:
+    '研究報告: #2024-001\n本日のアイデア体の観測により、興味深い現象が確認されました...',
   author: 'サレジア'
 };
 
@@ -60,34 +62,34 @@ export const LaboratoryPage = () => {
   return (
     <View padding="2rem">
       {/* ヘッダーセクション */}
-      <ContentSection 
-        variant="laboratory" 
-        title="Laboratory Alsarejia" 
+      <ContentSection
+        variant="laboratory"
+        title="Laboratory Alsarejia"
         description="世界の狭間に存在する不思議な研究施設。現実と想像の境界を探る研究が日々行われています。"
       >
-        <Card 
-          variation="elevated" 
+        <Card
+          variation="elevated"
           marginTop="1rem"
           padding="1rem"
           style={{ maxHeight: '120px', overflow: 'hidden' }}
         >
           <Flex direction="column" gap="small">
-            <Text 
-              as="pre" 
-              whiteSpace="pre-wrap" 
+            <Text
+              as="pre"
+              whiteSpace="pre-wrap"
               fontSize="sm"
               style={{
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 display: '-webkit-box',
                 WebkitLineClamp: '3',
-                WebkitBoxOrient: 'vertical',
+                WebkitBoxOrient: 'vertical'
               }}
             >
               {todaysResearch.content}
             </Text>
-            <Text 
-              textAlign="right" 
+            <Text
+              textAlign="right"
               fontStyle="italic"
               fontSize="sm"
               color="font.tertiary"
@@ -109,8 +111,8 @@ export const LaboratoryPage = () => {
           items={mainSections}
           gap="medium"
           templateColumns={{
-            base: "1fr",
-            medium: "1fr 1fr"
+            base: '1fr',
+            medium: '1fr 1fr'
           }}
         >
           {(item) => (
@@ -138,12 +140,12 @@ export const LaboratoryPage = () => {
       >
         <Grid
           templateColumns={{
-            base: "1fr",
-            medium: "1fr 1fr"
+            base: '1fr',
+            medium: '1fr 1fr'
           }}
           gap="medium"
         >
-          {facilitySections.map(section => (
+          {facilitySections.map((section) => (
             <ContentCard
               key={section.id}
               title={section.title}
@@ -161,9 +163,9 @@ export const LaboratoryPage = () => {
       </ContentSection>
 
       {/* フッター的な要素 */}
-      <Flex 
-        direction="column" 
-        alignItems="center" 
+      <Flex
+        direction="column"
+        alignItems="center"
         marginTop="4rem"
         padding="2rem"
         backgroundColor="background.secondary"

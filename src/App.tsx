@@ -1,4 +1,5 @@
 // src/App.tsx
+
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, Authenticator } from '@aws-amplify/ui-react';
 import { SessionProvider } from './contexts/SessionContext';
@@ -24,6 +25,10 @@ import { NewsPage } from './pages/call/NewsPage';
 import { LibraryOverviewPage } from './pages/library/LibraryOverviewPage';
 import { MainStory } from './pages/library/MainStory';
 import { SideStory } from './pages/library/SideStory';
+import { SideStoryListPage } from './pages/library/SideStoryListPage';
+import { SideStoryDetailPage } from './pages/library/SideStoryDetailPage';
+import { LibraryPage } from './pages/library/LibraryPage';
+import { RecordsPage } from './pages/library/RecordsPage';
 
 // Laboratory Pages
 import { LaboratoryPage } from './pages/laboratory/LaboratoryPage';
@@ -46,6 +51,7 @@ import { GalleryPage } from './pages/gallery/GalleryPage';
 import { MainPage } from './pages/MainPage';
 import { RightsPage } from './pages/system/RightsPage';
 import { TermsPage } from './pages/system/TermsPage';
+import { GuidelinesPage } from './pages/system/GuidelinesPage';
 
 // Auth Pages
 import { SignInPage } from './pages/system/auth/SignInPage';
@@ -62,6 +68,11 @@ import { ProfilePage } from './pages/user/ProfilePage';
 import { FavoritesPage } from './pages/user/FavoritesPage';
 
 import { ErrorBoundary } from './components/common/ErrorBoundary';
+
+// ★ 新規追加ページ
+import { GalleryDetailPage } from './pages/gallery/GalleryDetailPage';        // 追加
+import { MaterialDetailPage } from './pages/materials/MaterialDetailPage';   // 追加
+import { AdminDashboardPage } from './pages/admin/AdminDashboardPage';       // 追加
 
 function App() {
   return (
@@ -91,6 +102,10 @@ function App() {
                   <Route path="/library" element={<LibraryOverviewPage />} />
                   <Route path="/library/mainstory" element={<MainStory />} />
                   <Route path="/library/sidestory" element={<SideStory />} />
+                  <Route path="/library/sidestorylist" element={<SideStoryListPage />} />
+                  <Route path="/library/sidestory/detail/:storyId" element={<SideStoryDetailPage />} />
+                  <Route path="/library/records" element={<RecordsPage />} />
+                  <Route path="/library/page" element={<LibraryPage />} />
                 </Route>
 
                 {/* Laboratory */}
@@ -115,13 +130,22 @@ function App() {
                   <Route path="/materials/quxe" element={<QuxeMaterials />} />
                   <Route path="/materials/hodemei" element={<HodemeiMaterials />} />
                   <Route path="/materials/alsarejia" element={<AlsarejiaMaterials />} />
+                  {/* ★ 新規追加の詳細ルート */}
+                  <Route 
+                    path="/materials/:attribution/:world/:materialId" 
+                    element={<MaterialDetailPage />} 
+                  />
                 </Route>
 
                 {/* Gallery */}
                 <Route element={<MainLayout />}>
                   <Route path="/gallery" element={<GalleryPage />} />
+                  {/* ★ 新規追加のギャラリ詳細ルート */}
+                  <Route path="/gallery/view/:galleryId" element={<GalleryDetailPage />} />
+
                   <Route path="/rights" element={<RightsPage />} />
                   <Route path="/terms" element={<TermsPage />} />
+                  <Route path="/guidelines" element={<GuidelinesPage />} />
                 </Route>
 
                 {/* Protected */}
@@ -138,6 +162,15 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <FavoritesPage />
+                    </ProtectedRoute>
+                  }
+                />
+                {/* 管理者専用 */}
+                <Route 
+                  path="/admin"
+                  element={
+                    <ProtectedRoute accessLevel="admin">
+                      <AdminDashboardPage />
                     </ProtectedRoute>
                   }
                 />

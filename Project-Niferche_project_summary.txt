@@ -97,6 +97,7 @@
     - pages/
       - materials/
         - HodemeiMaterials.tsx
+        - MaterialDetailPage.tsx
         - AlsarejiaMaterials.tsx
         - QuxeMaterials.tsx
         - MaterialsAbout.tsx
@@ -110,10 +111,14 @@
         - ObservationPage.tsx
       - gallery/
         - GalleryPage.tsx
+        - GalleryDetailPage.tsx
+      - admin/
+        - AdminDashboardPage.tsx
       - library/
         - SideStory.tsx
         - MainStory.tsx
         - LibraryOverviewPage.tsx
+        - RecordsPage.tsx
         - SideStoryListPage.tsx
         - SideStoryDetailPage.tsx
         - LibraryPage.tsx
@@ -127,6 +132,7 @@
           - SignInPage.tsx
           - SignUpPage.tsx
         - TermsPage.tsx
+        - GuidelinesPage.tsx
         - RightsPage.tsx
       - comingsoon.tsx
       - call/
@@ -873,6 +879,7 @@ export default defineConfig(({ mode }) => {
 
 ```
 // src/App.tsx
+
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, Authenticator } from '@aws-amplify/ui-react';
 import { SessionProvider } from './contexts/SessionContext';
@@ -898,6 +905,10 @@ import { NewsPage } from './pages/call/NewsPage';
 import { LibraryOverviewPage } from './pages/library/LibraryOverviewPage';
 import { MainStory } from './pages/library/MainStory';
 import { SideStory } from './pages/library/SideStory';
+import { SideStoryListPage } from './pages/library/SideStoryListPage';
+import { SideStoryDetailPage } from './pages/library/SideStoryDetailPage';
+import { LibraryPage } from './pages/library/LibraryPage';
+import { RecordsPage } from './pages/library/RecordsPage';
 
 // Laboratory Pages
 import { LaboratoryPage } from './pages/laboratory/LaboratoryPage';
@@ -920,6 +931,7 @@ import { GalleryPage } from './pages/gallery/GalleryPage';
 import { MainPage } from './pages/MainPage';
 import { RightsPage } from './pages/system/RightsPage';
 import { TermsPage } from './pages/system/TermsPage';
+import { GuidelinesPage } from './pages/system/GuidelinesPage';
 
 // Auth Pages
 import { SignInPage } from './pages/system/auth/SignInPage';
@@ -936,6 +948,11 @@ import { ProfilePage } from './pages/user/ProfilePage';
 import { FavoritesPage } from './pages/user/FavoritesPage';
 
 import { ErrorBoundary } from './components/common/ErrorBoundary';
+
+// ★ 新規追加ページ
+import { GalleryDetailPage } from './pages/gallery/GalleryDetailPage';        // 追加
+import { MaterialDetailPage } from './pages/materials/MaterialDetailPage';   // 追加
+import { AdminDashboardPage } from './pages/admin/AdminDashboardPage';       // 追加
 
 function App() {
   return (
@@ -965,6 +982,10 @@ function App() {
                   <Route path="/library" element={<LibraryOverviewPage />} />
                   <Route path="/library/mainstory" element={<MainStory />} />
                   <Route path="/library/sidestory" element={<SideStory />} />
+                  <Route path="/library/sidestorylist" element={<SideStoryListPage />} />
+                  <Route path="/library/sidestory/detail/:storyId" element={<SideStoryDetailPage />} />
+                  <Route path="/library/records" element={<RecordsPage />} />
+                  <Route path="/library/page" element={<LibraryPage />} />
                 </Route>
 
                 {/* Laboratory */}
@@ -989,13 +1010,22 @@ function App() {
                   <Route path="/materials/quxe" element={<QuxeMaterials />} />
                   <Route path="/materials/hodemei" element={<HodemeiMaterials />} />
                   <Route path="/materials/alsarejia" element={<AlsarejiaMaterials />} />
+                  {/* ★ 新規追加の詳細ルート */}
+                  <Route 
+                    path="/materials/:attribution/:world/:materialId" 
+                    element={<MaterialDetailPage />} 
+                  />
                 </Route>
 
                 {/* Gallery */}
                 <Route element={<MainLayout />}>
                   <Route path="/gallery" element={<GalleryPage />} />
+                  {/* ★ 新規追加のギャラリ詳細ルート */}
+                  <Route path="/gallery/view/:galleryId" element={<GalleryDetailPage />} />
+
                   <Route path="/rights" element={<RightsPage />} />
                   <Route path="/terms" element={<TermsPage />} />
+                  <Route path="/guidelines" element={<GuidelinesPage />} />
                 </Route>
 
                 {/* Protected */}
@@ -1012,6 +1042,15 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <FavoritesPage />
+                    </ProtectedRoute>
+                  }
+                />
+                {/* 管理者専用 */}
+                <Route 
+                  path="/admin"
+                  element={
+                    <ProtectedRoute accessLevel="admin">
+                      <AdminDashboardPage />
                     </ProtectedRoute>
                   }
                 />
@@ -2058,6 +2097,7 @@ export const CallLayout = () => {
 ### src/components/layout/LaboratoryLayout.tsx
 
 ```
+// src/components/layout/LaboratoryLayout.tsx
 import { View, Flex, Button } from '@aws-amplify/ui-react';
 import { Outlet, Link } from 'react-router-dom';
 import { NavigationHeader } from './navigation-header';
@@ -2077,7 +2117,7 @@ export const LaboratoryLayout = () => {
       </View>
 
       <View height="60px" />
-      
+
       <View
         as="main"
         flex="1"
@@ -2110,9 +2150,10 @@ export const LaboratoryLayout = () => {
             height="20px"
             margin="0 8px"
           />
+          {/* 修正: "/niferche/rights" → "/rights" */}
           <Button
             as={Link}
-            to="/niferche/rights"
+            to="/rights"
             variation="link"
             size="small"
             padding="0"
@@ -2133,29 +2174,33 @@ export const LaboratoryLayout = () => {
     </Flex>
   );
 };
+
 ```
 
 ### src/components/layout/MainLayout.tsx
 
 ```
+// src/components/layout/MainLayout.tsx
 import { View, Flex, Button } from '@aws-amplify/ui-react';
 import { NavigationHeader } from './navigation-header';
 import { Helmet } from 'react-helmet-async';
 import { Link, Outlet } from 'react-router-dom';
-
 
 export const MainLayout = () => {
   return (
     <>
       <Helmet>
         <title>Project Niferche</title>
-        <meta name="description" content="Project Niferche - 創作活動のためのオンラインプラットフォーム" />
+        <meta
+          name="description"
+          content="Project Niferche - 創作活動のためのオンラインプラットフォーム"
+        />
         <link
           href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
           rel="stylesheet"
         />
       </Helmet>
-      
+
       <Flex direction="column" height="100vh" width="100vw" position="relative">
         <View
           position="fixed"
@@ -2170,7 +2215,7 @@ export const MainLayout = () => {
         </View>
 
         <View height="60px" />
-        
+
         <View
           as="main"
           flex="1"
@@ -2203,13 +2248,8 @@ export const MainLayout = () => {
               height="20px"
               margin="0 8px"
             />
-            <Button
-              as={Link}
-              to="/niferche/rights"
-              variation="link"
-              size="small"
-              padding="0"
-            >
+            {/* 修正: "/niferche/rights" → "/rights" */}
+            <Button as={Link} to="/rights" variation="link" size="small" padding="0">
               権利情報
             </Button>
             <Button
@@ -2227,6 +2267,7 @@ export const MainLayout = () => {
     </>
   );
 };
+
 ```
 
 ### src/components/layout/MaterialsRootLayout.tsx
@@ -4640,6 +4681,104 @@ export const HodemeiMaterials = () => {
 
 ```
 
+### src/pages/materials/MaterialDetailPage.tsx
+
+```
+// src/pages/materials/MaterialDetailPage.tsx
+import { useParams, useNavigate } from 'react-router-dom';
+import { View, Heading, Text, Image, Card, Flex, Button } from '@aws-amplify/ui-react';
+import { useEffect, useState } from 'react';
+
+interface MaterialDoc {
+  id: string;
+  title: string;
+  description: string;
+  attribution: 'official' | 'shared';
+  world: 'hodemei' | 'quxe' | 'alsarejia' | 'common';
+  imagePath?: string;
+  content?: string; // テキスト本文など
+}
+
+// 仮のダミーデータ
+const MOCK_MATERIALS: MaterialDoc[] = [
+  {
+    id: 'doc001',
+    title: 'Hodemeiの先端科学',
+    description: 'Hodemei世界における科学技術のあれこれ',
+    attribution: 'official',
+    world: 'hodemei',
+    imagePath: '/images/materials/tech-system.jpg',
+    content: '詳細な科学設定や基礎理論について...'
+  }
+];
+
+export const MaterialDetailPage = () => {
+  const { attribution, world, materialId } = useParams();
+  const navigate = useNavigate();
+
+  const [doc, setDoc] = useState<MaterialDoc | null>(null);
+
+  useEffect(() => {
+    // 実際にはGraphQL / S3などから fetch
+    const found = MOCK_MATERIALS.find(
+      (item) =>
+        item.id === materialId &&
+        item.attribution === attribution &&
+        item.world === world
+    );
+    setDoc(found || null);
+  }, [attribution, world, materialId]);
+
+  if (!doc) {
+    return (
+      <View padding="2rem" textAlign="center">
+        <Heading level={3}>資料が見つかりません</Heading>
+        <Button onClick={() => navigate(-1)} marginTop="1rem">
+          戻る
+        </Button>
+      </View>
+    );
+  }
+
+  return (
+    <View padding="2rem">
+      <Button 
+        onClick={() => navigate(-1)} 
+        marginBottom="1rem"
+      >
+        ← 一覧へ戻る
+      </Button>
+
+      <Card variation="elevated">
+        <Flex direction="column" gap="small">
+          <Heading level={2}>{doc.title}</Heading>
+          <Text>
+            {doc.attribution === 'official' ? '公式資料' : '共有資料'} / {doc.world}
+          </Text>
+          {doc.imagePath && (
+            <Image
+              src={doc.imagePath}
+              alt={doc.title}
+              width="100%"
+              maxHeight="300px"
+              objectFit="cover"
+            />
+          )}
+          <Text marginTop="1rem">{doc.description}</Text>
+
+          {doc.content && (
+            <Text marginTop="1rem" whiteSpace="pre-wrap">
+              {doc.content}
+            </Text>
+          )}
+        </Flex>
+      </Card>
+    </View>
+  );
+};
+
+```
+
 ### src/pages/materials/AlsarejiaMaterials.tsx
 
 ```
@@ -5455,13 +5594,13 @@ import {
 import { ContentCard } from '../../components/common/ContentCard';
 import { ContentSection } from '../../components/common/ContentSection';
 
-
 const mainSections = [
   {
     id: 'mainstory',
     title: 'Main Story',
     description: '記憶を失った研究者サレジアと、ニファーシェが織りなす物語',
-    linkTo: '/laboratory/mainstory',
+    // 修正: linkToを "/library/mainstory" へ変更
+    linkTo: '/library/mainstory',
     imageUrl: '/images/main-story.jpg',
     isAvailable: true
   },
@@ -5469,7 +5608,8 @@ const mainSections = [
     id: 'sidestory',
     title: 'Side Stories',
     description: '様々な視点から描かれる物語',
-    linkTo: '/laboratory/sidestory',
+    // 同じく修正(サイドストーリーは /library/sidestory)
+    linkTo: '/library/sidestory',
     imageUrl: '/images/side-story.jpg',
     isAvailable: true
   }
@@ -5497,7 +5637,8 @@ const facilitySections = [
 const todaysResearch = {
   id: 'sample-research',
   title: 'サンプル研究報告書',
-  content: '研究報告: #2024-001\n本日のアイデア体の観測により、興味深い現象が確認されました...',
+  content:
+    '研究報告: #2024-001\n本日のアイデア体の観測により、興味深い現象が確認されました...',
   author: 'サレジア'
 };
 
@@ -5505,34 +5646,34 @@ export const LaboratoryPage = () => {
   return (
     <View padding="2rem">
       {/* ヘッダーセクション */}
-      <ContentSection 
-        variant="laboratory" 
-        title="Laboratory Alsarejia" 
+      <ContentSection
+        variant="laboratory"
+        title="Laboratory Alsarejia"
         description="世界の狭間に存在する不思議な研究施設。現実と想像の境界を探る研究が日々行われています。"
       >
-        <Card 
-          variation="elevated" 
+        <Card
+          variation="elevated"
           marginTop="1rem"
           padding="1rem"
           style={{ maxHeight: '120px', overflow: 'hidden' }}
         >
           <Flex direction="column" gap="small">
-            <Text 
-              as="pre" 
-              whiteSpace="pre-wrap" 
+            <Text
+              as="pre"
+              whiteSpace="pre-wrap"
               fontSize="sm"
               style={{
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 display: '-webkit-box',
                 WebkitLineClamp: '3',
-                WebkitBoxOrient: 'vertical',
+                WebkitBoxOrient: 'vertical'
               }}
             >
               {todaysResearch.content}
             </Text>
-            <Text 
-              textAlign="right" 
+            <Text
+              textAlign="right"
               fontStyle="italic"
               fontSize="sm"
               color="font.tertiary"
@@ -5554,8 +5695,8 @@ export const LaboratoryPage = () => {
           items={mainSections}
           gap="medium"
           templateColumns={{
-            base: "1fr",
-            medium: "1fr 1fr"
+            base: '1fr',
+            medium: '1fr 1fr'
           }}
         >
           {(item) => (
@@ -5583,12 +5724,12 @@ export const LaboratoryPage = () => {
       >
         <Grid
           templateColumns={{
-            base: "1fr",
-            medium: "1fr 1fr"
+            base: '1fr',
+            medium: '1fr 1fr'
           }}
           gap="medium"
         >
-          {facilitySections.map(section => (
+          {facilitySections.map((section) => (
             <ContentCard
               key={section.id}
               title={section.title}
@@ -5606,9 +5747,9 @@ export const LaboratoryPage = () => {
       </ContentSection>
 
       {/* フッター的な要素 */}
-      <Flex 
-        direction="column" 
-        alignItems="center" 
+      <Flex
+        direction="column"
+        alignItems="center"
         marginTop="4rem"
         padding="2rem"
         backgroundColor="background.secondary"
@@ -5621,6 +5762,7 @@ export const LaboratoryPage = () => {
     </View>
   );
 };
+
 ```
 
 ### src/pages/laboratory/FacilityGuide.tsx
@@ -6553,6 +6695,112 @@ const GalleryUploadForm = () => {
 
 ```
 
+### src/pages/gallery/GalleryDetailPage.tsx
+
+```
+// src/pages/gallery/GalleryDetailPage.tsx
+import { useParams, useNavigate } from 'react-router-dom';
+import { View, Heading, Text, Image, Button, Flex } from '@aws-amplify/ui-react';
+import { useState, useEffect } from 'react';
+
+/** 仮のギャラリーデータ */
+interface GalleryItem {
+  id: string;
+  title: string;
+  imagePath: string;
+  description?: string;
+}
+
+// ダミー一覧（本来はバックエンド連携やuseInfiniteContents()で取得）
+const GALLERY_DATA: GalleryItem[] = [
+  {
+    id: 'sample1',
+    title: 'サンプル画像1',
+    imagePath: '/images/sc.jpg',
+    description: 'テスト用のイメージです'
+  },
+  {
+    id: 'sample2',
+    title: 'サンプル画像2',
+    imagePath: '/images/fallback.jpg',
+    description: 'もうひとつのテスト用イメージ'
+  }
+];
+
+export const GalleryDetailPage = () => {
+  const { galleryId } = useParams();
+  const navigate = useNavigate();
+  const [item, setItem] = useState<GalleryItem | null>(null);
+
+  useEffect(() => {
+    // 仮: ダミーデータから検索
+    const found = GALLERY_DATA.find((g) => g.id === galleryId);
+    setItem(found || null);
+  }, [galleryId]);
+
+  if (!item) {
+    return (
+      <View padding="2rem" textAlign="center">
+        <Heading level={3}>指定された画像が見つかりませんでした</Heading>
+        <Button onClick={() => navigate('/gallery')} marginTop="1rem">
+          ギャラリーへ戻る
+        </Button>
+      </View>
+    );
+  }
+
+  return (
+    <View padding="2rem" maxWidth="800px" margin="0 auto">
+      <Button onClick={() => navigate('/gallery')} marginBottom="1rem">
+        ← ギャラリー一覧に戻る
+      </Button>
+
+      <Flex direction="column" gap="medium" alignItems="center">
+        <Heading level={2}>{item.title}</Heading>
+        <Image
+          src={item.imagePath}
+          alt={item.title}
+          objectFit="cover"
+          width="100%"
+          maxWidth="600px"
+        />
+        {item.description && (
+          <Text>{item.description}</Text>
+        )}
+      </Flex>
+    </View>
+  );
+};
+
+```
+
+### src/pages/admin/AdminDashboardPage.tsx
+
+```
+// src/pages/admin/AdminDashboardPage.tsx
+import { View, Heading, Text, Button } from '@aws-amplify/ui-react';
+import { useNavigate } from 'react-router-dom';
+
+export const AdminDashboardPage = () => {
+  const navigate = useNavigate();
+
+  return (
+    <View padding="2rem">
+      <Heading level={2}>管理ダッシュボード</Heading>
+      <Text marginTop="1rem">
+        ここではユーザー管理やコンテンツ審査などの管理機能を行えます。
+        （実際の機能は今後実装予定）
+      </Text>
+
+      <Button onClick={() => navigate('/') } marginTop="2rem">
+        トップページへ戻る
+      </Button>
+    </View>
+  );
+};
+
+```
+
 ### src/pages/library/SideStory.tsx
 
 ```
@@ -7014,6 +7262,110 @@ export const LibraryOverviewPage = () => {
         </Button>
       )}
       {loading && items.length > 0 && <SkeletonList count={2} />}
+    </View>
+  );
+};
+
+```
+
+### src/pages/library/RecordsPage.tsx
+
+```
+// src/pages/library/RecordsPage.tsx
+import { useState } from 'react';
+import { View, Heading, Collection, Card, Text, Badge, Flex, Button } from '@aws-amplify/ui-react';
+import { useNavigate } from 'react-router-dom';
+
+interface RecordItem {
+  id: string;
+  title: string;
+  description: string;
+  category: 'theory' | 'experiment' | 'observation' | 'misc';
+  status: 'open' | 'closed';
+  date: string;
+}
+
+const mockRecords: RecordItem[] = [
+  {
+    id: 'r-001',
+    title: 'アイデア体の共鳴現象',
+    description: '複数のアイデア体を同時観測した際の共鳴現象研究ノート',
+    category: 'experiment',
+    status: 'open',
+    date: '2024-03-10'
+  },
+  {
+    id: 'r-002',
+    title: '境界領域に関する考察',
+    description: '現実と想像の狭間における不思議な干渉のレポート',
+    category: 'theory',
+    status: 'closed',
+    date: '2024-02-28'
+  }
+];
+
+export const RecordsPage = () => {
+  const [filter, setFilter] = useState<'all' | 'open' | 'closed'>('all');
+  const navigate = useNavigate();
+
+  const filtered = mockRecords.filter(rec => {
+    if (filter === 'all') return true;
+    return rec.status === filter;
+  });
+
+  return (
+    <View padding="2rem">
+      <Heading level={1} marginBottom="1rem">
+        研究記録集
+      </Heading>
+      <Text marginBottom="1rem">
+        Laboratoryで記録された研究データや実験結果を閲覧できます。
+      </Text>
+
+      <Flex gap="small" marginBottom="1rem">
+        <Button
+          onClick={() => setFilter('all')}
+          variation={filter === 'all' ? 'primary' : 'link'}
+        >
+          全て
+        </Button>
+        <Button
+          onClick={() => setFilter('open')}
+          variation={filter === 'open' ? 'primary' : 'link'}
+        >
+          公開中
+        </Button>
+        <Button
+          onClick={() => setFilter('closed')}
+          variation={filter === 'closed' ? 'primary' : 'link'}
+        >
+          閲覧終了
+        </Button>
+      </Flex>
+
+      <Collection type="list" items={filtered} gap="small">
+        {(item) => (
+          <Card key={item.id} variation="elevated" padding="1rem">
+            <Flex direction="column" gap="xsmall">
+              <Heading level={3}>{item.title}</Heading>
+              <Text>{item.description}</Text>
+              <Flex gap="small" alignItems="center">
+                <Badge variation={item.status === 'open' ? 'success' : 'warning'}>
+                  {item.status === 'open' ? '公開中' : '閲覧終了'}
+                </Badge>
+                <Badge variation="info">{item.category}</Badge>
+                <Text fontSize="small" color="font.tertiary">
+                  {item.date}
+                </Text>
+              </Flex>
+            </Flex>
+          </Card>
+        )}
+      </Collection>
+
+      <Button onClick={() => navigate('/library')} marginTop="2rem" variation="link">
+        ライブラリトップへ戻る
+      </Button>
     </View>
   );
 };
@@ -7797,6 +8149,68 @@ const Section: React.FC<SectionProps> = ({ title, content }) => (
 
 ```
 
+### src/pages/system/GuidelinesPage.tsx
+
+```
+// src/pages/system/GuidelinesPage.tsx
+import { View, Heading, Text, Divider, Flex, Button } from '@aws-amplify/ui-react';
+import { useNavigate } from 'react-router-dom';
+
+export const GuidelinesPage = () => {
+  const navigate = useNavigate();
+  
+  return (
+    <View padding="medium" maxWidth="800px" margin="0 auto">
+      <Heading level={1}>ガイドライン</Heading>
+      <Divider marginBlock="medium" />
+
+      <Text>
+        ここでは、Project Niferche内で創作活動や投稿を行うにあたってのガイドラインを示します。
+        ユーザーの皆様に安心して活動いただくために、以下の点をご一読ください。
+      </Text>
+
+      <Flex direction="column" gap="medium" marginTop="1.5rem">
+        <Section
+          title="1. 投稿コンテンツに関して"
+          content={`公序良俗に反する表現、極端に攻撃的な言動はお控えください。二次創作などを行う場合は、原著作者の権利を尊重しましょう。`}
+        />
+
+        <Section
+          title="2. コミュニティマナー"
+          content={`コメント欄やフォーラムでは他者の意見を尊重し、建設的な議論を行ってください。誹謗中傷や荒らし行為は警告やアカウント停止の対象となります。`}
+        />
+
+        <Section
+          title="3. 二次利用規約"
+          content={`公式コンテンツを含む作品を使用する際は、必ず出典を明記し、改変がある場合は改変箇所を明確に示してください。`}
+        />
+
+        <Section
+          title="4. 運営ポリシー"
+          content={`運営チームは、投稿内容が本ガイドラインに反すると判断した場合、投稿を削除する権利を有します。重大な違反にはアカウント停止等の措置を取ることがあります。`}
+        />
+      </Flex>
+
+      <Divider marginBlock="medium" />
+
+      <Button onClick={() => navigate('/call/philosophy')} variation="link">
+        戻る
+      </Button>
+    </View>
+  );
+};
+
+const Section = ({ title, content }: { title: string; content: string }) => (
+  <View marginBottom="1rem">
+    <Heading level={2} fontSize="large">{title}</Heading>
+    <Text whiteSpace="pre-wrap" marginTop="small">
+      {content}
+    </Text>
+  </View>
+);
+
+```
+
 ### src/pages/system/RightsPage.tsx
 
 ```
@@ -8076,7 +8490,8 @@ export const AboutPage = () => {
 ### src/pages/call/PhilosophyPage.tsx
 
 ```
-import { 
+// src/pages/call/PhilosophyPage.tsx
+import {
   Card,
   Heading,
   Text,
@@ -8098,7 +8513,10 @@ export const PhilosophyPage = () => {
     <>
       <Helmet>
         <title>理念 - Project Niferche</title>
-        <meta name="description" content="Project Nifercheが掲げる理念と活動方針について" />
+        <meta
+          name="description"
+          content="Project Nifercheが掲げる理念と活動方針について"
+        />
       </Helmet>
 
       <View padding={tokens.space.large}>
@@ -8109,8 +8527,10 @@ export const PhilosophyPage = () => {
           maxWidth="800px"
           margin="0 auto"
         >
-          <Heading level={1} textAlign="center">理念</Heading>
-          
+          <Heading level={1} textAlign="center">
+            理念
+          </Heading>
+
           <Alert variation="info" margin={tokens.space.medium}>
             Project Nifercheは創作活動支援のためのプラットフォームです。
             特定の思想や信条を広めることを目的とした活動ではありません。
@@ -8122,18 +8542,18 @@ export const PhilosophyPage = () => {
             <Badge variation="success">理念1</Badge>
             <Heading level={3}>人類の精神的豊かさの追求</Heading>
             <Text padding={tokens.space.small}>
-              創造活動による自己実現の支援を通じて、現実的な社会的問題の解決に貢献します。
+              創造活動による自己実現の支援を通じて、社会的問題の解決にも貢献します。
               オープンな創作環境および設定資料集の提供、オープンデータセットの作成と管理を行います。
             </Text>
-            <Flex 
-            direction={{ base: 'column', medium: 'row' }}
-            gap={tokens.space.medium}
-            justifyContent="center"
-            alignItems="center"
-            marginTop={tokens.space.large}
-          >
+            <Flex
+              direction={{ base: 'column', medium: 'row' }}
+              gap={tokens.space.medium}
+              justifyContent="center"
+              alignItems="center"
+              marginTop={tokens.space.large}
+            >
               <Link to="/rights" style={{ textDecoration: 'none' }}>
-                <Button variation="link">利用規約</Button>
+                <Button variation="link">権利情報</Button>
               </Link>
               <Link to="/guidelines" style={{ textDecoration: 'none' }}>
                 <Button variation="link">ガイドライン</Button>
@@ -8150,7 +8570,7 @@ export const PhilosophyPage = () => {
               交流プラットフォーム「Laboratory Alsarejia」を提供します。
             </Text>
             <Flex justifyContent="flex-end" padding={tokens.space.small}>
-              <Link to="/laboratory/mainstory" style={{ textDecoration: 'none' }}>
+              <Link to="/library/mainstory" style={{ textDecoration: 'none' }}>
                 <Button variation="primary">メインストーリーを読む</Button>
               </Link>
             </Flex>
@@ -8158,9 +8578,10 @@ export const PhilosophyPage = () => {
 
           <Divider margin={tokens.space.large} />
 
-          <Heading level={3} textAlign="center">最新のお知らせ</Heading>
+          <Heading level={3} textAlign="center">
+            最新のお知らせ
+          </Heading>
           <Card margin={tokens.space.medium}>
-            {/* お知らせコンポーネントを後ほど実装 */}
             <Text color="font.secondary">お知らせはまもなく実装されます</Text>
           </Card>
         </Card>
@@ -8168,9 +8589,6 @@ export const PhilosophyPage = () => {
     </>
   );
 };
-
-
-
 
 ```
 
@@ -8245,7 +8663,8 @@ export const NewsPage = () => {
 ### src/pages/MainPage.tsx
 
 ```
-import { 
+// src/pages/MainPage.tsx
+import {
   Heading,
   View,
   Text,
@@ -8257,26 +8676,22 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { ContentCard } from '../components/common/ContentCard';
 
-  // 更新情報の登録
-  const newsItems = [
-    {
-      date: '2024.11.24',
-      text: 'Webサイトをリニューアルしました'
-    },
-    {
-      date: '2024.11.23',
-      text: 'メインストーリー第一章を公開しました'
-    },
-    {
-      date: '2024.11.22',
-      text: 'Laboratory Alsarejiaの設定資料を追加しました'
-    }
-  ];
+// ニュース例
+const newsItems = [
+  {
+    date: '2024.11.24',
+    text: 'Webサイトをリニューアルしました'
+  },
+  {
+    date: '2024.11.23',
+    text: 'メインストーリー第一章を公開しました'
+  },
+  {
+    date: '2024.11.22',
+    text: 'Laboratory Alsarejiaの設定資料を追加しました'
+  }
+];
 
-
-
-
-//出力
 export const MainPage = () => {
   const { tokens } = useTheme();
 
@@ -8284,7 +8699,10 @@ export const MainPage = () => {
     <>
       <Helmet>
         <title>Project Niferche</title>
-        <meta name="description" content="Project Nifercheは、アイデアの共有を通して新しい物語を紡ぎ出す創発的な創作プロジェクトです。" />
+        <meta
+          name="description"
+          content="Project Nifercheは、アイデアの共有を通して新しい物語を紡ぎ出す創発的な創作プロジェクトです。"
+        />
       </Helmet>
 
       {/* ヒーローセクション */}
@@ -8295,7 +8713,6 @@ export const MainPage = () => {
         padding={{ base: 'medium', large: 'xxl' }}
         height="80vh"
         style={{
-          zIndex:'5',
           backgroundImage: 'url("../images/sc.jpg")',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
@@ -8336,15 +8753,15 @@ export const MainPage = () => {
             maxWidth="900px"
             padding="medium"
           >
-            「人類は高度な情報交換システムを有する情報社会に到達しました。<br/>
-            しかし、急速な技術の発展に対し、文化・精神の成熟は非常に緩やかなものです。<br/>
+            「人類は高度な情報交換システムを有する情報社会に到達しました。<br />
+            しかし、急速な技術の発展に対し、文化・精神の成熟は非常に緩やかなものです。<br />
             皆様の精神の充実と輝かしい個性の発現を願い、我々は灯火を掲げます。」
           </Text>
 
           <Flex direction="row" gap="medium">
             <Button
               as={Link}
-              to="/about"
+              to="/call/about" // 修正箇所: もともと "/about" を "/call/about" に
               variation="primary"
               size="large"
             >
@@ -8353,7 +8770,7 @@ export const MainPage = () => {
             <Button
               as={Link}
               to="/laboratory/about"
-              variation="primary"//スタイル指定
+              variation="primary"
               size="large"
             >
               Laboratory へ
@@ -8376,7 +8793,9 @@ export const MainPage = () => {
                 direction="row"
                 gap="medium"
                 padding="small"
-                backgroundColor={index === 0 ? tokens.colors.background.primary : undefined}
+                backgroundColor={
+                  index === 0 ? tokens.colors.background.primary : undefined
+                }
                 borderRadius="small"
               >
                 <Text fontWeight="bold">{item.date}</Text>
@@ -8391,8 +8810,8 @@ export const MainPage = () => {
       <View padding={{ base: 'medium', large: 'xl' }}>
         <Flex direction="column" maxWidth="1200px" margin="0 auto" gap="xl">
           <Heading level={2}>主なコンテンツ</Heading>
-          
-          <Flex 
+
+          <Flex
             direction={{ base: 'column', large: 'row' }}
             gap="large"
             alignItems="stretch"
@@ -8401,7 +8820,7 @@ export const MainPage = () => {
               title="メインストーリー"
               description="記憶を失った研究者サレジアと、不思議な存在ニファーシェの物語"
               imagePath="/images/main-story.jpg"
-              linkTo="/laboratory/mainstory"
+              linkTo="/library/mainstory"
             />
 
             <ContentCard
@@ -8426,18 +8845,21 @@ export const MainPage = () => {
         backgroundColor={tokens.colors.background.secondary}
         padding={{ base: 'medium', large: 'xl' }}
       >
-        <Flex direction="column" maxWidth="1200px" margin="0 auto" gap="large" alignItems="center">
-          <Heading level={2} textAlign="center">創作の輪に参加しませんか？</Heading>
+        <Flex
+          direction="column"
+          maxWidth="1200px"
+          margin="0 auto"
+          gap="large"
+          alignItems="center"
+        >
+          <Heading level={2} textAlign="center">
+            創作の輪に参加しませんか？
+          </Heading>
           <Text textAlign="center" maxWidth="600px">
             Laboratory Alsarejiaでは、あなたのアイデアや創作物を共有し、
             新しい物語を一緒に紡ぎ出すことができます。
           </Text>
-          <Button
-            as={Link}
-            to="/about"
-            variation="primary"
-            size="large"
-          >
+          <Button as={Link} to="/call/about" variation="primary" size="large">
             参加方法を確認する
           </Button>
         </Flex>
@@ -8445,6 +8867,7 @@ export const MainPage = () => {
     </>
   );
 };
+
 ```
 
 ### src/pages/NotFoundPage.tsx
