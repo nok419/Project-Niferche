@@ -1,6 +1,6 @@
 // src/components/common/FavoriteButton.tsx
 import { Button } from '@aws-amplify/ui-react';
-import { useAuth } from '../../components/auth/AuthContext';
+import { useSession } from '../../contexts/SessionContext';
 import { useState } from 'react';
 
 interface FavoriteButtonProps {
@@ -14,22 +14,21 @@ export const FavoriteButton = ({
   initialState = false,
   onToggle 
 }: FavoriteButtonProps) => {
-  const { isAuthenticated } = useAuth();
+  const { isSignedIn } = useSession();
   const [isFavorite, setIsFavorite] = useState(initialState);
 
   const handleFavoriteClick = async () => {
-    if (!isAuthenticated) {
-      // 未認証ユーザーへの処理
+    if (!isSignedIn) {
+      alert('ログインが必要です');
       return;
     }
 
     try {
       const newState = !isFavorite;
       setIsFavorite(newState);
-      onToggle?.(newState); // 親コンポーネントに状態変更を通知
-      
-      // TODO: バックエンドとの連携
-      console.log(`Toggle favorite for content: ${contentId}`);
+      onToggle?.(newState);
+      // TODO: バックエンド連携 (GraphQL mutationなど)
+      console.log(`Toggled favorite for contentId=${contentId}, newState=${newState}`);
     } catch (error) {
       console.error('Error toggling favorite:', error);
     }
@@ -45,3 +44,4 @@ export const FavoriteButton = ({
     </Button>
   );
 };
+

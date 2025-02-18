@@ -33,7 +33,7 @@ def generate_project_summary(project_dir):
     print(f"gitignore_patterns: {gitignore_patterns}")
     summaryignore_patterns = read_summaryignore(project_dir)
     print(f"summaryignore_patterns: {summaryignore_patterns}")
-    additional_ignore_patterns = ['generate_project_summary.py','.summaryignore', f'{project_name}_project_summary.txt', '.git']
+    additional_ignore_patterns = ['generate_project_summary.py','summaryignore', f'{project_name}_project_summary.txt', '.git']
 
     file_contents_section = "\n## File Contents\n\n"
 
@@ -83,7 +83,7 @@ def read_gitignore(project_dir):
     return []
 
 def read_summaryignore(project_dir):
-    summaryignore_path = os.path.join(project_dir, '.summaryignore')
+    summaryignore_path = os.path.join(project_dir, 'summaryignore')
     if os.path.exists(summaryignore_path):
         with open(summaryignore_path, 'r') as file:
             patterns = [line.strip() for line in file if line.strip() and not line.startswith('#')]

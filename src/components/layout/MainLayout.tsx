@@ -1,21 +1,24 @@
+// src/components/layout/MainLayout.tsx
 import { View, Flex, Button } from '@aws-amplify/ui-react';
 import { NavigationHeader } from './navigation-header';
 import { Helmet } from 'react-helmet-async';
 import { Link, Outlet } from 'react-router-dom';
-
 
 export const MainLayout = () => {
   return (
     <>
       <Helmet>
         <title>Project Niferche</title>
-        <meta name="description" content="Project Niferche - 創作活動のためのオンラインプラットフォーム" />
+        <meta
+          name="description"
+          content="Project Niferche - 創作活動のためのオンラインプラットフォーム"
+        />
         <link
           href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
           rel="stylesheet"
         />
       </Helmet>
-      
+
       <Flex direction="column" height="100vh" width="100vw" position="relative">
         <View
           position="fixed"
@@ -30,7 +33,7 @@ export const MainLayout = () => {
         </View>
 
         <View height="60px" />
-        
+
         <View
           as="main"
           flex="1"
@@ -63,13 +66,8 @@ export const MainLayout = () => {
               height="20px"
               margin="0 8px"
             />
-            <Button
-              as={Link}
-              to="/niferche/rights"
-              variation="link"
-              size="small"
-              padding="0"
-            >
+            {/* 修正: "/niferche/rights" → "/rights" */}
+            <Button as={Link} to="/rights" variation="link" size="small" padding="0">
               権利情報
             </Button>
             <Button

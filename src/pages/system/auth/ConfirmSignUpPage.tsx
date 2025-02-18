@@ -1,4 +1,3 @@
-
 // src/pages/system/auth/ConfirmSignUpPage.tsx
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -10,7 +9,8 @@ import {
   Text,
   Alert
 } from '@aws-amplify/ui-react';
-import { useAuth } from '../../../components/auth/AuthContext';
+// 旧: import { useAuth } from '../../../components/auth/AuthContext';
+import { useSession } from '../../../contexts/SessionContext';
 
 export const ConfirmSignUpPage = () => {
   const [code, setCode] = useState('');
@@ -18,12 +18,14 @@ export const ConfirmSignUpPage = () => {
   const [username, setUsername] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
-  const { confirmSignUp } = useAuth();
+
+  // 旧: const { confirmSignUp } = useAuth();
+  const { confirmSignUp } = useSession();
 
   useEffect(() => {
-    // location.stateからusernameを取得
     const state = location.state as { username?: string };
     if (!state?.username) {
+      // ユーザ名がない → サインアップ画面へ戻す
       navigate('/auth/signup');
     } else {
       setUsername(state.username);
@@ -34,11 +36,12 @@ export const ConfirmSignUpPage = () => {
     e.preventDefault();
     try {
       await confirmSignUp(username, code);
+      // 確認成功 → サインイン画面へ
       navigate('/auth/signin', {
         state: { message: 'アカウントが確認されました。サインインしてください。' }
       });
     } catch (error: any) {
-      setError(error.message);
+      setError(error.message || 'Unknown error');
     }
   };
 

@@ -9,7 +9,9 @@ import {
   Text,
   Alert
 } from '@aws-amplify/ui-react';
-import { useAuth } from '../../../components/auth/AuthContext';
+// 旧: import { useAuth } from '../../../components/auth/AuthContext';
+// 新: SessionContext から
+import { useSession } from '../../../contexts/SessionContext';
 
 export const SignUpPage = () => {
   const [username, setUsername] = useState('');
@@ -18,7 +20,9 @@ export const SignUpPage = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const { signUp } = useAuth();
+
+  // 旧: const { signUp } = useAuth();
+  const { signUp } = useSession();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,14 +30,14 @@ export const SignUpPage = () => {
       setError('パスワードが一致しません');
       return;
     }
-
     try {
       await signUp(username, password, email);
+      // サインアップ成功 → 確認コード入力画面へ
       navigate('/auth/confirm', { 
         state: { username, email } 
       });
     } catch (error: any) {
-      setError(error.message);
+      setError(error.message || 'Unknown error');
     }
   };
 

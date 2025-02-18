@@ -1,14 +1,17 @@
 // components/layout/AuthLayout.tsx
-import { Outlet } from 'react-router-dom';
-import { NavigationHeader } from './navigation-header';
+import { Outlet, Navigate } from 'react-router-dom';
 import { View } from '@aws-amplify/ui-react';
-import { useAuth } from '../auth/AuthContext';
-import { Navigate } from 'react-router-dom';
+import { NavigationHeader } from './navigation-header';
+
+// 旧: import { useAuth } from '../auth/AuthContext';
+import { useSession } from '../../contexts/SessionContext';
 
 export const AuthLayout = () => {
-  const { isAuthenticated } = useAuth();
+  // 旧: const { isAuthenticated } = useAuth();
+  const { isSignedIn } = useSession();
 
-  if (isAuthenticated) {
+  // もしサインイン済みならトップへリダイレクト
+  if (isSignedIn) {
     return <Navigate to="/" replace />;
   }
 

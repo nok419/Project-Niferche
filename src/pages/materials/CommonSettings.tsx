@@ -1,78 +1,130 @@
 // src/pages/materials/CommonSettings.tsx
+import { useEffect, useState } from 'react';
 import { MaterialsLayout } from '../../components/materials/MaterialsLayout';
-import { Collection, View } from '@aws-amplify/ui-react';
+import {
+  View,
+  ToggleButtonGroup,
+  ToggleButton,
+  Collection,
+  Button,
+} from '@aws-amplify/ui-react';
+
+import { AdvancedFilterPanel } from '../../components/common/AdvancedFilterPanel';
+import { SkeletonList } from '../../components/common/SkeletonList';
+import { ErrorAlert } from '../../components/common/ErrorAlert';
+import { LibraryListViewItem } from '../../components/common/LibraryListViewItem';
 import { DocumentCard } from '../../components/materials/DocumentCard';
-import { DocumentFilter } from '../../components/materials/DocumentFilter';
-import { useState } from 'react';
+
+import { useInfiniteContents } from '../../hooks/useInfiniteContents';
 import { MaterialDocument } from '../../types/materials';
 
-const commonSections: MaterialDocument[] = [
-  {
-    id: 'ideaspace',
-    title: 'アイデア空間理論',
-    description: '存在の構造と意味論的定義の曖昧性に関する示唆',
-    category: 'THEORY',
-    reference: 'COM-001',
-    linkTo: '/materials/common/ideaspace',
-    isAvailable: true,
-    variant: 'manuscript'
-  },
-  {
-    id: 'reality',
-    title: '現実性理論',
-    description: '観測と実在の関係、共鳴効果や減衰効果による自己確立',
-    category: 'THEORY',
-    reference: 'COM-002',
-    linkTo: '/materials/common/reality',
-    isAvailable: true,
-    variant: 'manuscript'
-  },
-  // ... 他のセクション
-];
-
 export const CommonSettings = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [filterCondition, setFilterCondition] = useState({
+    keyword: '',
+    world: 'all',
+    tags: [] as string[],
+  });
+
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
-  const filteredContent = commonSections.filter((item: MaterialDocument) => {
-    const matchesSearch = searchTerm === '' || 
-      item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.description.toLowerCase().includes(searchTerm.toLowerCase());
-      
-    const matchesCategory = selectedCategory === 'all' || 
-      item.category === selectedCategory;
+  const {
+    items,
+    loadMore,
+    hasMore,
+    loading,
+    error,
+    resetItems,
+  } = useInfiniteContents();
 
-    return matchesSearch && matchesCategory;
-  });
+  useEffect(() => {
+    resetItems();
+    loadMore({
+      filter: {
+        // 例: category eq "THEORY" ...
+      },
+      limit: 6,
+    });
+  }, [filterCondition, resetItems, loadMore]);
+
+  const mappedItems: MaterialDocument[] = items.map((item) => ({
+    id: item.id,
+    title: item.title ?? 'Common Setting Title',
+    description: item.description ?? 'No description',
+    category: 'THEORY',
+    reference: 'COM-xxx',
+    linkTo: `/materials/common/${item.id}`,
+    isAvailable: true,
+    variant: 'manuscript',
+    imagePath: '',
+  }));
 
   return (
     <MaterialsLayout
       title="共通設定資料"
-      description="Project Nifercheの基盤となる理論体系と言語システムについて解説します。"
+      description="Project Nifercheの基盤となる理論体系や言語など。"
     >
       <View padding="1rem">
-        <DocumentFilter
-          onSearch={setSearchTerm}
-          onCategoryChange={setSelectedCategory}
-          onViewChange={setViewMode}
-          onSortChange={() => {}}
+        <AdvancedFilterPanel
+          availableTags={['理論', '言語', '基礎']}
+          availableWorlds={['COMMON', 'QUXE', 'HODEMEI', 'ALSAREJIA']}
+          onChange={(newFilter) => setFilterCondition(newFilter)}
         />
-        
-        <Collection
-          type={viewMode}
-          items={filteredContent}
-          gap="medium"
-          templateColumns={viewMode === 'grid' ? {
-            base: "1fr",
-            medium: "1fr 1fr",
-            large: "1fr 1fr 1fr"
-          } : undefined}
+
+        <ToggleButtonGroup
+          value={viewMode}
+          isExclusive
+          onChange={(value) => setViewMode(value as 'grid' | 'list')}
+          margin="1rem 0"
         >
-          {(item: MaterialDocument) => (
-            <DocumentCard {...item} key={item.id} />
-          )}
-        </Collection>
+          <ToggleButton value="grid">グリッド</ToggleButton>
+          <ToggleButton value="list">リスト</ToggleButton>
+        </ToggleButtonGroup>
+
+        {error && <ErrorAlert errorMessage={error} onDismiss={() => {}} />}
+
+        {loading && items.length === 0 ? (
+          <SkeletonList count={4} />
+        ) : (
+          <>
+            {viewMode === 'grid' && (
+              <Collection
+                type="grid"
+                items={mappedItems}
+                gap="medium"
+                templateColumns={{
+                  base: '1fr',
+                  medium: '1fr 1fr',
+                  large: '1fr 1fr 1fr',
+                }}
+              >
+                {(item) => <DocumentCard key={item.id} {...item} />}
+              </Collection>
+            )}
+            {viewMode === 'list' && (
+              <Collection type="list" items={mappedItems} gap="small">
+                {(item) => (
+                  <LibraryListViewItem
+                    key={item.id}
+                    id={item.id}
+                    title={item.title}
+                    description={item.description}
+                    isAvailable={item.isAvailable}
+                    reference={item.reference}
+                    linkTo={item.linkTo}
+                    category={item.category}
+                  />
+                )}
+              </Collection>
+            )}
+          </>
+        )}
+
+        {hasMore && !loading && (
+          <Button onClick={() => loadMore()} marginTop="1rem">
+            さらに読み込む
+          </Button>
+        )}
+        {loading && items.length > 0 && <SkeletonList count={2} />}
       </View>
     </MaterialsLayout>
   );

@@ -1,52 +1,69 @@
 // src/pages/materials/QuxeMaterials.tsx
+import { useEffect, useState } from 'react';
 import { MaterialsLayout } from '../../components/materials/MaterialsLayout';
-import { Collection, View, ToggleButtonGroup, ToggleButton, Tabs } from '@aws-amplify/ui-react';
-import { DocumentCard } from '../../components/materials/DocumentCard';
-import { DocumentFilter } from '../../components/materials/DocumentFilter';
-import { useState } from 'react';
-import { MaterialDocument, MaterialCategory } from '../../types/materials';
+import {
+  View,
+  ToggleButtonGroup,
+  ToggleButton,
+  Tabs,
+  Collection,
+  Button,
+} from '@aws-amplify/ui-react';
 
-const quxeContents: MaterialDocument[] = [
-  {
-    id: 'magic-basics',
-    title: '魔法の基礎',
-    description: 'Quxeの魔法システムの基本概念と分類体系',
-    category: 'MAGIC',
-    reference: 'QUX-001',
-    linkTo: '/materials/quxe/magic-basics',
-    isAvailable: true,
-    variant: 'manuscript',
-    imagePath: '/images/materials/magic-basics.jpg'
-  },
-  {
-    id: 'magic-elements',
-    title: '魔法の属性',
-    description: '魔法属性とその相互作用について',
-    category: 'MAGIC',
-    reference: 'QUX-002',
-    linkTo: '/materials/quxe/magic-elements',
-    isAvailable: true,
-    variant: 'manuscript',
-    imagePath: '/images/materials/magic-elements.jpg'
-  },
-  // ... 他のコンテンツ
-];
+import { AdvancedFilterPanel } from '../../components/common/AdvancedFilterPanel';
+import { SkeletonList } from '../../components/common/SkeletonList';
+import { ErrorAlert } from '../../components/common/ErrorAlert';
+import { LibraryListViewItem } from '../../components/common/LibraryListViewItem';
+import { DocumentCard } from '../../components/materials/DocumentCard';
+
+import { useInfiniteContents } from '../../hooks/useInfiniteContents';
+import { MaterialDocument } from '../../types/materials';
 
 export const QuxeMaterials = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<MaterialCategory>('MAGIC');
+  const [filterCondition, setFilterCondition] = useState({
+    keyword: '',
+    world: 'all',
+    tags: [] as string[],
+  });
+
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [attribution, setAttribution] = useState<'official' | 'shared'>('official');
 
-  const filteredContent = quxeContents.filter((item) => {
-    const matchesSearch = searchTerm === '' || 
-      item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.description.toLowerCase().includes(searchTerm.toLowerCase());
-      
-    const matchesCategory = item.category === selectedCategory;
+  // 選択中のタブ（Quxe内のカテゴリ）  
+  const [selectedCategory, setSelectedCategory] = useState('MAGIC');
 
-    return matchesSearch && matchesCategory;
-  });
+  const {
+    items,
+    loadMore,
+    hasMore,
+    loading,
+    error,
+    resetItems,
+  } = useInfiniteContents();
+
+  // フィルタ/タブ変更ごとにリセット&再ロード
+  useEffect(() => {
+    resetItems();
+    loadMore({
+      filter: {
+        // 例: QUXEコンテンツのみ読みたい等 => worldType eq "QUXE"
+      },
+      limit: 6,
+    });
+  }, [filterCondition, attribution, selectedCategory, resetItems, loadMore]);
+
+  // ダミー変換
+  const mappedItems: MaterialDocument[] = items.map((item) => ({
+    id: item.id,
+    title: item.title ?? 'Untitled Quxe',
+    description: item.description ?? 'No description',
+    category: selectedCategory as any,
+    reference: 'QUX-XXX',
+    linkTo: `/materials/${attribution}/quxe/${item.id}`,
+    isAvailable: true,
+    variant: 'document',
+    imagePath: '/images/materials/magic-basics.jpg',
+  }));
 
   return (
     <MaterialsLayout
@@ -64,21 +81,28 @@ export const QuxeMaterials = () => {
           <ToggleButton value="shared">共有設定</ToggleButton>
         </ToggleButtonGroup>
 
-        <DocumentFilter
-          onSearch={setSearchTerm}
-          onCategoryChange={(category) => setSelectedCategory(category as MaterialCategory)}
-          onViewChange={setViewMode}
-          onSortChange={() => {}}
+        <AdvancedFilterPanel
+          availableTags={['魔法基礎', '精霊', '呪文', '歴史']}
+          availableWorlds={['QUXE', 'HODEMEI', 'ALSAREJIA']}
+          onChange={(newFilter) => setFilterCondition(newFilter)}
         />
+
+        <ToggleButtonGroup
+          value={viewMode}
+          isExclusive
+          onChange={(value) => setViewMode(value as 'grid' | 'list')}
+          margin="1rem 0"
+        >
+          <ToggleButton value="grid">グリッド</ToggleButton>
+          <ToggleButton value="list">リスト</ToggleButton>
+        </ToggleButtonGroup>
 
         <Tabs
           spacing="equal"
           value={selectedCategory}
           onChange={(e) => {
             const target = e.target as HTMLButtonElement;
-            if (target.value) {
-              setSelectedCategory(target.value as MaterialCategory);
-            }
+            setSelectedCategory(target.value);
           }}
         >
           <Tabs.List>
@@ -90,25 +114,52 @@ export const QuxeMaterials = () => {
             <Tabs.Item value="HISTORY">歴史</Tabs.Item>
           </Tabs.List>
         </Tabs>
-        
-        <Collection
-          type={viewMode}
-          items={filteredContent}
-          gap="medium"
-          templateColumns={viewMode === 'grid' ? {
-            base: "1fr",
-            medium: "1fr 1fr",
-            large: "1fr 1fr 1fr"
-          } : undefined}
-        >
-          {(item: MaterialDocument) => (
-            <DocumentCard 
-              {...item} 
-              key={item.id}
-              linkTo={`/materials/${attribution}/quxe/${item.id}`}
-            />
-          )}
-        </Collection>
+
+        {error && <ErrorAlert errorMessage={error} onDismiss={() => {}} />}
+
+        {loading && items.length === 0 ? (
+          <SkeletonList count={4} />
+        ) : (
+          <>
+            {viewMode === 'grid' && (
+              <Collection
+                type="grid"
+                items={mappedItems}
+                gap="medium"
+                templateColumns={{
+                  base: '1fr',
+                  medium: '1fr 1fr',
+                  large: '1fr 1fr 1fr',
+                }}
+              >
+                {(item) => <DocumentCard key={item.id} {...item} />}
+              </Collection>
+            )}
+            {viewMode === 'list' && (
+              <Collection type="list" items={mappedItems} gap="small">
+                {(item) => (
+                  <LibraryListViewItem
+                    key={item.id}
+                    id={item.id}
+                    title={item.title}
+                    description={item.description}
+                    isAvailable={item.isAvailable}
+                    reference={item.reference}
+                    linkTo={item.linkTo}
+                    category={item.category}
+                  />
+                )}
+              </Collection>
+            )}
+          </>
+        )}
+
+        {hasMore && !loading && (
+          <Button onClick={() => loadMore()} marginTop="1rem">
+            さらに読み込む
+          </Button>
+        )}
+        {loading && items.length > 0 && <SkeletonList count={2} />}
       </View>
     </MaterialsLayout>
   );

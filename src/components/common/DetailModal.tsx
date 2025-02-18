@@ -12,6 +12,16 @@ import {
   Divider,
 } from '@aws-amplify/ui-react';
 
+/**
+ * ▼ Amplify UI の Badge は variation に
+ *    'info' | 'error' | 'warning' | 'success'
+ *  のみを指定可能です。
+ */
+type EntityType = 'facility' | 'research' | 'idea' | 'story' | 'material';
+
+// あるいは、今後さらに追加したいなら下記のようにまとめてもOK
+// export type BadgeVariationType = 'info' | 'error' | 'warning' | 'success';
+
 interface DetailData {
   id: string;
   title: string;
@@ -29,8 +39,8 @@ interface DetailData {
 interface DetailModalProps {
   isOpen: boolean;
   onClose: () => void;
-  data: DetailData; // nullを許容しない
-  entityType: 'facility' | 'research' | 'idea';
+  data: DetailData;
+  entityType: EntityType;  
 }
 
 export const DetailModal: React.FC<DetailModalProps> = ({
@@ -41,9 +51,29 @@ export const DetailModal: React.FC<DetailModalProps> = ({
 }) => {
   const { tokens } = useTheme();
 
+  // ◆ entityType から Badge の variation を決定する関数
+  const getBadgeVariation = (type: EntityType) => {
+    switch (type) {
+      case 'facility':
+        return 'success';   // 緑
+      case 'research':
+        return 'info';      // 青
+      case 'idea':
+        return 'warning';   // 黄
+      case 'story':
+        return 'info';      // (お好みで)
+      case 'material':
+        return 'success';   // (お好みで)
+      default:
+        return 'info';      // どれにも該当しないとき
+    }
+  };
+
+  // モーダルの表示/非表示
   if (!isOpen) return null;
 
   return (
+    // ※ `inset="0"` は使えないので top="0" left="0" ... 等で代用
     <View
       position="fixed"
       top="0"
@@ -52,8 +82,7 @@ export const DetailModal: React.FC<DetailModalProps> = ({
       bottom="0"
       style={{
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        position: 'fixed',
-        zIndex: 1000
+        zIndex: 1000,
       }}
       onClick={onClose}
     >
@@ -66,14 +95,15 @@ export const DetailModal: React.FC<DetailModalProps> = ({
         padding={tokens.space.medium}
         backgroundColor={tokens.colors.background.primary}
         style={{
-          position: 'relative',
           top: '50%',
           left: '50%',
-          transform: 'translate(-50%, -50%)'
+          transform: 'translate(-50%, -50%)',
         }}
-        onClick={e => e.stopPropagation()}
+        // カード領域のクリックはモーダルを閉じないよう stopPropagation
+        onClick={(e) => e.stopPropagation()}
       >
         <Flex direction="column" gap={tokens.space.medium}>
+
           {data.imagePath && (
             <Image
               src={data.imagePath}
@@ -87,20 +117,19 @@ export const DetailModal: React.FC<DetailModalProps> = ({
 
           <Flex justifyContent="space-between" alignItems="center">
             <Heading level={2}>{data.title}</Heading>
-            {entityType && (
-              <Badge
-                variation={entityType === 'facility' ? 'success' :
-                         entityType === 'research' ? 'info' : 'warning'}
-              >
-                {entityType.charAt(0).toUpperCase() + entityType.slice(1)}
-              </Badge>
-            )}
+
+            {/* Badge の variation に "neutral" や "default" は不可。 */}
+            <Badge variation={getBadgeVariation(entityType)}>
+              {entityType.charAt(0).toUpperCase() + entityType.slice(1)}
+            </Badge>
           </Flex>
 
           {data.tags && data.tags.length > 0 && (
             <Flex gap="small" wrap="wrap">
               {data.tags.map(tag => (
-                <Badge key={tag}>{tag}</Badge>
+                <Badge key={tag} variation="info">
+                  {tag}
+                </Badge>
               ))}
             </Flex>
           )}
@@ -119,7 +148,7 @@ export const DetailModal: React.FC<DetailModalProps> = ({
             </>
           )}
 
-          {data.metadata && Object.keys(data.metadata).length > 0 && (
+          {data.metadata && (
             <View
               backgroundColor={tokens.colors.background.secondary}
               padding={tokens.space.medium}

@@ -1,3 +1,4 @@
+// src/components/layout/LaboratoryLayout.tsx
 import { View, Flex, Button } from '@aws-amplify/ui-react';
 import { Outlet, Link } from 'react-router-dom';
 import { NavigationHeader } from './navigation-header';
@@ -17,7 +18,7 @@ export const LaboratoryLayout = () => {
       </View>
 
       <View height="60px" />
-      
+
       <View
         as="main"
         flex="1"
@@ -50,9 +51,10 @@ export const LaboratoryLayout = () => {
             height="20px"
             margin="0 8px"
           />
+          {/* 修正: "/niferche/rights" → "/rights" */}
           <Button
             as={Link}
-            to="/niferche/rights"
+            to="/rights"
             variation="link"
             size="small"
             padding="0"

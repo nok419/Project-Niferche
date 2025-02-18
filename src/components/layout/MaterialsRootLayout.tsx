@@ -1,8 +1,21 @@
+// File: src/components/layout/MaterialsRootLayout.tsx
 import { View, Flex, Button } from '@aws-amplify/ui-react';
-import { NavigationHeader } from '../layout/navigation-header';
+import { NavigationHeader } from './navigation-header';
 import { Link, Outlet } from 'react-router-dom';
 
-export const MaterialsLayout = () => {
+/**
+ * こちらは「React Router」のRoute Outletを持つルート用レイアウト:
+ *   <Route element={<MaterialsRootLayout />}>
+ *     <Route path="/materials/about" ... />
+ *     ...
+ *   </Route>
+ *
+ * 一方、"components/materials/MaterialsLayout.tsx" は
+ * 各ページで「設定資料タイトルや説明」を表示するデザイン用ラッパコンポーネント
+ * (props: { title, description, children }) として使うイメージ。
+ */
+
+export const MaterialsRootLayout = () => {
   return (
     <Flex direction="column" height="100vh" width="100vw">
       <View

@@ -6,9 +6,8 @@ import {
     Card,
     Text
   } from '@aws-amplify/ui-react';
-  import { useAuth } from '../../components/auth/AuthContext';
   import { Navigate } from 'react-router-dom';
-  
+  import { useSession } from '../../contexts/SessionContext';
   interface FavoriteItem {
     id: string;
     title: string;
@@ -16,9 +15,9 @@ import {
   }
   
   export const FavoritesPage = () => {
-    const { isAuthenticated } = useAuth(); // user削除
+    const { isSignedIn } = useSession();
   
-    if (!isAuthenticated) {
+    if (!isSignedIn) {
       return <Navigate to="/auth/signin" />;
     }
   

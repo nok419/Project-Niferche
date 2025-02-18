@@ -7,10 +7,13 @@ import {
   Flex 
 } from '@aws-amplify/ui-react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../auth/AuthContext';
+// Replace the old import:
+// import { useAuth } from '../auth/AuthContext';
+import { useSession } from '../../contexts/SessionContext';
 
 export const UserMenu = () => {
-  const { user, signOut } = useAuth();
+  // Destructure from the new session context
+  const { user, signOut } = useSession();
 
   return (
     <Menu 
