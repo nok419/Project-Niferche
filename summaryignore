@@ -2,10 +2,11 @@
 # ここにサマリー生成から除外したいパターンを記述
 # ---------------------------
 
-# devフォルダ内の全ファイル除外
+# 除外ファイル
 dev
-
-# node_modulesフォルダ内の全ファイル除外
+dist
+git
+public
 node_modules
 
 # スクリプトファイル自体は読まない
@@ -16,5 +17,11 @@ package-lock.json
 
 # 概要ファイルは読まない
 overview
+
+*.cjs
+*.yml
+*.local
+*.json
+*.html
 
 
