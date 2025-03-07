@@ -1,3 +1,81 @@
+# amplify
+
+## Directory Structure
+
+- amplify/
+  - auth/
+    - resource.ts
+  - backend.ts
+  - data/
+    - resource.ts
+  - package.json
+  - storage/
+    - resource.ts
+  - tsconfig.json
+
+## File Contents
+
+### auth\resource.ts
+
+```
+// File: amplify/auth/resource.ts
+import { defineAuth } from '@aws-amplify/backend';
+
+export const auth = defineAuth({
+  loginWith: {
+    email: {
+      verificationEmailSubject: 'Project Niferche - メールアドレス確認',
+      verificationEmailBody: (code) => 
+        `Project Nifercheへようこそ。\n認証コード：${code}\nこのコードの有効期限は15分です。`,
+      verificationEmailStyle: 'CODE'
+    }
+  },
+  userAttributes: {
+    nickname: {
+      mutable: true,
+      required: false
+    },
+    email: {
+      mutable: true,
+      required: true
+    }
+  },
+  multifactor: {
+    mode: 'OFF'
+  },
+  // 追加の設定
+  accountRecovery: 'EMAIL_ONLY',
+});
+```
+
+### backend.ts
+
+```
+import { defineBackend } from '@aws-amplify/backend';
+import { auth } from './auth/resource';
+import { data } from './data/resource';
+import { storage } from './storage/resource';
+
+const backend = defineBackend({
+  auth,
+  data,
+  storage
+});
+
+// Gen2の正しい形式で出力を追加
+backend.addOutput({
+  storage: {
+    bucket_name: 'niferche-content',
+    aws_region: 'ap-northeast-1'
+  }
+});
+
+export const { auth: authOutput, storage: storageOutput } = backend;
+```
+
+### data\resource.ts
+
+```
 // File: amplify/data/resource.ts
 import { type ClientSchema, a, defineData } from '@aws-amplify/backend';
 
@@ -194,3 +272,93 @@ export const data = defineData({
     }
   }
 });
+```
+
+### package.json
+
+```
+{
+  "type": "module"
+}
+```
+
+### storage\resource.ts
+
+```
+// File: amplify/storage/resource.ts
+import { defineStorage } from '@aws-amplify/backend';
+
+export const storage = defineStorage({
+  name: 'niferche-content',
+  access: (allow) => ({
+    // 公式コンテンツ
+    'official/laboratory/*': [
+      allow.guest.to(['read']),
+      allow.groups(['admin']).to(['write', 'delete'])
+    ],
+    'official/materials/*': [
+      allow.guest.to(['read']),
+      allow.groups(['admin']).to(['write', 'delete'])
+    ],
+
+    // 共有コンテンツ - ユーザーごとのフォルダを管理
+    'shared/laboratory/{entity_id}/*': [
+      allow.guest.to(['read']),
+      allow.entity('identity').to(['read', 'write', 'delete'])
+    ],
+    'shared/materials/{entity_id}/*': [
+      allow.guest.to(['read']),
+      allow.entity('identity').to(['read', 'write', 'delete'])
+    ],
+
+    // システム用
+    'system/*': [
+      allow.guest.to(['read']),
+      allow.groups(['admin']).to(['write', 'delete'])
+    ],
+
+    // 一時ファイル用（アップロード中など）
+    'temp/*': [
+      allow.authenticated.to(['read', 'write']),
+      allow.groups(['admin']).to(['delete'])
+    ],
+
+    // サムネイル用
+    'thumbnails/*': [
+      allow.guest.to(['read']),
+      allow.authenticated.to(['write']),
+      allow.groups(['admin']).to(['delete'])
+    ],
+
+    // ユーザープロフィール用
+    'profiles/{entity_id}/*': [
+      allow.guest.to(['read']),
+      allow.entity('identity').to(['read', 'write']),
+      allow.groups(['admin']).to(['delete'])
+    ]
+  })
+});
+```
+
+### tsconfig.json
+
+```
+{
+  "compilerOptions": {
+    "target": "es2022",
+    "module": "es2022",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "paths": {
+      "$amplify/*": [
+        "../.amplify/generated/*"
+      ]
+    }
+  }
+}
+```
+
