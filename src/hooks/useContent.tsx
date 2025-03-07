@@ -1,4 +1,4 @@
-// src/hooks/useContent.tsx
+// src/hooks/useContent.ts
 import { generateClient } from 'aws-amplify/api';
 import { type Schema } from '../../amplify/data/resource';
 import { useState } from 'react';
@@ -30,17 +30,11 @@ export const useContent = () => {
     }
   };
 
-  // コンテンツ一覧の取得 (リレーションシップ対応)
+  // コンテンツ一覧の取得
   const listContents = async (options?: ContentOptions) => {
     setLoading(true);
     try {
-      const response = await client.models.Content.list({
-        ...options,
-        selectionSet: ['id', 'title', 'description', 'primaryCategory', 'worldType', 
-                      'attribution', 'visibility', 'status', 'tags', 'mainKey', 
-                      'thumbnailKey', 'createdAt', 'updatedAt',
-                      { owner: ['id', 'nickname'] }] // リレーションシップの取得
-      });
+      const response = await client.models.Content.list(options);
       return response.data;
     } catch (e) {
       setError(e instanceof Error ? e : new Error('Failed to list contents'));
