@@ -1,27 +1,27 @@
 # ---------------------------
-# ここにサマリー生成から除外したいパターンを記述
-# ---------------------------
-
-# 除外ファイル
 dev
+newdev
 dist
 git
 public
 node_modules
+.git
 
-# スクリプトファイル自体は読まない
+
 generate_project_summary.py
 
-# lockファイルは長大すぎる＆平常時に参照されないので除外
 package-lock.json
 
-# 概要ファイルは読まない
-overview
 
 *.cjs
 *.yml
 *.local
 *.json
 *.html
+*.gitignore
+*.txt
+# ---------------------------
+
+
 
 

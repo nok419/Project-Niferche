@@ -66,7 +66,8 @@ import { ErrorPage } from './pages/ErrorPage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { ProfilePage } from './pages/user/ProfilePage';
 import { FavoritesPage } from './pages/user/FavoritesPage';
-
+import { EditProfilePage } from './pages/user/EditProfilePage';
+import { UploadContentPage } from './pages/user/UploadContentPage';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
 
 // ★ 新規追加ページ
@@ -162,6 +163,22 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <FavoritesPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/user/edit"
+                  element={
+                    <ProtectedRoute>
+                      <EditProfilePage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/user/upload"
+                  element={
+                    <ProtectedRoute>
+                      <UploadContentPage />
                     </ProtectedRoute>
                   }
                 />
