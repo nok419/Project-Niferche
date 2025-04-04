@@ -1,34 +1,32 @@
-// ------------------------------------------------------
-// 3. useInfiniteContents に "resetItems" メソッドを追加
-//    フィルタ条件が変わった時に itemsを再初期化できるように
-// ------------------------------------------------------
 // src/hooks/useInfiniteContents.tsx
-
 import { useState, useCallback } from 'react';
 import { generateClient } from 'aws-amplify/api';
 import { type Schema } from '../../amplify/data/resource';
+import { Content } from '../types/content';
+import { ApiError, FilterOptions } from '../types/common';
 
-interface ListContentOptions {
-  filter?: Record<string, any>;
+interface InfiniteContentOptions {
+  filter?: FilterOptions;
   limit?: number;
 }
 
 export const useInfiniteContents = () => {
   const client = generateClient<Schema>();
 
-  const [items, setItems] = useState<any[]>([]);
+  const [items, setItems] = useState<Content[]>([]);
   const [nextToken, setNextToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string>('');
+  const [error, setError] = useState<ApiError | null>(null);
 
-  // 新規メソッド: items をリセット
+  // 項目リセット関数
   const resetItems = useCallback(() => {
     setItems([]);
     setNextToken(null);
-    setError('');
+    setError(null);
   }, []);
 
-  const loadMore = useCallback(async (options: ListContentOptions = {}) => {
+  // データ読み込み関数
+  const loadMore = useCallback(async (options: InfiniteContentOptions = {}) => {
     try {
       setLoading(true);
       const resp = await client.models.Content.list({
@@ -39,11 +37,18 @@ export const useInfiniteContents = () => {
       if (resp.errors && resp.errors.length > 0) {
         throw new Error(resp.errors[0].message);
       }
+      
       const data = resp.data || [];
-      setItems((prev) => [...prev, ...data]);
+      setItems((prev) => [...prev, ...(data as unknown as Content[])]);
       setNextToken(resp.nextToken || null);
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      const apiError = e as ApiError;
+      setError({
+        name: apiError.name || 'Error',
+        message: apiError.message || 'Failed to load more content',
+        code: apiError.code,
+        stack: apiError.stack
+      });
     } finally {
       setLoading(false);
     }

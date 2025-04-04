@@ -1,51 +1,68 @@
-// src/hooks/useContent.ts
+// src/hooks/useContent.tsx
 import { generateClient } from 'aws-amplify/api';
 import { type Schema } from '../../amplify/data/resource';
 import { useState } from 'react';
 import { getUrl, uploadData } from 'aws-amplify/storage';
+import { ApiError, ApiResponse, FilterOptions, PaginationOptions } from '../types/common';
+import { Content, ContentResult } from '../types/content';
 
 const client = generateClient<Schema>();
 
-interface ContentOptions {
-  filter?: Record<string, any>;
-  limit?: number;
-  nextToken?: string;
+// より具体的な型でリクエストオプションを定義
+export interface ContentOptions extends PaginationOptions {
+  filter?: FilterOptions;
 }
 
+// 型パラメータ付きフックに変更
 export const useContent = () => {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+  const [error, setError] = useState<ApiError | null>(null);
 
   // コンテンツの取得
-  const getContent = async (id: string) => {
+  const getContent = async (id: string): Promise<Content | null> => {
     setLoading(true);
     try {
       const response = await client.models.Content.get({ id });
-      return response.data;
+      return response.data as unknown as Content;
     } catch (e) {
-      setError(e instanceof Error ? e : new Error('Failed to get content'));
-      throw e;
+      const apiError = e as ApiError;
+      setError({
+        name: apiError.name || 'Error',
+        message: apiError.message || 'Failed to get content',
+        code: apiError.code,
+        stack: apiError.stack
+      });
+      throw apiError;
     } finally {
       setLoading(false);
     }
   };
 
   // コンテンツ一覧の取得
-  const listContents = async (options?: ContentOptions) => {
+  const listContents = async (options?: ContentOptions): Promise<ContentResult> => {
     setLoading(true);
     try {
       const response = await client.models.Content.list(options);
-      return response.data;
+      return {
+        items: (response.data || []) as unknown as Content[],
+        nextToken: response.nextToken || undefined
+      };
     } catch (e) {
-      setError(e instanceof Error ? e : new Error('Failed to list contents'));
-      throw e;
+      const apiError = e as ApiError;
+      setError({
+        name: apiError.name || 'Error',
+        message: apiError.message || 'Failed to list contents',
+        code: apiError.code,
+        stack: apiError.stack
+      });
+      throw apiError;
     } finally {
       setLoading(false);
     }
   };
 
   // ストレージからファイルのURLを取得
-  const getFileUrl = async (path: string) => {
+  const getFileUrl = async (path: string): Promise<string> => {
     try {
       const response = await getUrl({
         path,
@@ -53,8 +70,14 @@ export const useContent = () => {
       });
       return response.url.toString();
     } catch (e) {
-      setError(e instanceof Error ? e : new Error('Failed to get file URL'));
-      throw e;
+      const apiError = e as ApiError;
+      setError({
+        name: apiError.name || 'Error',
+        message: apiError.message || 'Failed to get file URL',
+        code: apiError.code,
+        stack: apiError.stack
+      });
+      throw apiError;
     }
   };
 
@@ -68,9 +91,20 @@ export const useContent = () => {
       }).result;
       return response;
     } catch (e) {
-      setError(e instanceof Error ? e : new Error('Failed to upload file'));
-      throw e;
+      const apiError = e as ApiError;
+      setError({
+        name: apiError.name || 'Error',
+        message: apiError.message || 'Failed to upload file',
+        code: apiError.code,
+        stack: apiError.stack
+      });
+      throw apiError;
     }
+  };
+
+  // エラーリセット関数追加
+  const resetError = () => {
+    setError(null);
   };
 
   return {
@@ -79,6 +113,7 @@ export const useContent = () => {
     getContent,
     listContents,
     getFileUrl,
-    uploadFile
+    uploadFile,
+    resetError
   };
 };

@@ -2,8 +2,7 @@
 import { Navigate } from 'react-router-dom';
 import { useSession } from '../../contexts/SessionContext';
 import React from 'react';
-
-type AccessLevel = 'admin' | 'branch'; // 必要に応じてカスタム
+import { AccessLevel, getUserRole } from '../../types/auth';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -13,35 +12,45 @@ interface ProtectedRouteProps {
 
 /**
  * 認証が必要なルート用。サインインしていなければ /auth/signin へ。
- * さらにaccessLevelがadminなら、ユーザー属性 custom:role=admin をチェックする例。
+ * さらにaccessLevelがadminなら、ユーザー属性 custom:role=admin をチェックする。
  */
 export const ProtectedRoute = ({
   children,
-  accessLevel,
+  accessLevel = AccessLevel.AUTHENTICATED,
   creatorId,
 }: ProtectedRouteProps) => {
   const { isSignedIn, user } = useSession();
 
+  // 非認証状態ならログインページへリダイレクト
   if (!isSignedIn) {
+    // PUBLICレベルなら認証不要
+    if (accessLevel === AccessLevel.PUBLIC) {
+      return <>{children}</>;
+    }
     return <Navigate to="/auth/signin" replace />;
   }
 
-  if (accessLevel === 'admin') {
-    const role = user?.attributes?.['custom:role'];
-    if (role !== 'admin') {
-      return <Navigate to="/" />;
+  // 管理者権限レベルチェック
+  if (accessLevel === AccessLevel.ADMIN) {
+    const userRole = getUserRole(user);
+    if (userRole !== 'admin') {
+      return <Navigate to="/" replace />;  // 権限不足の場合はホームへリダイレクト
     }
   }
 
-  if (accessLevel === 'branch') {
-    const role = user?.attributes?.['custom:role'];
-    const isCreator = creatorId === user?.username;
-    const isAdmin = role === 'admin';
+  // 所有者と管理者のみアクセス可能なコンテンツ
+  if (accessLevel === AccessLevel.OWNER_PRIVATE && creatorId) {
+    const userRole = getUserRole(user);
+    const isCreator = creatorId === user?.username || creatorId === user?.userId;
+    const isAdmin = userRole === 'admin';
+    
     if (!isCreator && !isAdmin) {
-      return <Navigate to="/" />;
+      return <Navigate to="/" replace />;
     }
   }
 
+  // 所有者のみ編集可能、他ユーザーは閲覧可能なコンテンツ
+  // ここでは単純に閲覧可能なのでチェックは必要ない
+  
   return <>{children}</>;
 };
-

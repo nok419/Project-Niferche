@@ -1,31 +1,21 @@
-// File: src/hooks/useBadges.ts
-import { useState, useEffect } from 'react';
+// src/hooks/useBadges.ts
+import { useState, useEffect, useCallback } from 'react';
 import { generateClient } from 'aws-amplify/api';
-import { Badge, UserBadgeProgress, BadgeRequirementType } from '../types/badges';
+import { Badge, BadgeProgress, BadgeRequirementType, transformToBadge, transformToBadgeProgress } from '../types/badges';
+import { ApiError } from '../types/common';
 import type { Schema } from '../../amplify/data/resource';
-
-const transformToBadge = (data: any): Badge => ({
-  id: data.id,
-  name: data.name,
-  description: data.description,
-  iconUrl: data.iconUrl || '/images/badges/default.png',
-  condition: data.requirement,
-  requirementType: data.requirementType as BadgeRequirementType,
-  requirement: data.requirement,
-  priority: data.priority,
-  isSecret: data.isSecret,
-  createdAt: data.createdAt,
-  updatedAt: data.updatedAt
-});
 
 export const useBadges = () => {
   const client = generateClient<Schema>();
   const [userBadges, setUserBadges] = useState<Badge[]>([]);
-  const [badgeProgress, setBadgeProgress] = useState<UserBadgeProgress[]>([]);
+  const [badgeProgress, setBadgeProgress] = useState<BadgeProgress[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<ApiError | null>(null);
 
-  const checkBadgeProgress = async (type: BadgeRequirementType, value: string) => {
+  // バッジ進捗確認関数
+  const checkBadgeProgress = useCallback(async (type: BadgeRequirementType, value: string) => {
     try {
+      // 特定の条件に一致するバッジを検索
       const badge = await client.models.Badge.list({
         filter: {
           requirementType: { eq: type },
@@ -34,46 +24,74 @@ export const useBadges = () => {
       });
 
       if (badge.data.length > 0) {
-        const progressUpdate = await client.models.BadgeProgress.update({
-          id: badge.data[0].id,
-          progress: 100,
-          isCompleted: true,
-          completedAt: new Date().toISOString(),
-          lastUpdatedAt: new Date().toISOString()
-        });
+        // 既存の進捗を確認（ない場合は新規作成）
+        const badgeId = badge.data[0].id;
+        const existingProgress = badgeProgress.find(p => p.badgeId === badgeId);
+        
+        if (existingProgress) {
+          // 既に完了済みなら何もしない
+          if (existingProgress.isCompleted) {
+            return;
+          }
+          
+          // 進捗を更新
+          const progressUpdate = await client.models.BadgeProgress.update({
+            id: existingProgress.id,
+            progress: 100,
+            isCompleted: true,
+            completedAt: new Date().toISOString(),
+            lastUpdatedAt: new Date().toISOString()
+          });
 
-        // null チェックを追加
-        if (progressUpdate?.data) {
-          const updatedProgress: UserBadgeProgress = {
-            id: progressUpdate.data.id ?? crypto.randomUUID(),
-            userId: progressUpdate.data.userId,
-            badgeId: progressUpdate.data.badgeId,
-            progress: progressUpdate.data.progress,
-            isCompleted: progressUpdate.data.isCompleted,
-            completedAt: progressUpdate.data.completedAt || null,
-            lastUpdatedAt: progressUpdate.data.lastUpdatedAt,
-            createdAt: progressUpdate.data.createdAt,
-            updatedAt: progressUpdate.data.updatedAt
-          };
+          if (progressUpdate?.data) {
+            const updatedProgress = transformToBadgeProgress(progressUpdate.data);
+            setBadgeProgress(prev => 
+              prev.map(p => p.id === updatedProgress.id ? updatedProgress : p)
+            );
+          }
+        } else {
+          // 新規進捗を作成
+          const userId = (await client.models.UserProfile.list({ limit: 1 })).data[0]?.userId || 'anonymous';
+          
+          const newProgress = await client.models.BadgeProgress.create({
+            userId,
+            badgeId,
+            progress: 100,
+            isCompleted: true,
+            completedAt: new Date().toISOString(),
+            lastUpdatedAt: new Date().toISOString()
+          });
 
-          setBadgeProgress(prev => 
-            prev.map(p => 
-              p.badgeId === badge.data[0].id ? updatedProgress : p
-            )
-          );
+          if (newProgress?.data) {
+            const createdProgress = transformToBadgeProgress(newProgress.data);
+            setBadgeProgress(prev => [...prev, createdProgress]);
+          }
         }
       }
-    } catch (error) {
-      console.error('Error checking badge progress:', error);
+    } catch (e) {
+      const apiError = e as ApiError;
+      setError({
+        name: apiError.name || 'Error',
+        message: apiError.message || 'Failed to check badge progress',
+        code: apiError.code,
+        stack: apiError.stack
+      });
+      console.error('Error checking badge progress:', e);
     }
-  };
+  }, [client, badgeProgress]);
 
+  // バッジデータ読み込み
   useEffect(() => {
     const loadBadges = async () => {
       try {
         setIsLoading(true);
-        const badgesResult = await client.models.Badge.list({});
-        const progressResult = await client.models.BadgeProgress.list({});
+        setError(null);
+        
+        // バッジと進捗を並行して取得
+        const [badgesResult, progressResult] = await Promise.all([
+          client.models.Badge.list({}),
+          client.models.BadgeProgress.list({})
+        ]);
         
         if (badgesResult?.data) {
           const transformedBadges = badgesResult.data.map(transformToBadge);
@@ -81,34 +99,31 @@ export const useBadges = () => {
         }
 
         if (progressResult?.data) {
-          const transformedProgress = progressResult.data.map(item => ({
-            id: item.id,
-            userId: item.userId,
-            badgeId: item.badgeId,
-            progress: item.progress,
-            isCompleted: item.isCompleted,
-            completedAt: item.completedAt || null,
-            lastUpdatedAt: item.lastUpdatedAt,
-            createdAt: item.createdAt,
-            updatedAt: item.updatedAt
-          })) as UserBadgeProgress[];
-          
+          const transformedProgress = progressResult.data.map(transformToBadgeProgress);
           setBadgeProgress(transformedProgress);
         }
-      } catch (error) {
-        console.error('Error loading badges:', error);
+      } catch (e) {
+        const apiError = e as ApiError;
+        setError({
+          name: apiError.name || 'Error',
+          message: apiError.message || 'Failed to load badges',
+          code: apiError.code,
+          stack: apiError.stack
+        });
+        console.error('Error loading badges:', e);
       } finally {
         setIsLoading(false);
       }
     };
 
     loadBadges();
-  }, []);
+  }, [client]);
 
   return {
     userBadges,
     badgeProgress,
     isLoading,
+    error,
     checkBadgeProgress
   };
 };
