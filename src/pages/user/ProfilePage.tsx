@@ -4,7 +4,7 @@ import { useSession } from '../../contexts/SessionContext';
 import { useState } from 'react';
 
 export const ProfilePage = () => {
-  const { isSignedIn, user, loadSession } = useSession();
+  const { isSignedIn, user } = useSession();
   const [isEditing, setIsEditing] = useState(false);
 
   // ログインしてなければ ProtectedRoute で弾かれるはずだが
@@ -17,12 +17,6 @@ export const ProfilePage = () => {
   const username = user?.username;
   const email = user?.attributes?.email;
   const role = user?.attributes?.['custom:role'];
-
-  const handleRefreshSession = async () => {
-    // IDトークンの有効期限切れ等を手動でリフレッシュしたいとき
-    await loadSession(true);
-    alert('トークンを再取得しました');
-  };
 
   return (
     <View padding="medium">
@@ -40,10 +34,6 @@ export const ProfilePage = () => {
         ) : (
           <Button onClick={() => setIsEditing(true)}>プロフィールを編集</Button>
         )}
-
-        <Button onClick={handleRefreshSession} variation="link">
-          トークンを再取得する
-        </Button>
       </Card>
     </View>
   );

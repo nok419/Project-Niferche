@@ -1,5 +1,4 @@
 // src/types/content.ts
-import { BaseContent, ContentVariant, ContentStatus, WorldCategory, Attribution, ContentVisibility } from './common';
 
 // コンテンツカテゴリ
 export enum ContentCategory {
@@ -28,16 +27,18 @@ export interface ContentReference {
 }
 
 // 拡張コンテンツインターフェース
-export interface Content extends BaseContent {
-  variant: ContentVariant;
+export interface Content {
+  id: string;
+  title: string;
+  description: string;
   primaryTypes: string[];
   supplementaryTypes?: string[];
-  primaryCategory: ContentCategory;
+  primaryCategory: string;
   secondaryCategories?: string[];
-  worldType: WorldCategory;
-  attribution: Attribution;
-  visibility: ContentVisibility;
-  status: ContentStatus;
+  worldType: string;
+  attribution: string;
+  visibility: string;
+  status: string;
   tags?: string[];
   sourceRefs?: ContentReference[];
   relatedContent?: ContentReference[];
@@ -70,62 +71,6 @@ export interface FavoriteItem {
   contentType: string;
 }
 
-// APIへのコンテンツ作成リクエスト型
-export interface CreateContentInput {
-  title: string;
-  description: string;
-  primaryTypes: string[];
-  supplementaryTypes?: string[];
-  primaryCategory: ContentCategory;
-  secondaryCategories?: string[];
-  worldType: WorldCategory;
-  attribution: Attribution;
-  visibility: ContentVisibility;
-  status: ContentStatus;
-  mainKey: string;
-  thumbnailKey?: string;
-  ownerId: string;
-}
-
-// APIへのコンテンツ更新リクエスト型
-export interface UpdateContentInput {
-  id: string;
-  title?: string;
-  description?: string;
-  primaryTypes?: string[];
-  supplementaryTypes?: string[];
-  primaryCategory?: ContentCategory;
-  secondaryCategories?: string[];
-  worldType?: WorldCategory;
-  attribution?: Attribution;
-  visibility?: ContentVisibility;
-  status?: ContentStatus;
-  tags?: string[];
-  mainKey?: string;
-  thumbnailKey?: string;
-  collaborators?: string[];
-  version: string; // バージョン管理用
-}
-
-// コンテンツフィルタリング用オプション
-export interface ContentFilterOptions {
-  primaryCategory?: ContentCategory;
-  worldType?: WorldCategory;
-  attribution?: Attribution;
-  visibility?: ContentVisibility;
-  status?: ContentStatus;
-  tags?: string[];
-  ownerId?: string;
-}
-
-// コンテンツ検索用オプション
-export interface ContentSearchOptions {
-  keyword?: string;
-  filter?: ContentFilterOptions;
-  limit?: number;
-  nextToken?: string;
-}
-
 // コンテンツ取得結果
 export interface ContentResult {
   items: Content[];
@@ -135,7 +80,7 @@ export interface ContentResult {
 // コンテンツ管理用ヘルパー関数
 export function isContentAccessible(content: Content, isAuthenticated: boolean, userId?: string): boolean {
   // 公開コンテンツは誰でも閲覧可能
-  if (content.visibility === ContentVisibility.PUBLIC) {
+  if (content.visibility === 'PUBLIC') {
     return true;
   }
 
@@ -145,18 +90,18 @@ export function isContentAccessible(content: Content, isAuthenticated: boolean, 
   }
 
   // 認証済みコンテンツはログインしていれば閲覧可能
-  if (content.visibility === ContentVisibility.AUTHENTICATED) {
+  if (content.visibility === 'AUTHENTICATED') {
     return true;
   }
 
   // プライベートコンテンツは所有者か共同編集者のみ閲覧可能
-  if (content.visibility === ContentVisibility.PRIVATE) {
+  if (content.visibility === 'PRIVATE') {
     if (!userId) return false;
     
     // 所有者または共同編集者かチェック
     return (
       content.ownerId === userId || 
-      (content.collaborators && content.collaborators.includes(userId))
+      (content.collaborators ? content.collaborators.includes(userId) : false)
     );
   }
 

@@ -115,7 +115,7 @@ export const QuxeMaterials = () => {
           </Tabs.List>
         </Tabs>
 
-        {error && <ErrorAlert errorMessage={error} onDismiss={() => {}} />}
+        {error && <ErrorAlert errorMessage={error.message || 'エラーが発生しました'} onDismiss={() => {}} />}
 
         {loading && items.length === 0 ? (
           <SkeletonList count={4} />

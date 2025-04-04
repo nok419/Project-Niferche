@@ -31,7 +31,7 @@ export const ProtectedRoute = ({
   }
 
   // 管理者権限レベルチェック
-  if (accessLevel === AccessLevel.ADMIN) {
+  if (accessLevel === AccessLevel.ADMIN && user) {
     const userRole = getUserRole(user);
     if (userRole !== 'admin') {
       return <Navigate to="/" replace />;  // 権限不足の場合はホームへリダイレクト
@@ -39,7 +39,7 @@ export const ProtectedRoute = ({
   }
 
   // 所有者と管理者のみアクセス可能なコンテンツ
-  if (accessLevel === AccessLevel.OWNER_PRIVATE && creatorId) {
+  if (accessLevel === AccessLevel.OWNER_PRIVATE && creatorId && user) {
     const userRole = getUserRole(user);
     const isCreator = creatorId === user?.username || creatorId === user?.userId;
     const isAdmin = userRole === 'admin';
@@ -48,9 +48,6 @@ export const ProtectedRoute = ({
       return <Navigate to="/" replace />;
     }
   }
-
-  // 所有者のみ編集可能、他ユーザーは閲覧可能なコンテンツ
-  // ここでは単純に閲覧可能なのでチェックは必要ない
   
   return <>{children}</>;
 };

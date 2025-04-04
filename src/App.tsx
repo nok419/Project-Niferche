@@ -1,8 +1,7 @@
 // src/App.tsx
 
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { ThemeProvider, Authenticator } from '@aws-amplify/ui-react';
-import { SessionProvider } from './contexts/SessionContext';
+import { ThemeProvider } from '@aws-amplify/ui-react';
 
 // themes
 import { laboratoryTheme } from './theme/laboratoryTheme';
@@ -63,133 +62,108 @@ import { NotFoundPage } from './pages/NotFoundPage';
 import { ErrorPage } from './pages/ErrorPage';
 
 // Protected
-import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { ProfilePage } from './pages/user/ProfilePage';
 import { FavoritesPage } from './pages/user/FavoritesPage';
 
 import { ErrorBoundary } from './components/common/ErrorBoundary';
 
 // ★ 新規追加ページ
-import { GalleryDetailPage } from './pages/gallery/GalleryDetailPage';        // 追加
-import { MaterialDetailPage } from './pages/materials/MaterialDetailPage';   // 追加
-import { AdminDashboardPage } from './pages/admin/AdminDashboardPage';       // 追加
+import { GalleryDetailPage } from './pages/gallery/GalleryDetailPage';        
+import { MaterialDetailPage } from './pages/materials/MaterialDetailPage';   
+import { AdminDashboardPage } from './pages/admin/AdminDashboardPage';       
 
 function App() {
   return (
-    <Authenticator.Provider>
-      <BrowserRouter>
-        <SessionProvider>
-          <ThemeProvider theme={theme}>
-            <ErrorBoundary>
-              <Routes>
+    <BrowserRouter>
+      <ThemeProvider theme={theme}>
+        <ErrorBoundary>
+          <Routes>
 
-                {/* Auth */}
-                <Route path="/auth" element={<AuthLayout />}>
-                  <Route path="signin" element={<SignInPage />} />
-                  <Route path="signup" element={<SignUpPage />} />
-                  <Route path="confirm" element={<ConfirmSignUpPage />} />
-                </Route>
+            {/* Auth */}
+            <Route path="/auth" element={<AuthLayout />}>
+              <Route path="signin" element={<SignInPage />} />
+              <Route path="signup" element={<SignUpPage />} />
+              <Route path="confirm" element={<ConfirmSignUpPage />} />
+            </Route>
 
-                {/* Call */}
-                <Route element={<CallLayout />}>
-                  <Route path="/call/about" element={<AboutPage />} />
-                  <Route path="/call/philosophy" element={<PhilosophyPage />} />
-                  <Route path="/call/news" element={<NewsPage />} />
-                </Route>
+            {/* Call */}
+            <Route element={<CallLayout />}>
+              <Route path="/call/about" element={<AboutPage />} />
+              <Route path="/call/philosophy" element={<PhilosophyPage />} />
+              <Route path="/call/news" element={<NewsPage />} />
+            </Route>
 
-                {/* Library */}
-                <Route element={<LibraryLayout />}>
-                  <Route path="/library" element={<LibraryOverviewPage />} />
-                  <Route path="/library/mainstory" element={<MainStory />} />
-                  <Route path="/library/sidestory" element={<SideStory />} />
-                  <Route path="/library/sidestorylist" element={<SideStoryListPage />} />
-                  <Route path="/library/sidestory/detail/:storyId" element={<SideStoryDetailPage />} />
-                  <Route path="/library/records" element={<RecordsPage />} />
-                  <Route path="/library/page" element={<LibraryPage />} />
-                </Route>
+            {/* Library */}
+            <Route element={<LibraryLayout />}>
+              <Route path="/library" element={<LibraryOverviewPage />} />
+              <Route path="/library/mainstory" element={<MainStory />} />
+              <Route path="/library/sidestory" element={<SideStory />} />
+              <Route path="/library/sidestorylist" element={<SideStoryListPage />} />
+              <Route path="/library/sidestory/detail/:storyId" element={<SideStoryDetailPage />} />
+              <Route path="/library/records" element={<RecordsPage />} />
+              <Route path="/library/page" element={<LibraryPage />} />
+            </Route>
 
-                {/* Laboratory */}
-                <Route
-                  element={
-                    <ThemeProvider theme={laboratoryTheme}>
-                      <LaboratoryLayout />
-                    </ThemeProvider>
-                  }
-                >
-                  <Route path="/laboratory/about" element={<LaboratoryPage />} />
-                  <Route path="/laboratory/observation" element={<ObservationPage />} />
-                  <Route path="/laboratory/archive" element={<ArchivePage />} />
-                  <Route path="/laboratory/guide" element={<GuidePage />} />
-                  <Route path="/laboratory/ideas" element={<IdeaLibrary />} />
-                </Route>
+            {/* Laboratory */}
+            <Route
+              element={
+                <ThemeProvider theme={laboratoryTheme}>
+                  <LaboratoryLayout />
+                </ThemeProvider>
+              }
+            >
+              <Route path="/laboratory/about" element={<LaboratoryPage />} />
+              <Route path="/laboratory/observation" element={<ObservationPage />} />
+              <Route path="/laboratory/archive" element={<ArchivePage />} />
+              <Route path="/laboratory/guide" element={<GuidePage />} />
+              <Route path="/laboratory/ideas" element={<IdeaLibrary />} />
+            </Route>
 
-                {/* Materials */}
-                <Route element={<MaterialsRootLayout />}>
-                  <Route path="/materials/about" element={<MaterialsAbout />} />
-                  <Route path="/materials/common" element={<CommonSettings />} />
-                  <Route path="/materials/quxe" element={<QuxeMaterials />} />
-                  <Route path="/materials/hodemei" element={<HodemeiMaterials />} />
-                  <Route path="/materials/alsarejia" element={<AlsarejiaMaterials />} />
-                  {/* ★ 新規追加の詳細ルート */}
-                  <Route 
-                    path="/materials/:attribution/:world/:materialId" 
-                    element={<MaterialDetailPage />} 
-                  />
-                </Route>
+            {/* Materials */}
+            <Route element={<MaterialsRootLayout />}>
+              <Route path="/materials/about" element={<MaterialsAbout />} />
+              <Route path="/materials/common" element={<CommonSettings />} />
+              <Route path="/materials/quxe" element={<QuxeMaterials />} />
+              <Route path="/materials/hodemei" element={<HodemeiMaterials />} />
+              <Route path="/materials/alsarejia" element={<AlsarejiaMaterials />} />
+              {/* 詳細ルート */}
+              <Route 
+                path="/materials/:attribution/:world/:materialId" 
+                element={<MaterialDetailPage />} 
+              />
+            </Route>
 
-                {/* Gallery */}
-                <Route element={<MainLayout />}>
-                  <Route path="/gallery" element={<GalleryPage />} />
-                  {/* ★ 新規追加のギャラリ詳細ルート */}
-                  <Route path="/gallery/view/:galleryId" element={<GalleryDetailPage />} />
+            {/* Gallery */}
+            <Route element={<MainLayout />}>
+              <Route path="/gallery" element={<GalleryPage />} />
+              {/* ギャラリ詳細ルート */}
+              <Route path="/gallery/view/:galleryId" element={<GalleryDetailPage />} />
 
-                  <Route path="/rights" element={<RightsPage />} />
-                  <Route path="/terms" element={<TermsPage />} />
-                  <Route path="/guidelines" element={<GuidelinesPage />} />
-                </Route>
+              <Route path="/rights" element={<RightsPage />} />
+              <Route path="/terms" element={<TermsPage />} />
+              <Route path="/guidelines" element={<GuidelinesPage />} />
+            </Route>
 
-                {/* Protected */}
-                <Route
-                  path="/profile"
-                  element={
-                    <ProtectedRoute>
-                      <ProfilePage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/favorites"
-                  element={
-                    <ProtectedRoute>
-                      <FavoritesPage />
-                    </ProtectedRoute>
-                  }
-                />
-                {/* 管理者専用 */}
-                <Route 
-                  path="/admin"
-                  element={
-                    <ProtectedRoute accessLevel="admin">
-                      <AdminDashboardPage />
-                    </ProtectedRoute>
-                  }
-                />
+            {/* プロフィール・お気に入り */}
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/favorites" element={<FavoritesPage />} />
+            
+            {/* 管理者ページ */}
+            <Route path="/admin" element={<AdminDashboardPage />} />
 
-                {/* メイン */}
-                <Route path="/" element={<MainLayout />}>
-                  <Route index element={<MainPage />} />
-                </Route>
+            {/* メイン */}
+            <Route path="/" element={<MainLayout />}>
+              <Route index element={<MainPage />} />
+            </Route>
 
-                {/* エラー */}
-                <Route path="/error" element={<ErrorPage />} />
-                <Route path="*" element={<NotFoundPage />} />
+            {/* エラー */}
+            <Route path="/error" element={<ErrorPage />} />
+            <Route path="*" element={<NotFoundPage />} />
 
-              </Routes>
-            </ErrorBoundary>
-          </ThemeProvider>
-        </SessionProvider>
-      </BrowserRouter>
-    </Authenticator.Provider>
+          </Routes>
+        </ErrorBoundary>
+      </ThemeProvider>
+    </BrowserRouter>
   );
 }
 

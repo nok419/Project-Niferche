@@ -9,40 +9,27 @@ import {
   Text,
   Alert
 } from '@aws-amplify/ui-react';
-// 旧: import { useAuth } from '../../../components/auth/AuthContext';
-import { useSession } from '../../../contexts/SessionContext';
 
 export const ConfirmSignUpPage = () => {
   const [code, setCode] = useState('');
-  const [error, setError] = useState('');
-  const [username, setUsername] = useState('');
+  const [error] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
-
-  // 旧: const { confirmSignUp } = useAuth();
-  const { confirmSignUp } = useSession();
 
   useEffect(() => {
     const state = location.state as { username?: string };
     if (!state?.username) {
       // ユーザ名がない → サインアップ画面へ戻す
       navigate('/auth/signup');
-    } else {
-      setUsername(state.username);
     }
   }, [location, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      await confirmSignUp(username, code);
-      // 確認成功 → サインイン画面へ
-      navigate('/auth/signin', {
-        state: { message: 'アカウントが確認されました。サインインしてください。' }
-      });
-    } catch (error: any) {
-      setError(error.message || 'Unknown error');
-    }
+    // モックバージョンでは確認成功をシミュレート
+    navigate('/auth/signin', {
+      state: { message: 'アカウントが確認されました。サインインしてください。' }
+    });
   };
 
   return (
@@ -73,6 +60,11 @@ export const ConfirmSignUpPage = () => {
           アカウント作成をやり直す
         </Button>
       </Text>
+      <View marginTop="1rem">
+        <Alert variation="info">
+          これはモックページです。任意のコードを入力してください。
+        </Alert>
+      </View>
     </View>
   );
 };

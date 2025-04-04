@@ -75,7 +75,7 @@ export const LibraryOverviewPage = () => {
         <ToggleButton value="list">リスト</ToggleButton>
       </ToggleButtonGroup>
 
-      {error && <ErrorAlert errorMessage={error} onDismiss={() => {}} />}
+      {error && <ErrorAlert errorMessage={error.message || 'エラーが発生しました'} onDismiss={() => {}} />}
 
       {loading && items.length === 0 ? (
         <SkeletonList count={4} />

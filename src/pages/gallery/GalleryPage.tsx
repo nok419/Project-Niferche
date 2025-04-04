@@ -1,5 +1,4 @@
 // src/pages/gallery/GalleryPage.tsx
-
 import { useEffect, useState } from 'react';
 import {
   View,
@@ -8,7 +7,6 @@ import {
   ToggleButton,
   Collection,
   Button,
-  Flex,
 } from '@aws-amplify/ui-react';
 
 import { AdvancedFilterPanel } from '../../components/common/AdvancedFilterPanel';
@@ -60,7 +58,7 @@ export const GalleryPage = () => {
     path: '/images/sc.jpg',  // ダミー
     title: item.title ?? 'No Title',
     description: item.description,
-    category: item.category ?? 'illustration',
+    category: item.primaryCategory ?? 'illustration',
     tags: item.tags ?? [],
     isAvailable: true,
   }));
@@ -87,7 +85,7 @@ export const GalleryPage = () => {
         <ToggleButton value="list">リスト</ToggleButton>
       </ToggleButtonGroup>
 
-      {error && <ErrorAlert errorMessage={error} />}
+      {error && <ErrorAlert errorMessage={error.message || 'エラーが発生しました'} onDismiss={() => {}} />}
 
       {loading && items.length === 0 ? (
         <SkeletonList count={4} />
@@ -145,51 +143,6 @@ export const GalleryPage = () => {
         </Button>
       )}
       {loading && items.length > 0 && <SkeletonList count={2} />}
-
-      <View marginTop="2rem">
-        <GalleryUploadForm />
-      </View>
     </View>
-  );
-};
-
-const GalleryUploadForm = () => {
-  const [file, setFile] = useState<File | null>(null);
-  const [title, setTitle] = useState('');
-  const [desc, setDesc] = useState('');
-
-  const handleSubmit = async () => {
-    if (!file) {
-      alert('ファイルを選択してください');
-      return;
-    }
-    // ここでS3アップロード & DBにメタ情報を保存するなど
-    alert(`タイトル「${title}」で投稿しました`);
-  };
-
-  return (
-    <Flex direction="column" gap="small">
-      <Heading level={4}>ギャラリーに投稿</Heading>
-      <input
-        type="file"
-        accept="image/*"
-        onChange={(e) => {
-          const selected = e.target.files?.[0];
-          if (selected) setFile(selected);
-        }}
-      />
-      <input
-        type="text"
-        placeholder="作品タイトル"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-      />
-      <textarea
-        placeholder="作品の説明"
-        value={desc}
-        onChange={(e) => setDesc(e.target.value)}
-      />
-      <Button onClick={handleSubmit}>アップロード</Button>
-    </Flex>
   );
 };

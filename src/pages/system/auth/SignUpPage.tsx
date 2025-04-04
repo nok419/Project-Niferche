@@ -9,9 +9,6 @@ import {
   Text,
   Alert
 } from '@aws-amplify/ui-react';
-// 旧: import { useAuth } from '../../../components/auth/AuthContext';
-// 新: SessionContext から
-import { useSession } from '../../../contexts/SessionContext';
 
 export const SignUpPage = () => {
   const [username, setUsername] = useState('');
@@ -21,24 +18,15 @@ export const SignUpPage = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  // 旧: const { signUp } = useAuth();
-  const { signUp } = useSession();
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirmPassword) {
       setError('パスワードが一致しません');
       return;
     }
-    try {
-      await signUp(username, password, email);
-      // サインアップ成功 → 確認コード入力画面へ
-      navigate('/auth/confirm', { 
-        state: { username, email } 
-      });
-    } catch (error: any) {
-      setError(error.message || 'Unknown error');
-    }
+    
+    // モックバージョンではサインアップをシミュレート
+    setError('現在、新規登録機能は利用できません。テスト用アカウントをご利用ください。');
   };
 
   return (
@@ -86,6 +74,13 @@ export const SignUpPage = () => {
           サインイン
         </Button>
       </Text>
+      <View marginTop="1rem">
+        <Alert variation="info">
+          テスト用アカウント:<br />
+          管理者: username=admin, password=password<br />
+          一般: username=user, password=password
+        </Alert>
+      </View>
     </View>
   );
 };

@@ -16,7 +16,7 @@ import { LibraryListViewItem } from '../../components/common/LibraryListViewItem
 import { DocumentCard } from '../../components/materials/DocumentCard';
 
 import { useInfiniteContents } from '../../hooks/useInfiniteContents';
-import { MaterialDocument } from '../../types/materials';
+import { MaterialDocument, MaterialCategory } from '../../types/materials';
 
 export const CommonSettings = () => {
   const [filterCondition, setFilterCondition] = useState({
@@ -50,12 +50,12 @@ export const CommonSettings = () => {
     id: item.id,
     title: item.title ?? 'Common Setting Title',
     description: item.description ?? 'No description',
-    category: 'THEORY',
+    category: MaterialCategory.THEORY,
     reference: 'COM-xxx',
     linkTo: `/materials/common/${item.id}`,
     isAvailable: true,
     variant: 'manuscript',
-    imagePath: '',
+    imagePath: ''
   }));
 
   return (
@@ -80,7 +80,7 @@ export const CommonSettings = () => {
           <ToggleButton value="list">リスト</ToggleButton>
         </ToggleButtonGroup>
 
-        {error && <ErrorAlert errorMessage={error} onDismiss={() => {}} />}
+        {error && <ErrorAlert errorMessage={error.message || 'エラーが発生しました'} onDismiss={() => {}} />}
 
         {loading && items.length === 0 ? (
           <SkeletonList count={4} />

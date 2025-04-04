@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Card, Image, Text, Heading, Flex, Button, View, Loader } from '@aws-amplify/ui-react';
-import { StorageService } from '../../services/storage';
+import { MockStorageService } from '../../services/mockStorage';
 
 interface ContentDisplayProps {
   path: string;
@@ -38,10 +38,10 @@ export const ContentDisplay: React.FC<ContentDisplayProps> = ({
         setImageLoadError(false);
 
         if (type === 'image') {
-          const url = await StorageService.getFileUrl(path);
+          const url = await MockStorageService.getImage(path);
           if (isMounted) setContent(url);
         } else {
-          const text = await StorageService.getTextContent(path);
+          const text = await MockStorageService.getText(path);
           if (isMounted) setContent(text);
         }
       } catch (err) {

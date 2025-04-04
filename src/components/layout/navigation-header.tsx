@@ -69,7 +69,7 @@ const navigation: NavItem[] = [
 export const NavigationHeader = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
-  const { isSignedIn, signOut, user } = useSession();
+  const { isSignedIn, logout, user } = useSession();
   const isMobile = useBreakpointValue({ base: true, medium: false });
 
   const isActive = (path: string) => {
@@ -195,7 +195,7 @@ export const NavigationHeader = () => {
           <Button width="100%" variation="link">管理画面</Button>
         </Link>
       )}
-      <Button width="100%" variation="link" onClick={signOut}>
+      <Button width="100%" variation="link" onClick={logout}>
         ログアウト
       </Button>
     </>
@@ -298,4 +298,3 @@ export const NavigationHeader = () => {
     </View>
   );
 };
-

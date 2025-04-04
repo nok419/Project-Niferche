@@ -9,7 +9,6 @@ import {
   Text,
   Alert
 } from '@aws-amplify/ui-react';
-// 旧: import { useAuth } from '../../../components/auth/AuthContext';
 import { useSession } from '../../../contexts/SessionContext';
 
 export const SignInPage = () => {
@@ -17,16 +16,17 @@ export const SignInPage = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-
-  // 旧: const { signIn } = useAuth();
-  const { signIn } = useSession();
+  const { login } = useSession();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await signIn(username, password);
-      // 成功時トップページへ or 任意の遷移先
-      navigate('/');
+      const success = await login(username, password);
+      if (success) {
+        navigate('/');
+      } else {
+        setError('ログインに失敗しました。ユーザー名とパスワードを確認してください。');
+      }
     } catch (error: any) {
       setError(error.message || 'Unknown error');
     }
@@ -63,6 +63,13 @@ export const SignInPage = () => {
           新規登録
         </Button>
       </Text>
+      <View marginTop="1rem">
+        <Alert variation="info">
+          テスト用アカウント:<br />
+          管理者: username=admin, password=password<br />
+          一般: username=user, password=password
+        </Alert>
+      </View>
     </View>
   );
 };

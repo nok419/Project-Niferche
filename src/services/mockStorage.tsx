@@ -1,5 +1,5 @@
 // src/services/mockStorage.ts
-import type { LabDocument } from '../types/laboratory';
+import { LabDocument, LabCategory } from '../types/laboratory';
 
 export interface ContentData {
   body: string;
@@ -38,7 +38,7 @@ const MOCK_IDEA_DOCS: Record<string, LabDocument[]> = {
       id: 'idea-basis',
       title: 'アイデア体の基礎',
       description: 'アイデア体とその性質についての基本的な解説',
-      category: 'IDEA',
+      category: LabCategory.IDEA,
       reference: 'IDA-001',
       isAvailable: true,
       variant: 'document'
@@ -47,7 +47,7 @@ const MOCK_IDEA_DOCS: Record<string, LabDocument[]> = {
       id: 'idea-structure',
       title: 'アイデア構造論',
       description: 'アイデア体の内部構造と相互作用',
-      category: 'IDEA',
+      category: LabCategory.IDEA,
       reference: 'IDA-002',
       isAvailable: true,
       variant: 'document'
@@ -58,7 +58,7 @@ const MOCK_IDEA_DOCS: Record<string, LabDocument[]> = {
       id: 'idea-resonance',
       title: '共鳴現象',
       description: 'アイデア体間の共鳴と増幅に関する研究',
-      category: 'IDEA',
+      category: LabCategory.IDEA,
       reference: 'IDA-003',
       isAvailable: true,
       variant: 'document'
@@ -67,7 +67,7 @@ const MOCK_IDEA_DOCS: Record<string, LabDocument[]> = {
       id: 'idea-lifecycle',
       title: 'ライフサイクル',
       description: 'アイデア体の生成から消滅までの過程',
-      category: 'IDEA',
+      category: LabCategory.IDEA,
       reference: 'IDA-004',
       isAvailable: false,
       variant: 'document'
@@ -78,7 +78,7 @@ const MOCK_IDEA_DOCS: Record<string, LabDocument[]> = {
       id: 'idea-measurement',
       title: '観測方法論',
       description: 'アイデア体の観測と記録の手法',
-      category: 'IDEA',
+      category: LabCategory.IDEA,
       reference: 'IDA-005',
       isAvailable: true,
       variant: 'document'
@@ -93,7 +93,7 @@ const MOCK_FACILITY_DOCS: Record<string, LabDocument[]> = {
       id: 'facility-map',
       title: '施設マップ',
       description: 'アルサレジア研究所の全体マップです',
-      category: 'FACILITY',
+      category: LabCategory.FACILITY,
       reference: 'FAC-001',
       isAvailable: true,
       variant: 'image',
@@ -105,7 +105,7 @@ const MOCK_FACILITY_DOCS: Record<string, LabDocument[]> = {
       id: 'facility-security',
       title: 'セキュリティガイド',
       description: '研究所内での安全管理と機密情報の取り扱いについて',
-      category: 'FACILITY',
+      category: LabCategory.FACILITY,
       reference: 'FAC-003',
       isAvailable: true,
       variant: 'document'
@@ -114,7 +114,7 @@ const MOCK_FACILITY_DOCS: Record<string, LabDocument[]> = {
       id: 'facility-resources',
       title: '設備・リソース',
       description: '利用可能な研究設備とリソースの一覧',
-      category: 'FACILITY',
+      category: LabCategory.FACILITY,
       reference: 'FAC-004',
       isAvailable: false,
       variant: 'document'
@@ -125,7 +125,7 @@ const MOCK_FACILITY_DOCS: Record<string, LabDocument[]> = {
       id: 'facility-rules',
       title: '利用規約',
       description: '研究所の利用に関する基本的な規則と注意事項',
-      category: 'RULES',
+      category: LabCategory.RULES,
       reference: 'FAC-002',
       isAvailable: true,
       variant: 'document'
@@ -155,7 +155,7 @@ const MOCK_CONTENT: Record<string, ContentData> = {
     body: 'アイデア体の基本概念に関する説明...\n\n1. アイデア体とは\n2. 基本的な性質\n3. 観測方法\n\n詳細な内容はこれから追加されます。',
     metadata: {
       title: 'アイデア体の基本概念',
-      category: 'IDEA',
+      category: LabCategory.IDEA,
       reference: 'IDA-001'
     }
   },
@@ -163,7 +163,7 @@ const MOCK_CONTENT: Record<string, ContentData> = {
     body: '研究所の利用規約と注意事項...\n\n1. 一般的な注意事項\n2. セキュリティ規則\n3. 緊急時の対応\n\n詳細な内容はこれから追加されます。',
     metadata: {
       title: '研究所利用規約',
-      category: 'RULES',
+      category: LabCategory.RULES,
       reference: 'FAC-002'
     }
   }

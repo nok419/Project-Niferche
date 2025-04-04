@@ -7,13 +7,10 @@ import {
   Flex 
 } from '@aws-amplify/ui-react';
 import { Link } from 'react-router-dom';
-// Replace the old import:
-// import { useAuth } from '../auth/AuthContext';
 import { useSession } from '../../contexts/SessionContext';
 
 export const UserMenu = () => {
-  // Destructure from the new session context
-  const { user, signOut } = useSession();
+  const { user, logout } = useSession();
 
   return (
     <Menu 
@@ -45,7 +42,7 @@ export const UserMenu = () => {
           </Link>
         </MenuItem>
       )}
-      <MenuItem onClick={signOut}>
+      <MenuItem onClick={logout}>
         ログアウト
       </MenuItem>
     </Menu>

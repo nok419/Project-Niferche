@@ -120,7 +120,7 @@ export const HodemeiMaterials = () => {
         </Tabs>
 
         {/* エラー表示 */}
-        {error && <ErrorAlert errorMessage={error} onDismiss={() => {}} />}
+        {error && <ErrorAlert errorMessage={error.message || 'エラーが発生しました'} onDismiss={() => {}} />}
 
         {/* ローディング&表示 */}
         {loading && items.length === 0 ? (
