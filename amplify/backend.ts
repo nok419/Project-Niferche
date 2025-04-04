@@ -14,7 +14,10 @@ backend.addOutput({
   storage: {
     bucket_name: 'niferche-content',
     aws_region: 'ap-northeast-1'
+  },
+  data: {
+    api_key_expiration_days: 30
   }
 });
 
-export const { auth: authOutput, storage: storageOutput } = backend;
+export const { auth: authOutput, data: dataOutput, storage: storageOutput } = backend;

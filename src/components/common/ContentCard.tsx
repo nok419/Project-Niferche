@@ -1,11 +1,12 @@
-import { Card, Flex, Text, Heading, Image } from '@aws-amplify/ui-react';
+import { Card, Flex, Text, Heading, Image, View } from '@aws-amplify/ui-react';
 import { useNavigate } from 'react-router-dom';
+import './ContentCard.css';
 
 interface ContentCardProps {
   title: string;
   description?: string;
   imagePath?: string;
-  linkTo?: string;  // linkToをオプショナルに変更
+  linkTo?: string;
   onClick?: () => void;
   size?: 'small' | 'medium' | 'large';
   variant?: 'story' | 'material' | 'info';
@@ -17,7 +18,10 @@ export const ContentCard: React.FC<ContentCardProps> = ({
   description,
   imagePath,
   linkTo,
-  onClick
+  onClick,
+  size = 'medium',
+  variant = 'story',
+  footer
 }) => {
   const navigate = useNavigate();
 
@@ -25,8 +29,32 @@ export const ContentCard: React.FC<ContentCardProps> = ({
     if (onClick) {
       onClick();
     }
-    if (linkTo) {  // linkToが存在する場合のみナビゲート
+    if (linkTo) {
       navigate(linkTo);
+    }
+  };
+
+  // サイズに基づく設定
+  const getCardStyles = () => {
+    switch (size) {
+      case 'small':
+        return 'content-card-small';
+      case 'large':
+        return 'content-card-large';
+      default:
+        return 'content-card-medium';
+    }
+  };
+
+  // バリアントに基づく設定
+  const getVariantStyles = () => {
+    switch (variant) {
+      case 'material':
+        return 'content-card-material';
+      case 'info':
+        return 'content-card-info';
+      default:
+        return 'content-card-story';
     }
   };
 
@@ -35,32 +63,46 @@ export const ContentCard: React.FC<ContentCardProps> = ({
       variation="elevated"
       padding="medium"
       borderRadius="medium"
-      onClick={handleClick}
-      style={{
-        transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-      }}
-      className="clickable-card"
-      
+      onClick={linkTo || onClick ? handleClick : undefined}
+      className={`ContentCard ${getCardStyles()} ${getVariantStyles()} ${(linkTo || onClick) ? 'clickable' : ''}`}
+      aria-label={title}
     >
-      <Flex direction="column" gap="medium">
+      <Flex direction="column" gap="medium" className="content-card-container">
         {imagePath && (
-          <Image
-            src={imagePath}
-            alt={title}
-            objectFit="cover"
-            width="100%"
-            height="200px"
-            borderRadius="medium"
-          />
+          <div className="content-card-image-container">
+            <Image
+              src={imagePath}
+              alt={title}
+              objectFit="cover"
+              width="100%"
+              height="auto"
+              className="content-card-image"
+              borderRadius="medium"
+              loading="lazy"
+              onError={(e) => {
+                // オプション: 画像読み込みエラー時のフォールバック
+                e.currentTarget.src = '/images/fallback.jpg';
+              }}
+            />
+          </div>
         )}
         
-        <Heading level={3}>{title}</Heading>
+        <View className="content-card-content">
+          <Heading level={3} className="content-card-title">{title}</Heading>
+          
+          {description && (
+            <Text className="content-card-description">
+              {description.length > 120 ? `${description.substring(0, 120)}...` : description}
+            </Text>
+          )}
+        </View>
         
-        {description && (
-          <Text>{description}</Text>
+        {footer && (
+          <View className="content-card-footer">
+            {footer}
+          </View>
         )}
       </Flex>
-      
     </Card>
   );
 };

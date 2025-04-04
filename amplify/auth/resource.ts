@@ -18,11 +18,35 @@ export const auth = defineAuth({
     email: {
       mutable: true,
       required: true
+    },
+    preferred_username: {
+      mutable: true,
+      required: false
+    },
+    profile: {
+      mutable: true,
+      required: false
     }
   },
   multifactor: {
-    mode: 'OFF'
+    mode: 'OPTIONAL',
+    sms: {
+      enabled: true
+    }
+  },
+  passwordPolicy: {
+    minLength: 8,
+    requireLowercase: true,
+    requireUppercase: true,
+    requireNumbers: true,
+    requireSymbols: true
   },
   // 追加の設定
   accountRecovery: 'EMAIL_ONLY',
+  verificationMessages: {
+    email: {
+      subject: 'Project Niferche - メールアドレス確認',
+      message: (code) => `Project Nifercheへようこそ。\n認証コード：${code}\nこのコードの有効期限は15分です。`
+    }
+  }
 });
