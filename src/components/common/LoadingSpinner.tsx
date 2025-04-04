@@ -31,7 +31,7 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
       className={containerClasses}
     >
       <Loader 
-        size={size} 
+        variation="linear"
         className={`loading-spinner-${size}`}
         aria-label="読み込み中"
       />

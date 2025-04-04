@@ -243,10 +243,6 @@ export const data = defineData({
     defaultAuthorizationMode: 'userPool',
     apiKeyAuthorizationMode: {
       expiresInDays: 30
-    },
-    iamAuthorizationMode: {
-      // システムバックエンド操作用
-      enabled: true
     }
   }
 });

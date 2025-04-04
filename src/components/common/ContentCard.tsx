@@ -81,7 +81,9 @@ export const ContentCard: React.FC<ContentCardProps> = ({
               loading="lazy"
               onError={(e) => {
                 // オプション: 画像読み込みエラー時のフォールバック
-                e.currentTarget.src = '/images/fallback.jpg';
+                if (e && typeof e !== 'string' && 'currentTarget' in e) {
+                  (e.currentTarget as HTMLImageElement).src = '/images/fallback.jpg';
+                }
               }}
             />
           </div>
