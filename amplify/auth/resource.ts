@@ -5,7 +5,7 @@ export const auth = defineAuth({
   loginWith: {
     email: {
       verificationEmailSubject: 'Project Niferche - メールアドレス確認',
-      verificationEmailBody: (code) => 
+      verificationEmailBody: (code: string) => 
         `Project Nifercheへようこそ。\n認証コード：${code}\nこのコードの有効期限は15分です。`,
       verificationEmailStyle: 'CODE'
     }
@@ -19,7 +19,7 @@ export const auth = defineAuth({
       mutable: true,
       required: true
     },
-    preferred_username: {
+    preferredUsername: {
       mutable: true,
       required: false
     },
@@ -31,7 +31,7 @@ export const auth = defineAuth({
   multifactor: {
     mode: 'OPTIONAL',
     sms: {
-      enabled: true
+      smsMessage: (code) => `認証コード: ${code}`
     }
   },
   passwordPolicy: {
@@ -46,7 +46,7 @@ export const auth = defineAuth({
   verificationMessages: {
     email: {
       subject: 'Project Niferche - メールアドレス確認',
-      message: (code) => `Project Nifercheへようこそ。\n認証コード：${code}\nこのコードの有効期限は15分です。`
+      message: (code: string) => `Project Nifercheへようこそ。\n認証コード：${code}\nこのコードの有効期限は15分です。`
     }
   }
 });

@@ -64,6 +64,9 @@ import { ErrorPage } from './pages/ErrorPage';
 // Protected
 import { ProfilePage } from './pages/user/ProfilePage';
 import { FavoritesPage } from './pages/user/FavoritesPage';
+import ContentListPage from './pages/user/ContentListPage';
+import ContentDetailPage from './pages/user/ContentDetailPage';
+import ContentUploadPage from './pages/user/ContentUploadPage';
 
 import { ErrorBoundary } from './components/common/ErrorBoundary';
 
@@ -144,9 +147,12 @@ function App() {
               <Route path="/guidelines" element={<GuidelinesPage />} />
             </Route>
 
-            {/* プロフィール・お気に入り */}
+            {/* プロフィール・お気に入り・ユーザーコンテンツ */}
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/favorites" element={<FavoritesPage />} />
+            <Route path="/user/contents" element={<ContentListPage />} />
+            <Route path="/user/contents/:id" element={<ContentDetailPage />} />
+            <Route path="/user/contents/upload" element={<ContentUploadPage />} />
             
             {/* 管理者ページ */}
             <Route path="/admin" element={<AdminDashboardPage />} />

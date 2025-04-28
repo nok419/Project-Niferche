@@ -118,13 +118,8 @@ export const storage = defineStorage({
       allow.guest.to(['read']),
       allow.groups(['admin']).to(['write', 'delete'])
     ]
-  }),
+  })
   
-  // ストレージのライフサイクル設定
-  lifecycle: {
-    // 一時ファイルの有効期限は48時間
-    'temp/uploads/*': {
-      expireAfterDays: 2
-    }
-  }
+  // 注意: ライフサイクル設定はCDKなどで別途設定する必要があります
+  // 一時ファイルの有効期限は48時間
 });

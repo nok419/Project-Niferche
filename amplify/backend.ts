@@ -15,9 +15,8 @@ backend.addOutput({
     bucket_name: 'niferche-content',
     aws_region: 'ap-northeast-1'
   },
-  data: {
-    api_key_expiration_days: 30
-  }
+  data: {}
+  // API keyの有効期限は'amplify/data/resource.ts'で設定済み
 });
 
 export const { auth: authOutput, data: dataOutput, storage: storageOutput } = backend;

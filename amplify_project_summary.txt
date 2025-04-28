@@ -3,19 +3,20 @@
 ## Directory Structure
 
 - amplify/
+  - .DS_Store (binary file)
   - auth/
     - resource.ts
+  - storage/
+    - resource.ts
+  - package.json
+  - tsconfig.json
   - backend.ts
   - data/
     - resource.ts
-  - package.json
-  - storage/
-    - resource.ts
-  - tsconfig.json
 
 ## File Contents
 
-### auth\resource.ts
+### auth/resource.ts
 
 ```
 // File: amplify/auth/resource.ts
@@ -38,14 +39,205 @@ export const auth = defineAuth({
     email: {
       mutable: true,
       required: true
+    },
+    preferred_username: {
+      mutable: true,
+      required: false
+    },
+    profile: {
+      mutable: true,
+      required: false
     }
   },
   multifactor: {
-    mode: 'OFF'
+    mode: 'OPTIONAL',
+    sms: {
+      enabled: true
+    }
+  },
+  passwordPolicy: {
+    minLength: 8,
+    requireLowercase: true,
+    requireUppercase: true,
+    requireNumbers: true,
+    requireSymbols: true
   },
   // 追加の設定
   accountRecovery: 'EMAIL_ONLY',
+  verificationMessages: {
+    email: {
+      subject: 'Project Niferche - メールアドレス確認',
+      message: (code) => `Project Nifercheへようこそ。\n認証コード：${code}\nこのコードの有効期限は15分です。`
+    }
+  }
 });
+
+```
+
+### storage/resource.ts
+
+```
+// File: amplify/storage/resource.ts
+import { defineStorage } from '@aws-amplify/backend';
+
+export const storage = defineStorage({
+  name: 'niferche-content',
+  access: (allow) => ({
+    // 公式コンテンツ (各カテゴリ別に分類)
+    // メインストーリー
+    'official/laboratory/main-story/*': [
+      allow.guest.to(['read']),
+      allow.groups(['admin']).to(['write', 'delete'])
+    ],
+    // サイドストーリー
+    'official/laboratory/side-story/*': [
+      allow.guest.to(['read']),
+      allow.groups(['admin']).to(['write', 'delete'])
+    ],
+    // 設定資料 (世界別に分類)
+    'official/materials/common/*': [
+      allow.guest.to(['read']),
+      allow.groups(['admin']).to(['write', 'delete'])
+    ],
+    'official/materials/worlds/quxe/*': [
+      allow.guest.to(['read']),
+      allow.groups(['admin']).to(['write', 'delete'])
+    ],
+    'official/materials/worlds/hodemei/*': [
+      allow.guest.to(['read']),
+      allow.groups(['admin']).to(['write', 'delete'])
+    ],
+    'official/materials/worlds/alsarejia/*': [
+      allow.guest.to(['read']),
+      allow.groups(['admin']).to(['write', 'delete'])
+    ],
+
+    // 共有コンテンツ - ユーザーごとのフォルダを管理 (visibility設定に応じてアクセス制御)
+    // 公開コンテンツ
+    'shared/laboratory/side-story/public/{entity_id}/*': [
+      allow.guest.to(['read']),
+      allow.entity('identity').to(['read', 'write', 'delete'])
+    ],
+    'shared/materials/common/public/{entity_id}/*': [
+      allow.guest.to(['read']),
+      allow.entity('identity').to(['read', 'write', 'delete'])
+    ],
+    'shared/materials/worlds/public/{entity_id}/*': [
+      allow.guest.to(['read']),
+      allow.entity('identity').to(['read', 'write', 'delete'])
+    ],
+    
+    // 認証済みユーザーのみ閲覧可能なコンテンツ
+    'shared/laboratory/side-story/authenticated/{entity_id}/*': [
+      allow.authenticated.to(['read']),
+      allow.entity('identity').to(['read', 'write', 'delete'])
+    ],
+    'shared/materials/common/authenticated/{entity_id}/*': [
+      allow.authenticated.to(['read']),
+      allow.entity('identity').to(['read', 'write', 'delete'])
+    ],
+    'shared/materials/worlds/authenticated/{entity_id}/*': [
+      allow.authenticated.to(['read']),
+      allow.entity('identity').to(['read', 'write', 'delete'])
+    ],
+    
+    // プライベートコンテンツ
+    'shared/laboratory/side-story/private/{entity_id}/*': [
+      allow.entity('identity').to(['read', 'write', 'delete'])
+    ],
+    'shared/materials/common/private/{entity_id}/*': [
+      allow.entity('identity').to(['read', 'write', 'delete'])
+    ],
+    'shared/materials/worlds/private/{entity_id}/*': [
+      allow.entity('identity').to(['read', 'write', 'delete'])
+    ],
+
+    // システムリソース
+    'system/backups/*': [
+      allow.groups(['admin']).to(['read', 'write', 'delete'])
+    ],
+    'system/logs/*': [
+      allow.groups(['admin']).to(['read', 'write', 'delete'])
+    ],
+    'system/public/*': [
+      allow.guest.to(['read']),
+      allow.groups(['admin']).to(['write', 'delete'])
+    ],
+
+    // 一時ファイル用（アップロード中など）
+    'temp/uploads/{entity_id}/*': [
+      allow.entity('identity').to(['read', 'write']),
+      // 48時間後に自動削除するライフサイクルポリシーを設定する
+      allow.authenticated.to(['read']),
+      allow.groups(['admin']).to(['delete'])
+    ],
+
+    // サムネイル用
+    'thumbnails/content/*': [
+      allow.guest.to(['read']),
+      allow.authenticated.to(['write']),
+      allow.groups(['admin']).to(['delete'])
+    ],
+    'thumbnails/profile/*': [
+      allow.guest.to(['read']),
+      allow.authenticated.to(['write']),
+      allow.groups(['admin']).to(['delete'])
+    ],
+
+    // ユーザープロフィール用
+    'profiles/{entity_id}/*': [
+      // プロフィール画像は常に公開
+      allow.guest.to(['read']),
+      allow.entity('identity').to(['read', 'write']),
+      allow.groups(['admin']).to(['delete'])
+    ],
+    
+    // バッジ画像
+    'badges/*': [
+      allow.guest.to(['read']),
+      allow.groups(['admin']).to(['write', 'delete'])
+    ]
+  }),
+  
+  // ストレージのライフサイクル設定
+  lifecycle: {
+    // 一時ファイルの有効期限は48時間
+    'temp/uploads/*': {
+      expireAfterDays: 2
+    }
+  }
+});
+
+```
+
+### package.json
+
+```
+{
+  "type": "module"
+}
+```
+
+### tsconfig.json
+
+```
+{
+  "compilerOptions": {
+    "target": "es2022",
+    "module": "es2022",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "paths": {
+      "$amplify/*": [
+        "../.amplify/generated/*"
+      ]
+    }
+  }
+}
 ```
 
 ### backend.ts
@@ -67,13 +259,17 @@ backend.addOutput({
   storage: {
     bucket_name: 'niferche-content',
     aws_region: 'ap-northeast-1'
+  },
+  data: {
+    api_key_expiration_days: 30
   }
 });
 
-export const { auth: authOutput, storage: storageOutput } = backend;
+export const { auth: authOutput, data: dataOutput, storage: storageOutput } = backend;
+
 ```
 
-### data\resource.ts
+### data/resource.ts
 
 ```
 // File: amplify/data/resource.ts
@@ -131,102 +327,137 @@ const BadgeRequirementType = {
   CLICK_ACTION: 'CLICK_ACTION'
 } as const;
 
+// リファレンスタイプの定義
+const contentReferenceType = a.customType({
+  contentId: a.string().required(),
+  relationType: a.enum(Object.values(ReferenceType)).required()
+});
+
+// お気に入りタイプの定義
+const favoriteType = a.customType({
+  contentId: a.string().required(),
+  addedAt: a.datetime().required(),
+  contentType: a.string().required()
+});
 
 const schema = a.schema({
   Content: a.model({
     id: a.id(),
-    title: a.string(),
-    description: a.string(),
+    title: a.string().required(),
+    description: a.string().required(),
 
     // content type information
-    primaryTypes: a.string().array(),  
+    primaryTypes: a.string().array().required(),  
     supplementaryTypes: a.string().array(),
     
     // classification information
-    primaryCategory: a.enum(Object.values(ContentCategory)),
+    primaryCategory: a.enum(Object.values(ContentCategory)).required(),
     secondaryCategories: a.string().array(),
-    worldType: a.enum(Object.values(WorldCategory)),
-    attribution: a.enum(Object.values(Attribution)),
-    visibility: a.enum(Object.values(Visibility)),
+    worldType: a.enum(Object.values(WorldCategory)).required(),
+    attribution: a.enum(Object.values(Attribution)).required(),
+    visibility: a.enum(Object.values(Visibility)).required(),
 
     // status
-    status: a.enum(Object.values(ContentStatus)),
+    status: a.enum(Object.values(ContentStatus)).required(),
 
     // metadata
     tags: a.string().array(),
-    sourceRefs: a.customType({
-      contentId: a.string(),
-      relationType: a.enum(Object.values(ReferenceType))
-    }),
+    sourceRefs: contentReferenceType.array(),
     characterRefs: a.string().array(),
     itemRefs: a.string().array(),
-    relatedContent: a.customType({
-      contentId: a.string(),
-      relationType: a.enum(Object.values(ReferenceType))
-    }),
-    createdAt: a.datetime(),
-    updatedAt: a.datetime(),
-    version: a.string(),
+    relatedContent: contentReferenceType.array(),
+    createdAt: a.datetime().required(),
+    updatedAt: a.datetime().required(),
+    version: a.string().required(),
 
     // storage information
-    mainKey: a.string(),
+    mainKey: a.string().required(),
     thumbnailKey: a.string(),
     attachments: a.string().array(),
 
     // access control
-    ownerId: a.string(),
+    ownerId: a.string().required(),
     collaborators: a.string().array(),
 
-  }).authorization(allow => [
-    // 公開コンテンツは誰でも読める
-    allow.publicApiKey().to(['read']),
-    
-    // 認証済みユーザーはCRUDが可能
-    allow.authenticated().to(['create', 'read', 'update', 'delete']),
+    // relations
+    comments: a.hasMany('Comment')
 
+  }).authorization(allow => [
+    // 公開コンテンツは誰でも読める (visibilityがPUBLICの場合のみ)
+    allow.publicApiKey().to(['read']).when(content => content.visibility.eq('PUBLIC')),
+    
+    // 認証済みユーザーはPUBLICとAUTHENTICATEDの読み取りが可能
+    allow.authenticated().to(['read']).when(content => 
+      content.visibility.eq('PUBLIC')
+      .or(content.visibility.eq('AUTHENTICATED'))
+    ),
+    
+    // 認証済みユーザーは新規作成可能
+    allow.authenticated().to(['create']),
+    
     // 所有者は全ての操作が可能
-    allow.owner().to(['create', 'read', 'update', 'delete']),
+    allow.owner().to(['read', 'update', 'delete']),
+    
+    // コラボレーターはコンテンツの読み取りと更新が可能
+    allow.authenticated().to(['read', 'update']).when(content =>
+      content.collaborators.includes(a.identity().username)
+    ),
 
     // 管理者は全ての操作が可能
-    allow.group('admin').to(['create', 'read', 'update', 'delete'])
+    allow.groups(['admin']).to(['create', 'read', 'update', 'delete'])
   ]),
 
   Comment: a.model({
     id: a.id(),
-    contentId: a.string(),
-    authorId: a.string(),
-    text: a.string(),
-    createdAt: a.datetime(),
-    status: a.enum(['ACTIVE', 'HIDDEN', 'DELETED'])
+    contentId: a.string().required(),
+    authorId: a.string().required(),
+    text: a.string().required(),
+    createdAt: a.datetime().required(),
+    status: a.enum(['ACTIVE', 'HIDDEN', 'DELETED']).required(),
+    
+    // relations
+    content: a.belongsTo('Content')
   }).authorization(allow => [
-    allow.publicApiKey().to(['read']),
-    allow.owner().to(['create', 'update']),
-    allow.group('admin').to(['delete'])
+    // 公開コメントの読み取り (statusがACTIVEの場合のみ)
+    allow.publicApiKey().to(['read']).when(comment => comment.status.eq('ACTIVE')),
+    
+    // 認証済みユーザーはコメントの作成が可能
+    allow.authenticated().to(['create']),
+    
+    // 所有者は自分のコメントの更新と削除が可能
+    allow.owner().to(['update', 'delete']),
+    
+    // 管理者はコメントの管理が可能
+    allow.groups(['admin']).to(['read', 'update', 'delete'])
   ]),
 
   // ユーザープロファイルモデル
   UserProfile: a.model({
     id: a.id(),
     userId: a.string().required(),
-    nickname: a.string(),
-    email: a.string(),
-    role: a.enum(['user', 'admin']),           // .required()を削除
-    groups: a.string().array(),                 // groupsに修正
-    badges: a.string().array().required(),
-    favorites: a.customType({
-      contentId: a.string().required(),
-      addedAt: a.datetime().required(),
-      contentType: a.string().required()
-    }),
-    profileVisibility: a.enum(['public', 'private']),
+    nickname: a.string().required(),
+    email: a.string().required(),
+    role: a.enum(['user', 'admin']).required(),
+    groups: a.string().array(),
+    badges: a.string().array(),
+    favorites: favoriteType.array(),
+    profileVisibility: a.enum(['public', 'private']).required(),
     lastLoginAt: a.datetime(),
     createdAt: a.datetime().required(),
-    updatedAt: a.datetime().required()
+    updatedAt: a.datetime().required(),
+    
+    // 関連データ
+    badgeProgress: a.hasMany('BadgeProgress')
   }).authorization(allow => [
+    // 公開プロファイルは誰でも読める
+    allow.publicApiKey().to(['read']).when(profile => profile.profileVisibility.eq('public')),
+    
     // 認証済みユーザーは閲覧可能
     allow.authenticated().to(['read']),
+    
     // 所有者は全ての操作が可能
     allow.owner().to(['create', 'read', 'update', 'delete']),
+    
     // admin グループのユーザーは全ての操作が可能
     allow.groups(['admin']).to(['create', 'read', 'update', 'delete'])
   ]),
@@ -236,14 +467,21 @@ const schema = a.schema({
     id: a.id(),
     name: a.string().required(),
     description: a.string().required(),
-    requirementType: a.enum(Object.values(BadgeRequirementType)),
+    imageKey: a.string(),
+    requirementType: a.enum(Object.values(BadgeRequirementType)).required(),
     requirement: a.string().required(),
     createdAt: a.datetime().required(),
     priority: a.integer().required(),
-    isSecret: a.boolean().required()
+    isSecret: a.boolean().required(),
+    
+    // 関連データ
+    progress: a.hasMany('BadgeProgress')
   }).authorization(allow => [
+    // バッジ情報の読み取り
     allow.authenticated().to(['read']),
-    allow.owner().to(['create', 'update', 'delete'])
+    
+    // 管理者のみがバッジを管理できる
+    allow.groups(['admin']).to(['create', 'update', 'delete'])
   ]),
 
   // バッジ進捗モデル
@@ -254,10 +492,20 @@ const schema = a.schema({
     progress: a.integer().required(),
     isCompleted: a.boolean().required(),
     completedAt: a.datetime(),
-    lastUpdatedAt: a.datetime().required()
+    lastUpdatedAt: a.datetime().required(),
+    
+    // 関連データ
+    user: a.belongsTo('UserProfile'),
+    badge: a.belongsTo('Badge')
   }).authorization(allow => [
-    allow.owner(),
-    allow.authenticated().to(['read'])
+    // 所有者のみが自分の進捗を見られる
+    allow.owner().to(['read']),
+    
+    // 認証済みシステムがバッジ進捗を更新できる
+    allow.authenticated().to(['create', 'update']),
+    
+    // 管理者はバッジ進捗を管理できる
+    allow.groups(['admin']).to(['read', 'update', 'delete'])
   ])
 });
 
@@ -272,93 +520,6 @@ export const data = defineData({
     }
   }
 });
-```
 
-### package.json
-
-```
-{
-  "type": "module"
-}
-```
-
-### storage\resource.ts
-
-```
-// File: amplify/storage/resource.ts
-import { defineStorage } from '@aws-amplify/backend';
-
-export const storage = defineStorage({
-  name: 'niferche-content',
-  access: (allow) => ({
-    // 公式コンテンツ
-    'official/laboratory/*': [
-      allow.guest.to(['read']),
-      allow.groups(['admin']).to(['write', 'delete'])
-    ],
-    'official/materials/*': [
-      allow.guest.to(['read']),
-      allow.groups(['admin']).to(['write', 'delete'])
-    ],
-
-    // 共有コンテンツ - ユーザーごとのフォルダを管理
-    'shared/laboratory/{entity_id}/*': [
-      allow.guest.to(['read']),
-      allow.entity('identity').to(['read', 'write', 'delete'])
-    ],
-    'shared/materials/{entity_id}/*': [
-      allow.guest.to(['read']),
-      allow.entity('identity').to(['read', 'write', 'delete'])
-    ],
-
-    // システム用
-    'system/*': [
-      allow.guest.to(['read']),
-      allow.groups(['admin']).to(['write', 'delete'])
-    ],
-
-    // 一時ファイル用（アップロード中など）
-    'temp/*': [
-      allow.authenticated.to(['read', 'write']),
-      allow.groups(['admin']).to(['delete'])
-    ],
-
-    // サムネイル用
-    'thumbnails/*': [
-      allow.guest.to(['read']),
-      allow.authenticated.to(['write']),
-      allow.groups(['admin']).to(['delete'])
-    ],
-
-    // ユーザープロフィール用
-    'profiles/{entity_id}/*': [
-      allow.guest.to(['read']),
-      allow.entity('identity').to(['read', 'write']),
-      allow.groups(['admin']).to(['delete'])
-    ]
-  })
-});
-```
-
-### tsconfig.json
-
-```
-{
-  "compilerOptions": {
-    "target": "es2022",
-    "module": "es2022",
-    "moduleResolution": "bundler",
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "skipLibCheck": true,
-    "paths": {
-      "$amplify/*": [
-        "../.amplify/generated/*"
-      ]
-    }
-  }
-}
 ```
 

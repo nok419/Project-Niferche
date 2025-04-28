@@ -54,66 +54,66 @@ const BadgeRequirementType = {
 } as const;
 
 // リファレンスタイプの定義
-const contentReferenceType = a.customType({
-  contentId: a.string().required(),
-  relationType: a.enum(Object.values(ReferenceType)).required()
-});
+const contentReferenceTypeObject = {
+  contentId: a.string(),
+  relationType: a.enum(Object.values(ReferenceType))
+};
 
 // お気に入りタイプの定義
-const favoriteType = a.customType({
-  contentId: a.string().required(),
-  addedAt: a.datetime().required(),
-  contentType: a.string().required()
-});
+const favoriteTypeObject = {
+  contentId: a.string(),
+  addedAt: a.datetime(),
+  contentType: a.string()
+};
 
 const schema = a.schema({
   Content: a.model({
     id: a.id(),
-    title: a.string().required(),
-    description: a.string().required(),
+    title: a.string(),
+    description: a.string(),
 
     // content type information
-    primaryTypes: a.string().array().required(),  
-    supplementaryTypes: a.string().array(),
+    primaryTypes: a.string().array(),  
+    supplementaryTypes: a.string().array().optional(),
     
     // classification information
-    primaryCategory: a.enum(Object.values(ContentCategory)).required(),
-    secondaryCategories: a.string().array(),
-    worldType: a.enum(Object.values(WorldCategory)).required(),
-    attribution: a.enum(Object.values(Attribution)).required(),
-    visibility: a.enum(Object.values(Visibility)).required(),
+    primaryCategory: a.enum(Object.values(ContentCategory)),
+    secondaryCategories: a.string().array().optional(),
+    worldType: a.enum(Object.values(WorldCategory)),
+    attribution: a.enum(Object.values(Attribution)),
+    visibility: a.enum(Object.values(Visibility)),
 
     // status
-    status: a.enum(Object.values(ContentStatus)).required(),
+    status: a.enum(Object.values(ContentStatus)),
 
     // metadata
-    tags: a.string().array(),
-    sourceRefs: contentReferenceType.array(),
-    characterRefs: a.string().array(),
-    itemRefs: a.string().array(),
-    relatedContent: contentReferenceType.array(),
-    createdAt: a.datetime().required(),
-    updatedAt: a.datetime().required(),
-    version: a.string().required(),
+    tags: a.string().array().optional(),
+    sourceRefs: a.customType(contentReferenceTypeObject).array().optional(),
+    characterRefs: a.string().array().optional(),
+    itemRefs: a.string().array().optional(),
+    relatedContent: a.customType(contentReferenceTypeObject).array().optional(),
+    createdAt: a.datetime(),
+    updatedAt: a.datetime(),
+    version: a.string(),
 
     // storage information
-    mainKey: a.string().required(),
-    thumbnailKey: a.string(),
-    attachments: a.string().array(),
+    mainKey: a.string(),
+    thumbnailKey: a.string().optional(),
+    attachments: a.string().array().optional(),
 
     // access control
-    ownerId: a.string().required(),
-    collaborators: a.string().array(),
+    ownerId: a.string(),
+    collaborators: a.string().array().optional(),
 
     // relations
-    comments: a.hasMany('Comment')
+    comments: a.hasMany('Comment', 'content')
 
-  }).authorization(allow => [
+  }).authorization((allow, _, { if: when }) => [
     // 公開コンテンツは誰でも読める (visibilityがPUBLICの場合のみ)
-    allow.publicApiKey().to(['read']).when(content => content.visibility.eq('PUBLIC')),
+    allow.publicApiKey().to(['read']).if(content => content.visibility.eq('PUBLIC')),
     
     // 認証済みユーザーはPUBLICとAUTHENTICATEDの読み取りが可能
-    allow.authenticated().to(['read']).when(content => 
+    allow.authenticated().to(['read']).if(content => 
       content.visibility.eq('PUBLIC')
       .or(content.visibility.eq('AUTHENTICATED'))
     ),
@@ -125,7 +125,7 @@ const schema = a.schema({
     allow.owner().to(['read', 'update', 'delete']),
     
     // コラボレーターはコンテンツの読み取りと更新が可能
-    allow.authenticated().to(['read', 'update']).when(content =>
+    allow.authenticated().to(['read', 'update']).if(content =>
       content.collaborators.includes(a.identity().username)
     ),
 
@@ -135,17 +135,17 @@ const schema = a.schema({
 
   Comment: a.model({
     id: a.id(),
-    contentId: a.string().required(),
-    authorId: a.string().required(),
-    text: a.string().required(),
-    createdAt: a.datetime().required(),
-    status: a.enum(['ACTIVE', 'HIDDEN', 'DELETED']).required(),
+    contentId: a.string(),
+    authorId: a.string(),
+    text: a.string(),
+    createdAt: a.datetime(),
+    status: a.enum(['ACTIVE', 'HIDDEN', 'DELETED']),
     
     // relations
-    content: a.belongsTo('Content')
-  }).authorization(allow => [
+    content: a.belongsTo('Content', 'comments')
+  }).authorization((allow, _, { if: when }) => [
     // 公開コメントの読み取り (statusがACTIVEの場合のみ)
-    allow.publicApiKey().to(['read']).when(comment => comment.status.eq('ACTIVE')),
+    allow.publicApiKey().to(['read']).if(comment => comment.status.eq('ACTIVE')),
     
     // 認証済みユーザーはコメントの作成が可能
     allow.authenticated().to(['create']),
@@ -160,23 +160,23 @@ const schema = a.schema({
   // ユーザープロファイルモデル
   UserProfile: a.model({
     id: a.id(),
-    userId: a.string().required(),
-    nickname: a.string().required(),
-    email: a.string().required(),
-    role: a.enum(['user', 'admin']).required(),
-    groups: a.string().array(),
-    badges: a.string().array(),
-    favorites: favoriteType.array(),
-    profileVisibility: a.enum(['public', 'private']).required(),
-    lastLoginAt: a.datetime(),
-    createdAt: a.datetime().required(),
-    updatedAt: a.datetime().required(),
+    userId: a.string(),
+    nickname: a.string(),
+    email: a.string(),
+    role: a.enum(['user', 'admin']),
+    groups: a.string().array().optional(),
+    badges: a.string().array().optional(),
+    favorites: a.customType(favoriteTypeObject).array().optional(),
+    profileVisibility: a.enum(['public', 'private']),
+    lastLoginAt: a.datetime().optional(),
+    createdAt: a.datetime(),
+    updatedAt: a.datetime(),
     
     // 関連データ
-    badgeProgress: a.hasMany('BadgeProgress')
-  }).authorization(allow => [
+    badgeProgress: a.hasMany('BadgeProgress', 'user')
+  }).authorization((allow, _, { if: when }) => [
     // 公開プロファイルは誰でも読める
-    allow.publicApiKey().to(['read']).when(profile => profile.profileVisibility.eq('public')),
+    allow.publicApiKey().to(['read']).if(profile => profile.profileVisibility.eq('public')),
     
     // 認証済みユーザーは閲覧可能
     allow.authenticated().to(['read']),
@@ -191,17 +191,17 @@ const schema = a.schema({
   // バッジモデル
   Badge: a.model({
     id: a.id(),
-    name: a.string().required(),
-    description: a.string().required(),
-    imageKey: a.string(),
-    requirementType: a.enum(Object.values(BadgeRequirementType)).required(),
-    requirement: a.string().required(),
-    createdAt: a.datetime().required(),
-    priority: a.integer().required(),
-    isSecret: a.boolean().required(),
+    name: a.string(),
+    description: a.string(),
+    imageKey: a.string().optional(),
+    requirementType: a.enum(Object.values(BadgeRequirementType)),
+    requirement: a.string(),
+    createdAt: a.datetime(),
+    priority: a.integer(),
+    isSecret: a.boolean(),
     
     // 関連データ
-    progress: a.hasMany('BadgeProgress')
+    progress: a.hasMany('BadgeProgress', 'badge')
   }).authorization(allow => [
     // バッジ情報の読み取り
     allow.authenticated().to(['read']),
@@ -213,16 +213,16 @@ const schema = a.schema({
   // バッジ進捗モデル
   BadgeProgress: a.model({
     id: a.id(),
-    userId: a.string().required(),
-    badgeId: a.string().required(),
-    progress: a.integer().required(),
-    isCompleted: a.boolean().required(),
-    completedAt: a.datetime(),
-    lastUpdatedAt: a.datetime().required(),
+    userId: a.string(),
+    badgeId: a.string(),
+    progress: a.integer(),
+    isCompleted: a.boolean(),
+    completedAt: a.datetime().optional(),
+    lastUpdatedAt: a.datetime(),
     
     // 関連データ
-    user: a.belongsTo('UserProfile'),
-    badge: a.belongsTo('Badge')
+    user: a.belongsTo('UserProfile', 'badgeProgress'),
+    badge: a.belongsTo('Badge', 'progress')
   }).authorization(allow => [
     // 所有者のみが自分の進捗を見られる
     allow.owner().to(['read']),
