@@ -1,0 +1,286 @@
+/* ContentReader.css */
+
+.content-reader {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+  padding-bottom: 3rem;
+}
+
+/* Chapter Navigation */
+.chapter-navigation {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 1rem;
+}
+
+.chapter-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.chapter-button.active {
+  background-color: var(--primary);
+  color: var(--text-on-primary);
+  border-color: var(--primary);
+}
+
+.chapter-button.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.chapter-number {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.chapter-title {
+  font-size: 0.85rem;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+}
+
+/* Chapter Header */
+.chapter-header {
+  margin-bottom: 2.5rem;
+  text-align: center;
+}
+
+.chapter-header h1 {
+  font-size: 2.2rem;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+
+.chapter-summary {
+  font-size: 1.1rem;
+  font-style: italic;
+  color: var(--text-secondary);
+  max-width: 800px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+/* Content Container */
+.content-container {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: var(--text-primary);
+}
+
+/* Content Section */
+.content-section {
+  margin-bottom: 3rem;
+  padding: 1.5rem;
+  border-radius: var(--border-radius);
+  background-color: var(--surface);
+  transition: background-color 0.3s ease;
+}
+
+/* World-specific styling */
+.content-section.hodemei {
+  border-left: 4px solid var(--hodemei-primary);
+}
+
+.content-section.quxe {
+  border-left: 4px solid var(--quxe-primary);
+}
+
+.content-section.alsarejia {
+  border-left: 4px solid var(--alsarejia-primary);
+}
+
+.content-section.common {
+  border-left: 4px solid var(--primary);
+}
+
+.section-title {
+  font-size: 1.5rem;
+  margin-bottom: 1.2rem;
+  color: var(--text-primary);
+}
+
+/* Content Navigation */
+.content-navigation {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.navigation-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+.nav-button {
+  padding: 0.75rem 1.25rem;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.nav-button:hover {
+  background-color: var(--primary);
+  color: var(--text-on-primary);
+}
+
+.nav-button.prev {
+  margin-right: auto;
+}
+
+.nav-button.next {
+  margin-left: auto;
+}
+
+/* Glossary Card */
+.glossary-card {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 300px;
+  background-color: var(--surface);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-lg);
+  z-index: 100;
+  overflow: hidden;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  animation: glossary-appear 0.3s ease;
+}
+
+@keyframes glossary-appear {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.glossary-card.hodemei {
+  border-top: 4px solid var(--hodemei-primary);
+}
+
+.glossary-card.quxe {
+  border-top: 4px solid var(--quxe-primary);
+}
+
+.glossary-card.alsarejia {
+  border-top: 4px solid var(--alsarejia-primary);
+}
+
+.glossary-card.common {
+  border-top: 4px solid var(--primary);
+}
+
+.glossary-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background-color: var(--surface-alt);
+}
+
+.glossary-card-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: var(--text-tertiary);
+  transition: color 0.2s ease;
+}
+
+.close-button:hover {
+  color: var(--text-primary);
+}
+
+.glossary-card-content {
+  padding: 1rem;
+}
+
+.glossary-card-content p {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.related-terms {
+  font-size: 0.85rem;
+  color: var(--text-tertiary);
+  margin-top: 0.5rem;
+}
+
+.glossary-card-footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  background-color: var(--surface-alt);
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+}
+
+.glossary-category {
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+/* Full text mode (for side stories or materials) */
+.content-reader.full-text .content-container {
+  padding: 2rem;
+  background-color: var(--surface);
+  border-radius: var(--border-radius);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .chapter-header h1 {
+    font-size: 1.8rem;
+  }
+  
+  .content-section {
+    padding: 1.25rem;
+  }
+  
+  .glossary-card {
+    width: 85%;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 1rem;
+  }
+  
+  @keyframes glossary-appear {
+    from {
+      opacity: 0;
+      transform: translate(-50%, 20px);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+  }
+}

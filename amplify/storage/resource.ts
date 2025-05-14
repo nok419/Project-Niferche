@@ -1,125 +1,227 @@
-// File: amplify/storage/resource.ts
+// amplify/storage/resource.ts
 import { defineStorage } from '@aws-amplify/backend';
 
+/**
+ * S3ストレージ定義
+ * - 各区画ごとに分離されたストレージパス
+ * - 細かく設定された権限
+ * - Laboratoryセクションの独立性を保持
+ */
 export const storage = defineStorage({
   name: 'niferche-content',
   access: (allow) => ({
-    // 公式コンテンツ (各カテゴリ別に分類)
-    // メインストーリー
-    'official/laboratory/main-story/*': [
+    /**
+     * 区画A: サイト管理 - ストレージ構造
+     */
+    // サイト管理用ファイル
+    'site/announcements/*': [
       allow.guest.to(['read']),
-      allow.groups(['admin']).to(['write', 'delete'])
+      allow.authenticated().to(['read']).if(ctx => 
+        ctx.identity.claims['custom:userRole'].exists()
+      ),
+      allow.authenticated().to(['write', 'delete']).if(ctx => 
+        ctx.identity.claims['custom:userRole'].eq('ADMIN')
+      )
     ],
-    // サイドストーリー
-    'official/laboratory/side-story/*': [
+    'site/analytics/*': [
+      allow.authenticated().to(['read', 'write', 'delete']).if(ctx => 
+        ctx.identity.claims['custom:userRole'].eq('ADMIN')
+      )
+    ],
+    'site/system/*': [
+      allow.authenticated().to(['read', 'write', 'delete']).if(ctx => 
+        ctx.identity.claims['custom:userRole'].eq('ADMIN')
+      )
+    ],
+    
+    /**
+     * 区画B: Project Niferche - ストレージ構造
+     */
+    // メインストーリー（公式コンテンツ）
+    'niferche/official/main-story/*': [
       allow.guest.to(['read']),
-      allow.groups(['admin']).to(['write', 'delete'])
+      allow.authenticated().to(['write', 'delete']).if(ctx => 
+        ctx.identity.claims['custom:userRole'].eq('ADMIN').or(
+          ctx.identity.claims['custom:userRole'].eq('CONTENT_MANAGER')
+        )
+      )
     ],
-    // 設定資料 (世界別に分類)
-    'official/materials/common/*': [
+    
+    // サイドストーリー（公式コンテンツ）
+    'niferche/official/side-story/*': [
       allow.guest.to(['read']),
-      allow.groups(['admin']).to(['write', 'delete'])
+      allow.authenticated().to(['write', 'delete']).if(ctx => 
+        ctx.identity.claims['custom:userRole'].eq('ADMIN').or(
+          ctx.identity.claims['custom:userRole'].eq('CONTENT_MANAGER')
+        )
+      )
     ],
-    'official/materials/worlds/quxe/*': [
+    
+    // 設定資料（世界ごと、公式コンテンツ）
+    'niferche/official/materials/common/*': [
       allow.guest.to(['read']),
-      allow.groups(['admin']).to(['write', 'delete'])
+      allow.authenticated().to(['write', 'delete']).if(ctx => 
+        ctx.identity.claims['custom:userRole'].eq('ADMIN').or(
+          ctx.identity.claims['custom:userRole'].eq('CONTENT_MANAGER')
+        )
+      )
     ],
-    'official/materials/worlds/hodemei/*': [
+    'niferche/official/materials/hodemei/*': [
       allow.guest.to(['read']),
-      allow.groups(['admin']).to(['write', 'delete'])
+      allow.authenticated().to(['write', 'delete']).if(ctx => 
+        ctx.identity.claims['custom:userRole'].eq('ADMIN').or(
+          ctx.identity.claims['custom:userRole'].eq('CONTENT_MANAGER')
+        )
+      )
     ],
-    'official/materials/worlds/alsarejia/*': [
+    'niferche/official/materials/quxe/*': [
       allow.guest.to(['read']),
-      allow.groups(['admin']).to(['write', 'delete'])
+      allow.authenticated().to(['write', 'delete']).if(ctx => 
+        ctx.identity.claims['custom:userRole'].eq('ADMIN').or(
+          ctx.identity.claims['custom:userRole'].eq('CONTENT_MANAGER')
+        )
+      )
     ],
-
-    // 共有コンテンツ - ユーザーごとのフォルダを管理 (visibility設定に応じてアクセス制御)
-    // 公開コンテンツ
-    'shared/laboratory/side-story/public/{entity_id}/*': [
+    'niferche/official/materials/alsarejia/*': [
       allow.guest.to(['read']),
-      allow.entity('identity').to(['read', 'write', 'delete'])
+      allow.authenticated().to(['write', 'delete']).if(ctx => 
+        ctx.identity.claims['custom:userRole'].eq('ADMIN').or(
+          ctx.identity.claims['custom:userRole'].eq('CONTENT_MANAGER')
+        )
+      )
     ],
-    'shared/materials/common/public/{entity_id}/*': [
+    
+    // キャラクター情報（公式コンテンツ）
+    'niferche/official/characters/*': [
       allow.guest.to(['read']),
-      allow.entity('identity').to(['read', 'write', 'delete'])
+      allow.authenticated().to(['write', 'delete']).if(ctx => 
+        ctx.identity.claims['custom:userRole'].eq('ADMIN').or(
+          ctx.identity.claims['custom:userRole'].eq('CONTENT_MANAGER')
+        )
+      )
     ],
-    'shared/materials/worlds/public/{entity_id}/*': [
+    
+    // ユーザー作成コンテンツ（公開）
+    'niferche/user/{entity_id}/public/*': [
       allow.guest.to(['read']),
       allow.entity('identity').to(['read', 'write', 'delete'])
     ],
     
-    // 認証済みユーザーのみ閲覧可能なコンテンツ
-    'shared/laboratory/side-story/authenticated/{entity_id}/*': [
-      allow.authenticated.to(['read']),
-      allow.entity('identity').to(['read', 'write', 'delete'])
-    ],
-    'shared/materials/common/authenticated/{entity_id}/*': [
-      allow.authenticated.to(['read']),
-      allow.entity('identity').to(['read', 'write', 'delete'])
-    ],
-    'shared/materials/worlds/authenticated/{entity_id}/*': [
-      allow.authenticated.to(['read']),
+    // ユーザー作成コンテンツ（認証済みユーザーのみ閲覧可能）
+    'niferche/user/{entity_id}/authenticated/*': [
+      allow.authenticated().to(['read']),
       allow.entity('identity').to(['read', 'write', 'delete'])
     ],
     
-    // プライベートコンテンツ
-    'shared/laboratory/side-story/private/{entity_id}/*': [
+    // ユーザー作成コンテンツ（非公開）
+    'niferche/user/{entity_id}/private/*': [
       allow.entity('identity').to(['read', 'write', 'delete'])
     ],
-    'shared/materials/common/private/{entity_id}/*': [
-      allow.entity('identity').to(['read', 'write', 'delete'])
-    ],
-    'shared/materials/worlds/private/{entity_id}/*': [
-      allow.entity('identity').to(['read', 'write', 'delete'])
-    ],
-
-    // システムリソース
-    'system/backups/*': [
-      allow.groups(['admin']).to(['read', 'write', 'delete'])
-    ],
-    'system/logs/*': [
-      allow.groups(['admin']).to(['read', 'write', 'delete'])
-    ],
-    'system/public/*': [
+    
+    /**
+     * 区画C: Laboratory - ストレージ構造（LCB独立セクション）
+     */
+    // 公開プロジェクト
+    'laboratory/projects/public/*': [
       allow.guest.to(['read']),
-      allow.groups(['admin']).to(['write', 'delete'])
+      allow.authenticated().to(['write']).if(ctx => 
+        ctx.identity.claims['custom:laboratoryRole'].exists()
+      ),
+      allow.authenticated().to(['delete']).if(ctx => 
+        ctx.identity.claims['custom:laboratoryRole'].eq('ADMIN')
+      )
     ],
-
-    // 一時ファイル用（アップロード中など）
-    'temp/uploads/{entity_id}/*': [
-      allow.entity('identity').to(['read', 'write']),
-      // 48時間後に自動削除するライフサイクルポリシーを設定する
-      allow.authenticated.to(['read']),
-      allow.groups(['admin']).to(['delete'])
+    
+    // 認証済みユーザー向けプロジェクト
+    'laboratory/projects/authenticated/*': [
+      allow.authenticated().to(['read']),
+      allow.authenticated().to(['write']).if(ctx => 
+        ctx.identity.claims['custom:laboratoryRole'].exists()
+      ),
+      allow.authenticated().to(['delete']).if(ctx => 
+        ctx.identity.claims['custom:laboratoryRole'].eq('ADMIN')
+      )
     ],
-
-    // サムネイル用
-    'thumbnails/content/*': [
+    
+    // ユーザー固有のプロジェクト
+    'laboratory/user/{entity_id}/*': [
+      allow.entity('identity').to(['read', 'write', 'delete']),
+      allow.authenticated().to(['read']).if(ctx => 
+        ctx.identity.claims['custom:laboratoryRole'].eq('ADMIN')
+      )
+    ],
+    
+    // 創作タスク成果物
+    'laboratory/artifacts/{entity_id}/*': [
+      allow.entity('identity').to(['read', 'write', 'delete']),
+      allow.authenticated().to(['read']).if((_, ctx) => {
+        // プロジェクトのコラボレーターもアクセス可能（実際の実装ではリレーションをチェック）
+        return ctx.identity.claims['custom:laboratoryRole'].exists();
+      })
+    ],
+    
+    // Laboratory実験コンテンツ
+    'laboratory/experiments/*': [
       allow.guest.to(['read']),
-      allow.authenticated.to(['write']),
-      allow.groups(['admin']).to(['delete'])
+      allow.authenticated().to(['write']).if(ctx => 
+        ctx.identity.claims['custom:laboratoryRole'].exists()
+      ),
+      allow.authenticated().to(['delete']).if(ctx => 
+        ctx.identity.claims['custom:laboratoryRole'].eq('ADMIN')
+      )
     ],
-    'thumbnails/profile/*': [
+    
+    /**
+     * 共通リソース
+     */
+    // 共有アセット
+    'assets/shared/*': [
       allow.guest.to(['read']),
-      allow.authenticated.to(['write']),
-      allow.groups(['admin']).to(['delete'])
+      allow.authenticated().to(['write']).if(ctx => 
+        ctx.identity.claims['custom:userRole'].eq('CONTENT_CREATOR').or(
+          ctx.identity.claims['custom:userRole'].eq('CONTENT_MANAGER').or(
+            ctx.identity.claims['custom:userRole'].eq('ADMIN')
+          )
+        )
+      ),
+      allow.authenticated().to(['delete']).if(ctx => 
+        ctx.identity.claims['custom:userRole'].eq('ADMIN')
+      )
     ],
-
-    // ユーザープロフィール用
+    
+    // 公開画像
+    'assets/images/*': [
+      allow.guest.to(['read']),
+      allow.authenticated().to(['write']),
+      allow.authenticated().to(['delete']).if(ctx => 
+        ctx.identity.claims['custom:userRole'].eq('ADMIN')
+      )
+    ],
+    
+    // プロフィール画像
     'profiles/{entity_id}/*': [
-      // プロフィール画像は常に公開
       allow.guest.to(['read']),
       allow.entity('identity').to(['read', 'write']),
-      allow.groups(['admin']).to(['delete'])
+      allow.authenticated().to(['delete']).if(ctx => 
+        ctx.identity.claims['custom:userRole'].eq('ADMIN')
+      )
     ],
     
-    // バッジ画像
-    'badges/*': [
+    // 一時ファイル（48時間後に自動削除）
+    'temp/{entity_id}/*': [
+      allow.entity('identity').to(['read', 'write']),
+      allow.authenticated().to(['read', 'delete']).if(ctx => 
+        ctx.identity.claims['custom:userRole'].eq('ADMIN')
+      )
+    ],
+    
+    // サムネイル
+    'thumbnails/*': [
       allow.guest.to(['read']),
-      allow.groups(['admin']).to(['write', 'delete'])
+      allow.authenticated().to(['write']),
+      allow.authenticated().to(['delete']).if(ctx => 
+        ctx.identity.claims['custom:userRole'].eq('ADMIN')
+      )
     ]
   })
-  
-  // 注意: ライフサイクル設定はCDKなどで別途設定する必要があります
-  // 一時ファイルの有効期限は48時間
 });

@@ -1,0 +1,353 @@
+/* ProjectNifercheMainPage.css */
+
+.project-niferche-main-page {
+  width: 100%;
+  padding-bottom: 3rem;
+}
+
+/* Page Header */
+.page-header {
+  padding: 4rem 2rem;
+  background: var(--gradient-primary);
+  color: var(--text-on-primary);
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.page-header h1 {
+  font-size: 3.5rem;
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+}
+
+.page-description {
+  font-size: 1.3rem;
+  line-height: 1.8;
+  margin: 0 auto;
+  max-width: 800px;
+}
+
+/* Content Container */
+.content-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Section Styles */
+section {
+  margin-bottom: 4rem;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 0.5rem;
+}
+
+.section-header h2 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.section-description {
+  margin-bottom: 2rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  font-size: 1.1rem;
+}
+
+.view-all-link {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.view-all-link:hover {
+  text-decoration: underline;
+}
+
+/* Worlds Section */
+.worlds-section {
+  margin-bottom: 5rem;
+}
+
+.worlds-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.world-card {
+  border-radius: var(--border-radius);
+  padding: 2rem;
+  box-shadow: var(--shadow-md);
+  transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.world-card:hover {
+  transform: translateY(-5px);
+}
+
+.world-card h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+
+.world-card p {
+  margin-bottom: 1.5rem;
+  flex-grow: 1;
+}
+
+.world-card.hodemei {
+  background: linear-gradient(135deg, rgba(var(--hodemei-primary-rgb), 0.1) 0%, rgba(var(--hodemei-primary-rgb), 0.2) 100%);
+  border-left: 4px solid var(--hodemei-primary);
+}
+
+.world-card.quxe {
+  background: linear-gradient(135deg, rgba(var(--quxe-primary-rgb), 0.1) 0%, rgba(var(--quxe-primary-rgb), 0.2) 100%);
+  border-left: 4px solid var(--quxe-primary);
+}
+
+.world-card.alsarejia {
+  background: linear-gradient(135deg, rgba(var(--alsarejia-primary-rgb), 0.1) 0%, rgba(var(--alsarejia-primary-rgb), 0.2) 100%);
+  border-left: 4px solid var(--alsarejia-primary);
+}
+
+.world-card.common {
+  background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.1) 0%, rgba(var(--primary-rgb), 0.2) 100%);
+  border-left: 4px solid var(--primary);
+}
+
+.world-link {
+  align-self: flex-start;
+  padding: 0.5rem 1rem;
+  background-color: var(--primary);
+  color: var(--text-on-primary);
+  text-decoration: none;
+  border-radius: var(--border-radius);
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.world-link:hover {
+  background-color: var(--primary-dark);
+}
+
+/* Story Section */
+.chapters-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.chapter-item {
+  background-color: var(--surface);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.chapter-item:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.chapter-item h3 {
+  font-size: 1.4rem;
+  margin-bottom: 0.75rem;
+  color: var(--text-primary);
+}
+
+.chapter-item p {
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.chapter-meta {
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-tertiary);
+  font-size: 0.85rem;
+}
+
+.chapter-order {
+  font-weight: 600;
+}
+
+/* Side Stories Section */
+.stories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+/* Materials Section */
+.materials-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.material-card {
+  background-color: var(--surface);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s ease;
+}
+
+.material-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.material-card h3 {
+  font-size: 1.2rem;
+  margin-bottom: 0.75rem;
+  color: var(--text-primary);
+}
+
+.material-card p {
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.material-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.material-world {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.material-card.hodemei .material-world {
+  background-color: var(--hodemei-primary);
+  color: var(--text-on-primary);
+}
+
+.material-card.quxe .material-world {
+  background-color: var(--quxe-primary);
+  color: var(--text-on-primary);
+}
+
+.material-card.alsarejia .material-world {
+  background-color: var(--alsarejia-primary);
+  color: var(--text-on-primary);
+}
+
+.material-card.common .material-world {
+  background-color: var(--primary);
+  color: var(--text-on-primary);
+}
+
+.material-link {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.material-link:hover {
+  text-decoration: underline;
+}
+
+/* Glossary Preview Section */
+.glossary-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.glossary-item {
+  background-color: var(--surface);
+  border-radius: var(--border-radius);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  border-left: 4px solid transparent;
+}
+
+.glossary-item.hodemei {
+  border-left-color: var(--hodemei-primary);
+}
+
+.glossary-item.quxe {
+  border-left-color: var(--quxe-primary);
+}
+
+.glossary-item.alsarejia {
+  border-left-color: var(--alsarejia-primary);
+}
+
+.glossary-item.common {
+  border-left-color: var(--primary);
+}
+
+.glossary-item h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.glossary-item p {
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+  line-height: 1.5;
+  font-size: 0.95rem;
+}
+
+.glossary-meta {
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-tertiary);
+  font-size: 0.8rem;
+}
+
+.glossary-category {
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .page-header h1 {
+    font-size: 2.5rem;
+  }
+  
+  .page-description {
+    font-size: 1.1rem;
+  }
+  
+  .section-header h2 {
+    font-size: 1.5rem;
+  }
+  
+  .worlds-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .stories-grid,
+  .materials-grid {
+    grid-template-columns: 1fr;
+  }
+}

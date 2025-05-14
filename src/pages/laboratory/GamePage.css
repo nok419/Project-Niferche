@@ -1,0 +1,230 @@
+/* src/pages/laboratory/GamePage.css */
+
+.game-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.game-page__header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.game-page__title {
+  font-size: var(--font-size-xxl);
+  color: var(--laboratory-primary);
+  margin-bottom: 1rem;
+}
+
+.game-page__description {
+  font-size: var(--font-size-md);
+  color: var(--text-secondary);
+  max-width: 800px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.game-page__container {
+  display: flex;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.game-page__canvas-wrapper {
+  flex: 2;
+  position: relative;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+}
+
+.game-page__canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  background-color: #f0f0f0;
+}
+
+.game-page__start-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  z-index: 10;
+}
+
+.game-page__start-screen h2 {
+  font-size: var(--font-size-xl);
+  margin-bottom: 1rem;
+}
+
+.game-page__start-screen p {
+  margin-bottom: 2rem;
+}
+
+.game-page__start-button {
+  padding: 0.75rem 1.5rem;
+  font-size: var(--font-size-md);
+  font-weight: 500;
+  color: white;
+  background-color: var(--laboratory-primary);
+  border: none;
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.game-page__start-button:hover {
+  background-color: var(--laboratory-accent);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.game-page__dialogue {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 1rem;
+  z-index: 5;
+}
+
+.game-page__dialogue-content {
+  font-size: var(--font-size-md);
+  margin-bottom: 0.5rem;
+}
+
+.game-page__dialogue-indicator {
+  text-align: right;
+  animation: bounce 0.8s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.game-page__dialogue-help {
+  font-size: var(--font-size-sm);
+  text-align: right;
+  opacity: 0.7;
+}
+
+.game-page__controls {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.game-page__control-info {
+  flex: 1;
+}
+
+.game-page__control-info h3 {
+  font-size: var(--font-size-md);
+  margin-bottom: 0.5rem;
+  color: var(--laboratory-primary);
+}
+
+.game-page__control-info ul {
+  padding-left: 1.5rem;
+  font-size: var(--font-size-sm);
+}
+
+.game-page__touch-controls {
+  display: none;
+}
+
+.game-page__info {
+  flex: 1;
+  padding: 1.5rem;
+  background-color: rgba(var(--laboratory-primary-rgb), 0.05);
+  border-radius: var(--border-radius-md);
+}
+
+.game-page__coming-soon h3 {
+  font-size: var(--font-size-md);
+  color: var(--laboratory-primary);
+  margin-bottom: 1rem;
+}
+
+.game-page__coming-soon ul {
+  padding-left: 1.5rem;
+}
+
+.game-page__coming-soon li {
+  margin-bottom: 0.5rem;
+  color: var(--text-secondary);
+}
+
+.game-page__footer {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+/* モバイル用のタッチコントロール */
+@media (max-width: 768px) {
+  .game-page__container {
+    flex-direction: column;
+  }
+  
+  .game-page__touch-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 1rem;
+  }
+  
+  .game-page__touch-middle {
+    display: flex;
+    align-items: center;
+    margin: 0.5rem 0;
+  }
+  
+  .game-page__touch-up,
+  .game-page__touch-down,
+  .game-page__touch-left,
+  .game-page__touch-right,
+  .game-page__touch-action {
+    width: 60px;
+    height: 60px;
+    margin: 0.25rem;
+    background-color: rgba(var(--laboratory-primary-rgb), 0.2);
+    border: none;
+    border-radius: 50%;
+    font-size: var(--font-size-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--laboratory-primary);
+  }
+  
+  .game-page__touch-action {
+    width: 80px;
+    font-size: var(--font-size-sm);
+    border-radius: var(--border-radius-md);
+  }
+  
+  .game-page__control-info {
+    display: none;
+  }
+}

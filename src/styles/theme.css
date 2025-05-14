@@ -1,0 +1,174 @@
+/* src/styles/theme.css */
+
+:root {
+  /* Base Colors */
+  --color-white: #FFFFFF;
+  --color-black: #000000;
+  
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  
+  /* Typography */
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 20px;
+  --font-size-xl: 24px;
+  --font-size-xxl: 32px;
+  
+  /* Border Radius */
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 16px;
+  --border-radius-full: 9999px;
+
+  /* Transitions */
+  --transition-fast: 100ms ease-in-out;
+  --transition-default: 200ms ease-in-out;
+  --transition-slow: 300ms ease-in-out;
+  
+  /* Hodemei Theme */
+  --hodemei-primary: #0070F3;
+  --hodemei-secondary: #00C9A7;
+  --hodemei-background: #FAFAFA;
+  --hodemei-surface: #FFFFFF;
+  --hodemei-text: #333333;
+  --hodemei-accent: #FF4D4D;
+  --hodemei-font-header: 'Roboto, sans-serif';
+  --hodemei-font-body: 'Noto Sans JP, sans-serif';
+  
+  /* Quxe Theme */
+  --quxe-primary: #7E57C2;
+  --quxe-secondary: #26A69A;
+  --quxe-background: #F5F3E6;
+  --quxe-surface: #FFF8E1;
+  --quxe-text: #4A4236;
+  --quxe-accent: #FF9800;
+  --quxe-font-header: 'Crimson Text, serif';
+  --quxe-font-body: 'Lora, serif';
+  
+  /* Alsarejia Theme */
+  --alsarejia-primary: #212121;
+  --alsarejia-secondary: #424242;
+  --alsarejia-background: #121212;
+  --alsarejia-surface: #1E1E1E;
+  --alsarejia-text: #E0E0E0;
+  --alsarejia-accent: #BBDEFB;
+  --alsarejia-font-header: 'Space Mono, monospace';
+  --alsarejia-font-body: 'Work Sans, sans-serif';
+  
+  /* Laboratory Theme */
+  --laboratory-primary: #1A237E;
+  --laboratory-secondary: #00796B;
+  --laboratory-background: #121212;
+  --laboratory-surface: #1E1E1E;
+  --laboratory-text: #E0E0E0;
+  --laboratory-accent: #64FFDA;
+  --laboratory-font-header: 'Fira Code, monospace';
+  --laboratory-font-body: 'IBM Plex Sans, sans-serif';
+  
+  /* Common Theme */
+  --common-primary: #0070F3;
+  --common-secondary: #26A69A;
+  --common-background: #F8F9FA;
+  --common-surface: #FFFFFF;
+  --common-text: #333333;
+  --common-accent: #FF9800;
+  --common-font-header: 'Noto Sans JP, sans-serif';
+  --common-font-body: 'Noto Sans JP, sans-serif';
+  
+  /* Current Theme (default to common) */
+  --primary: var(--common-primary);
+  --secondary: var(--common-secondary);
+  --background: var(--common-background);
+  --surface: var(--common-surface);
+  --text: var(--common-text);
+  --accent: var(--common-accent);
+  --font-header: var(--common-font-header);
+  --font-body: var(--common-font-body);
+}
+
+/* Theme Classes */
+.theme-hodemei {
+  --primary: var(--hodemei-primary);
+  --secondary: var(--hodemei-secondary);
+  --background: var(--hodemei-background);
+  --surface: var(--hodemei-surface);
+  --text: var(--hodemei-text);
+  --accent: var(--hodemei-accent);
+  --font-header: var(--hodemei-font-header);
+  --font-body: var(--hodemei-font-body);
+}
+
+.theme-quxe {
+  --primary: var(--quxe-primary);
+  --secondary: var(--quxe-secondary);
+  --background: var(--quxe-background);
+  --surface: var(--quxe-surface);
+  --text: var(--quxe-text);
+  --accent: var(--quxe-accent);
+  --font-header: var(--quxe-font-header);
+  --font-body: var(--quxe-font-body);
+}
+
+.theme-alsarejia {
+  --primary: var(--alsarejia-primary);
+  --secondary: var(--alsarejia-secondary);
+  --background: var(--alsarejia-background);
+  --surface: var(--alsarejia-surface);
+  --text: var(--alsarejia-text);
+  --accent: var(--alsarejia-accent);
+  --font-header: var(--alsarejia-font-header);
+  --font-body: var(--alsarejia-font-body);
+}
+
+.theme-laboratory {
+  --primary: var(--laboratory-primary);
+  --secondary: var(--laboratory-secondary);
+  --background: var(--laboratory-background);
+  --surface: var(--laboratory-surface);
+  --text: var(--laboratory-text);
+  --accent: var(--laboratory-accent);
+  --font-header: var(--laboratory-font-header);
+  --font-body: var(--laboratory-font-body);
+}
+
+/* Dark Mode Support */
+[data-dark-mode="true"] {
+  --common-background: #121212;
+  --common-surface: #1E1E1E;
+  --common-text: #E0E0E0;
+  
+  --hodemei-background: #001428;
+  --hodemei-surface: #001F3F;
+  --hodemei-text: #E0E0E0;
+  
+  --quxe-background: #2C2418;
+  --quxe-surface: #3C301E;
+  --quxe-text: #E0E0E0;
+}
+
+/* Responsive Typography */
+@media (max-width: 576px) {
+  :root {
+    --font-size-xs: 10px;
+    --font-size-sm: 12px;
+    --font-size-md: 14px;
+    --font-size-lg: 18px;
+    --font-size-xl: 20px;
+    --font-size-xxl: 24px;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --transition-fast: 0ms;
+    --transition-default: 0ms;
+    --transition-slow: 0ms;
+  }
+}

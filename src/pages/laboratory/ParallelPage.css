@@ -1,0 +1,117 @@
+/* src/pages/laboratory/ParallelPage.css */
+
+.parallel-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.parallel-page__header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.parallel-page__title {
+  font-size: var(--font-size-xxl);
+  color: var(--laboratory-primary);
+  margin-bottom: 1rem;
+}
+
+.parallel-page__description {
+  font-size: var(--font-size-md);
+  color: var(--text-secondary);
+  max-width: 800px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.parallel-page__tabs {
+  display: flex;
+  justify-content: center;
+  margin: 2rem 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.parallel-page__tab {
+  padding: 1rem 2rem;
+  font-size: var(--font-size-md);
+  font-weight: 500;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.parallel-page__tab:hover {
+  color: var(--laboratory-primary);
+}
+
+.parallel-page__tab.active {
+  color: var(--laboratory-primary);
+  border-bottom-color: var(--laboratory-primary);
+}
+
+.parallel-page__content {
+  margin-top: 2rem;
+}
+
+.parallel-page__section-title {
+  font-size: var(--font-size-xl);
+  color: var(--laboratory-primary);
+  margin-bottom: 1rem;
+}
+
+.parallel-page__section-description {
+  font-size: var(--font-size-md);
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.parallel-page__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.parallel-page__footer {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .parallel-page {
+    padding: 1rem;
+  }
+  
+  .parallel-page__grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .parallel-page__tab {
+    padding: 0.75rem 1rem;
+    font-size: var(--font-size-sm);
+  }
+}
+
+@media (max-width: 480px) {
+  .parallel-page__header {
+    margin-bottom: 1.5rem;
+  }
+  
+  .parallel-page__title {
+    font-size: var(--font-size-xl);
+  }
+  
+  .parallel-page__description {
+    font-size: var(--font-size-sm);
+  }
+}

@@ -1,0 +1,109 @@
+claude_code_requirements.txt
+# Project Niferche ウェブサイト改修要件
+
+## 目的とサイト構造
+Project Nifercheウェブサイトは以下の3つの主要目的を持ちます：
+
+1. 個人的な創作プロジェクト「Project Niferche」のIP運営 (最優先)
+2. Project Nifercheの二次創作を収集する「parallel」の運営
+3. 共同創作プラットフォーム「LCB」の運営
+
+ウェブサイトは3つの主要区画に分かれています：
+
+### 区画A: Home
+- ウェブサイト全体のハブ機能
+- お知らせ、はじめに、マイページ、ギャラリーを含む
+
+### 区画B: Project Niferche
+- 創作IPのメインコンテンツ
+- メインストーリー/サイドストーリー/設定資料の3カテゴリ
+- 3世界（Hodemei/Quxe/Alsarejia）+共通設定の分類
+
+### 区画C: Laboratory Alsarejia
+- 試験的/半独立的なコンテンツ
+- parallel: 二次創作プラットフォーム
+- LCB: 共同創作プラットフォーム
+- Webゲーム: 開発予定のブラウザゲーム
+
+## データモデル
+
+### コンテンツモデル
+```typescript
+interface Content {
+  id: string;              // 一意のキー
+  title: string;           // タイトル
+  description: string;     // 説明
+  type: ContentType;       // テキスト/画像/動画/音楽など
+  author: string;          // 作者名
+  world: WorldType;        // hodemei/quxe/alsarejia/others
+  attribute: AttributeType; // メインストーリー/サイドストーリー/LCBなど
+  // 拡張性維持のための追加フィールド
+}
+
+type ContentType = 'text' | 'image' | 'video' | 'audio' | 'other';
+type WorldType = 'hodemei' | 'quxe' | 'alsarejia' | 'others';
+type AttributeType = 'main_story' | 'side_story' | 'materials' | 'lcb' | 'parallel' | 'gallery';
+ユーザーモデル
+typescriptinterface User {
+  id: string;                 // ユーザーID
+  email?: string;             // メールアドレス(member/adminのみ)
+  role: UserRole;             // 権限レベル
+  paymentInfo?: PaymentInfo;  // 支払い情報(memberのみ、オプション)
+  // その他プロフィール情報
+}
+
+type UserRole = 'admin' | 'member' | 'visitor';
+カテゴリ/タグシステム
+typescriptinterface Category {
+  id: string;
+  name: string;
+  parentId?: string;     // 親カテゴリID(階層構造)
+  children?: Category[]; // 子カテゴリ(階層構造)
+}
+
+interface Tag {
+  id: string;
+  name: string;
+  parentId?: string;  // 親タグID(階層構造)
+}
+UI/UXテーマと要件
+世界観別スタイルガイド
+
+Hodemei (近未来): スタイリッシュで洗練されたデザイン、都市的色調
+Quxe (ファンタジー): 幻想的で神秘的な雰囲気、豊かな色彩
+Alsarejia (宇宙的): 神秘的で静謐な雰囲気、洗練された白黒ベース
+Laboratory (実験室): Alsarejiaをベースに実験的要素、着色バリエーション
+
+ナビゲーション要件
+
+区画間移動: カード/ドロップダウン
+コンテンツ移動: カード/タブ/サイドバー
+階層表示: パス表示などでユーザーの現在位置を明示
+
+レスポンシブ対応
+
+装飾よりコンテンツアクセスを優先
+モバイル向けに特定要素を簡略化
+
+コア共通コンポーネント要件
+UniversalCard
+
+必須機能: 画像表示、テキスト表示、リンク機能
+サイズバリエーション対応
+画像/テキスト不足時でも使用可能な最小構成
+拡張性を持つ汎用設計
+
+BaseLayout
+
+固定ヘッダー/フッター
+サイドバー (モバイルではボタン等に変換)
+世界観テーマの適用
+
+実装優先順位と方針
+
+基本構造とコアコンポーネント
+テーマシステムと世界観表現
+区画ごとの主要ページ実装
+ユーザー関連機能の実装
+
+技術スタック: React, TypeScript, AWS Amplify Gen2

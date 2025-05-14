@@ -1,0 +1,156 @@
+/* src/pages/laboratory/LCBPage.css */
+
+.lcb-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.lcb-page__header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.lcb-page__title {
+  font-size: var(--font-size-xxl);
+  color: var(--laboratory-primary);
+  margin-bottom: 1rem;
+}
+
+.lcb-page__description {
+  font-size: var(--font-size-md);
+  color: var(--text-secondary);
+  max-width: 800px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.lcb-page__tabs {
+  display: flex;
+  justify-content: center;
+  margin: 2rem 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.lcb-page__tab {
+  padding: 1rem 2rem;
+  font-size: var(--font-size-md);
+  font-weight: 500;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.lcb-page__tab:hover {
+  color: var(--laboratory-primary);
+}
+
+.lcb-page__tab.active {
+  color: var(--laboratory-primary);
+  border-bottom-color: var(--laboratory-primary);
+}
+
+.lcb-page__content {
+  margin-top: 2rem;
+}
+
+.lcb-page__section-title {
+  font-size: var(--font-size-xl);
+  color: var(--laboratory-primary);
+  margin-bottom: 1rem;
+}
+
+.lcb-page__section-description {
+  font-size: var(--font-size-md);
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.lcb-page__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.lcb-page__footer {
+  margin-top: 3rem;
+  padding: 2rem;
+  background-color: rgba(var(--laboratory-primary-rgb), 0.1);
+  border-radius: var(--border-radius-lg);
+}
+
+.lcb-page__cta {
+  text-align: center;
+}
+
+.lcb-page__cta h3 {
+  font-size: var(--font-size-lg);
+  color: var(--laboratory-primary);
+  margin-bottom: 1rem;
+}
+
+.lcb-page__cta p {
+  font-size: var(--font-size-md);
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.lcb-page__cta-button {
+  padding: 0.75rem 1.5rem;
+  font-size: var(--font-size-md);
+  font-weight: 500;
+  color: white;
+  background-color: var(--laboratory-primary);
+  border: none;
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.lcb-page__cta-button:hover {
+  background-color: var(--laboratory-accent);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .lcb-page {
+    padding: 1rem;
+  }
+  
+  .lcb-page__grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .lcb-page__tab {
+    padding: 0.75rem 1rem;
+    font-size: var(--font-size-sm);
+  }
+}
+
+@media (max-width: 480px) {
+  .lcb-page__header {
+    margin-bottom: 1.5rem;
+  }
+  
+  .lcb-page__title {
+    font-size: var(--font-size-xl);
+  }
+  
+  .lcb-page__description {
+    font-size: var(--font-size-sm);
+  }
+  
+  .lcb-page__footer {
+    padding: 1.5rem 1rem;
+  }
+}

@@ -29,3 +29,4 @@ amplifyconfiguration*
 
 # dev
 #dev
+**/.claude/settings.local.json

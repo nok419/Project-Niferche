@@ -1,0 +1,222 @@
+/* MainStoryPage.css */
+
+.main-story-page {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem 3rem;
+}
+
+/* Chapter List Section */
+.chapters-overview {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.chapters-overview h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+.chapters-description {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto 3rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  font-size: 1.1rem;
+}
+
+.chapters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.chapter-card {
+  position: relative;
+  background-color: var(--surface);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  text-decoration: none;
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.chapter-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+}
+
+.chapter-card.disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.chapter-card.disabled:hover {
+  transform: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.chapter-number {
+  background-color: var(--primary);
+  color: var(--text-on-primary);
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--border-radius);
+  font-size: 0.8rem;
+  font-weight: 600;
+  position: absolute;
+  top: -0.5rem;
+  left: 1rem;
+}
+
+.chapter-card h2 {
+  font-size: 1.3rem;
+  margin: 0.5rem 0 1rem;
+  color: var(--text-primary);
+}
+
+.chapter-card p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  flex-grow: 1;
+  margin-bottom: 1rem;
+}
+
+.chapter-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  color: var(--text-tertiary);
+}
+
+.published-date {
+  font-style: italic;
+}
+
+.coming-soon {
+  background-color: var(--warning);
+  color: var(--text-on-accent);
+  padding: 0.25rem 0.5rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+/* Story Navigation */
+.story-navigation {
+  margin-bottom: 2rem;
+}
+
+.back-to-list {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius);
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.back-to-list:hover {
+  background-color: var(--surface-hover);
+  color: var(--text-primary);
+}
+
+/* Story Footer */
+.story-footer {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+
+.story-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.related-contents h3 {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+
+.related-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.related-link {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius);
+  text-decoration: none;
+  color: var(--primary);
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.related-link:hover {
+  background-color: var(--primary);
+  color: var(--text-on-primary);
+}
+
+/* Error state */
+.content-not-found {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.content-not-found h2 {
+  margin-bottom: 1.5rem;
+  color: var(--text-primary);
+}
+
+.back-link {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background-color: var(--primary);
+  color: var(--text-on-primary);
+  text-decoration: none;
+  border-radius: var(--border-radius);
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.back-link:hover {
+  background-color: var(--primary-dark);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .chapters-overview h1 {
+    font-size: 2rem;
+  }
+  
+  .chapters-description {
+    font-size: 1rem;
+  }
+  
+  .chapters-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .story-meta {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+}

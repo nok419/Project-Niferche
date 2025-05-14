@@ -1,0 +1,289 @@
+Project Niferche デザインシステム仕様
+テーマシステム概要
+Project Nifercheウェブサイトは、4つの世界観に基づくテーマシステムを実装します。各世界観は独自の視覚言語を持ちながらも、一貫したUIコンポーネントと操作性を提供します。
+基本方針
+
+CSS変数を使用した一貫したテーマシステム
+コンポーネントとテーマの分離による柔軟性
+モバイルファーストのレスポンシブデザイン
+アクセシビリティに配慮したコントラストと操作性
+
+世界観別テーマ詳細
+1. Hodemei (近未来)
+
+コンセプト: スタイリッシュで洗練された近未来的デザイン
+カラーパレット:
+
+Primary: #0070F3 (鮮やかな青)
+Secondary: #00C9A7 (ターコイズ)
+Background: #FAFAFA (明るいオフホワイト)
+Surface: #FFFFFF (純白)
+Text: #333333 (ダークグレー)
+Accent: #FF4D4D (明るい赤)
+
+
+タイポグラフィ:
+
+ヘッダー: Roboto, sans-serif (軽量・シャープ)
+本文: Noto Sans JP, sans-serif (クリーン・現代的)
+
+
+特徴的要素:
+
+細いボーダー
+シャープなエッジ
+幾何学的なアクセント
+微妙なグラデーション
+ネオンのようなアクセントカラー
+
+
+
+2. Quxe (ファンタジー)
+
+コンセプト: 幻想的で神秘的な自然との調和
+カラーパレット:
+
+Primary: #7E57C2 (神秘的な紫)
+Secondary: #26A69A (森の緑)
+Background: #F5F3E6 (古い羊皮紙)
+Surface: #FFF8E1 (温かいクリーム色)
+Text: #4A4236 (茶色がかった黒)
+Accent: #FF9800 (温かいオレンジ)
+
+
+タイポグラフィ:
+
+ヘッダー: Crimson Text, serif (装飾的・古典的)
+本文: Lora, serif (柔らかい・流動的)
+
+
+特徴的要素:
+
+有機的な形状
+柔らかいエッジ
+装飾的なボーダー
+自然モチーフのアクセント
+暖かみのある色調
+
+
+
+3. Alsarejia (宇宙的)
+
+コンセプト: 神秘的で静謐な宇宙的空間
+カラーパレット:
+
+Primary: #212121 (深い黒)
+Secondary: #424242 (ダークグレー)
+Background: #121212 (漆黒)
+Surface: #1E1E1E (暗いグレー)
+Text: #E0E0E0 (明るい銀色)
+Accent: #BBDEFB (青みがかった白)
+
+
+タイポグラフィ:
+
+ヘッダー: Space Mono, monospace (幾何学的・技術的)
+本文: Work Sans, sans-serif (クリーン・ミニマル)
+
+
+特徴的要素:
+
+極小のドット
+細いライン
+星のようなアクセント
+控えめなグリッドパターン
+白から青へのグラデーション
+
+
+
+4. Laboratory (実験室)
+
+コンセプト: Alsarejiaをベースにした実験的要素
+カラーパレット:
+
+Primary: #1A237E (濃紺)
+Secondary: #00796B (深緑)
+Background: #121212 (漆黒)
+Surface: #1E1E1E (暗いグレー)
+Text: #E0E0E0 (明るい銀色)
+Accent: #64FFDA (明るいターコイズ)
+
+
+タイポグラフィ:
+
+ヘッダー: Fira Code, monospace (技術的・コード風)
+本文: IBM Plex Sans, sans-serif (整然・科学的)
+
+
+特徴的要素:
+
+グリッドパターン
+ハイライトされたデータ表示
+技術的なアイコン
+実験装置を思わせる視覚要素
+点滅・パルス効果のアクセント
+
+
+
+レスポンシブデザイン
+ブレークポイント
+typescriptconst breakpoints = {
+  xs: 0,
+  sm: 576,
+  md: 768,
+  lg: 992,
+  xl: 1200,
+  xxl: 1400
+};
+モバイル特有の考慮事項
+
+ナビゲーションはハンバーガーメニューに変換
+カードは垂直方向に積み重ねて表示
+テキストサイズの適切な縮小
+タッチターゲットの適切なサイズ確保 (最小44x44px)
+装飾要素の簡略化
+
+タブレット特有の考慮事項
+
+サイドバーの折りたたみオプション
+2カラムグリッドへの最適化
+一部装飾要素の表示
+
+デスクトップ特有の考慮事項
+
+全装飾要素の表示
+マルチカラムレイアウトの活用
+ホバー効果の追加
+
+アニメーションとトランジション
+基本トランジション
+typescriptconst transitions = {
+  fast: '100ms ease-in-out',
+  default: '200ms ease-in-out',
+  slow: '300ms ease-in-out',
+};
+世界観別アニメーション
+
+Hodemei: スムーズで機械的な動き
+Quxe: 有機的でふわりとした動き
+Alsarejia: 控えめで静かな動き
+Laboratory: 技術的で精密な動き
+
+アクセシビリティ考慮
+
+reduced-motion設定の尊重
+過度なアニメーションの回避
+操作フィードバックの明確化
+
+実装アプローチ
+CSS変数の定義例
+css:root {
+  /* Base Colors */
+  --color-white: #FFFFFF;
+  --color-black: #000000;
+  
+  /* Hodemei Theme */
+  --hodemei-primary: #0070F3;
+  --hodemei-secondary: #00C9A7;
+  --hodemei-background: #FAFAFA;
+  --hodemei-surface: #FFFFFF;
+  --hodemei-text: #333333;
+  --hodemei-accent: #FF4D4D;
+
+  /* Quxe Theme */
+  --quxe-primary: #7E57C2;
+  --quxe-secondary: #26A69A;
+  --quxe-background: #F5F3E6;
+  --quxe-surface: #FFF8E1;
+  --quxe-text: #4A4236;
+  --quxe-accent: #FF9800;
+
+  /* Alsarejia Theme */
+  --alsarejia-primary: #212121;
+  --alsarejia-secondary: #424242;
+  --alsarejia-background: #121212;
+  --alsarejia-surface: #1E1E1E;
+  --alsarejia-text: #E0E0E0;
+  --alsarejia-accent: #BBDEFB;
+  
+  /* Laboratory Theme */
+  --laboratory-primary: #1A237E;
+  --laboratory-secondary: #00796B;
+  --laboratory-background: #121212;
+  --laboratory-surface: #1E1E1E;
+  --laboratory-text: #E0E0E0;
+  --laboratory-accent: #64FFDA;
+  
+  /* Current Theme (dynamically changed) */
+  --primary: var(--hodemei-primary);
+  --secondary: var(--hodemei-secondary);
+  --background: var(--hodemei-background);
+  --surface: var(--hodemei-surface);
+  --text: var(--hodemei-text);
+  --accent: var(--hodemei-accent);
+  
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  
+  /* Typography */
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 20px;
+  --font-size-xl: 24px;
+  --font-size-xxl: 32px;
+  
+  /* Transitions */
+  --transition-fast: 100ms ease-in-out;
+  --transition-default: 200ms ease-in-out;
+  --transition-slow: 300ms ease-in-out;
+  
+  /* Border Radius */
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 16px;
+  --border-radius-full: 9999px;
+}
+テーマ切り替え関数の例
+typescriptfunction setTheme(theme: WorldType) {
+  const root = document.documentElement;
+  
+  // Reset current theme
+  const themes: WorldType[] = ['hodemei', 'quxe', 'alsarejia', 'laboratory'];
+  themes.forEach(t => root.classList.remove(`theme-${t}`));
+  
+  // Set new theme
+  root.classList.add(`theme-${theme}`);
+  
+  // Update CSS variables
+  root.style.setProperty('--primary', `var(--${theme}-primary)`);
+  root.style.setProperty('--secondary', `var(--${theme}-secondary)`);
+  root.style.setProperty('--background', `var(--${theme}-background)`);
+  root.style.setProperty('--surface', `var(--${theme}-surface)`);
+  root.style.setProperty('--text', `var(--${theme}-text)`);
+  root.style.setProperty('--accent', `var(--${theme}-accent)`);
+  
+  // Update font families based on theme
+  switch(theme) {
+    case 'hodemei':
+      root.style.setProperty('--font-header', 'Roboto, sans-serif');
+      root.style.setProperty('--font-body', 'Noto Sans JP, sans-serif');
+      break;
+    case 'quxe':
+      root.style.setProperty('--font-header', 'Crimson Text, serif');
+      root.style.setProperty('--font-body', 'Lora, serif');
+      break;
+    case 'alsarejia':
+      root.style.setProperty('--font-header', 'Space Mono, monospace');
+      root.style.setProperty('--font-body', 'Work Sans, sans-serif');
+      break;
+    case 'laboratory':
+      root.style.setProperty('--font-header', 'Fira Code, monospace');
+      root.style.setProperty('--font-body', 'IBM Plex Sans, sans-serif');
+      break;
+  }
+}

@@ -1,176 +1,498 @@
 // src/App.tsx
+import React, { lazy, Suspense } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { ThemeProvider } from './core/context/ThemeContext';
+import { BaseLayout } from './layout/base/BaseLayout';
+import { NavigationSystem } from './layout/navigation/NavigationSystem';
 
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { ThemeProvider } from '@aws-amplify/ui-react';
+// ホームページは頻繁にアクセスされるので即時ロード
+import { HomePage } from './pages';
 
-// themes
-import { laboratoryTheme } from './theme/laboratoryTheme';
-import { theme } from './theme';
+// React.lazyを使用した遅延ロード
+// 区画A: 基本ページ
+const AnnouncementsPage = lazy(() => import('./pages/announcements/AnnouncementsPage'));
+const IntroductionPage = lazy(() => import('./pages/introduction/IntroductionPage'));
+const GalleryPage = lazy(() => import('./pages/gallery/GalleryPage'));
 
-// Layouts
-import { MainLayout } from './components/layout/MainLayout';
-import { CallLayout } from './components/layout/CallLayout';
-import { LibraryLayout } from './components/layout/LibraryLayout';
-import { LaboratoryLayout } from './components/layout/LaboratoryLayout';
-import { MaterialsRootLayout } from './components/layout/MaterialsRootLayout';
-import { AuthLayout } from './components/layout/AuthLayout';
+// 区画B: Project Niferche
+const ProjectNifercheMainPage = lazy(() => import('./pages/projectNiferche/ProjectNifercheMainPage'));
+const MainStoryPage = lazy(() => import('./pages/projectNiferche/MainStoryPage'));
+const SideStoryPage = lazy(() => import('./pages/projectNiferche/SideStoryPage'));
+const MaterialsPage = lazy(() => import('./pages/projectNiferche/MaterialsPage'));
 
-// Call Pages
-import { AboutPage } from './pages/call/AboutPage';
-import { PhilosophyPage } from './pages/call/PhilosophyPage';
-import { NewsPage } from './pages/call/NewsPage';
+// 区画C: Laboratory - 頻度の低いセクションなので個別にチャンク化
+const LaboratoryPages = {
+  Home: lazy(() => import('./pages/laboratory/LaboratoryHomePage')),
+  Parallel: lazy(() => import('./pages/laboratory/ParallelPage')),
+  LCB: lazy(() => import('./pages/laboratory/LCBPage')),
+  Game: lazy(() => import('./pages/laboratory/GamePage'))
+};
 
-// Library Pages
-import { LibraryOverviewPage } from './pages/library/LibraryOverviewPage';
-import { MainStory } from './pages/library/MainStory';
-import { SideStory } from './pages/library/SideStory';
-import { SideStoryListPage } from './pages/library/SideStoryListPage';
-import { SideStoryDetailPage } from './pages/library/SideStoryDetailPage';
-import { LibraryPage } from './pages/library/LibraryPage';
-import { RecordsPage } from './pages/library/RecordsPage';
+// デモページ
+const WorldNavigationDemo = lazy(() => import('./pages/demo/WorldNavigationDemo'));
 
-// Laboratory Pages
-import { LaboratoryPage } from './pages/laboratory/LaboratoryPage';
-import { ObservationPage } from './pages/laboratory/ObservationPage';
-import { ArchivePage } from './pages/laboratory/ArchivePage';
-import { GuidePage } from './pages/laboratory/GuidePage';
-import { IdeaLibrary } from './pages/laboratory/IdeaLibrary';
+// 実装前の一時的なプレースホルダー
+const ExperimentsPage = () => <div>実験室</div>;
+const InteractivePage = () => <div>インタラクティブコンテンツ</div>;
 
-// Materials Pages
-import { MaterialsAbout } from './pages/materials/MaterialsAbout';
-import { CommonSettings } from './pages/materials/CommonSettings';
-import { QuxeMaterials } from './pages/materials/QuxeMaterials';
-import { HodemeiMaterials } from './pages/materials/HodemeiMaterials';
-import { AlsarejiaMaterials } from './pages/materials/AlsarejiaMaterials';
+// ローディングインジケーター
+const LoadingFallback = () => (
+  <div className="loading-container">
+    <div className="loading-spinner"></div>
+    <p>読み込み中...</p>
+  </div>
+);
 
-// Gallery Page
-import { GalleryPage } from './pages/gallery/GalleryPage';
+// 404ページコンポーネント
+const NotFoundPage = () => (
+  <div className="container text-center">
+    <h1>404</h1>
+    <p>お探しのページは見つかりませんでした。</p>
+  </div>
+);
 
-// System Pages
-import { MainPage } from './pages/MainPage';
-import { RightsPage } from './pages/system/RightsPage';
-import { TermsPage } from './pages/system/TermsPage';
-import { GuidelinesPage } from './pages/system/GuidelinesPage';
+/**
+ * 区画A用のナビゲーション項目
+ */
+const homeNavItems = [
+  {
+    id: 'home',
+    label: 'ホーム',
+    path: '/',
+    icon: '🏠'
+  },
+  {
+    id: 'announcements',
+    label: 'お知らせ',
+    path: '/announcements',
+    icon: '📢'
+  },
+  {
+    id: 'introduction',
+    label: 'はじめに',
+    path: '/introduction',
+    icon: '📖'
+  },
+  {
+    id: 'gallery',
+    label: 'ギャラリー',
+    path: '/gallery',
+    icon: '🖼️'
+  },
+  {
+    id: 'project-niferche',
+    label: 'Project Niferche',
+    path: '/project-niferche/top',
+    icon: '🌍',
+    children: [
+      {
+        id: 'main-story',
+        label: 'メインストーリー',
+        path: '/project-niferche/main-story'
+      },
+      {
+        id: 'side-story',
+        label: 'サイドストーリー',
+        path: '/project-niferche/side-story'
+      },
+      {
+        id: 'materials',
+        label: '設定資料',
+        path: '/project-niferche/materials'
+      }
+    ]
+  },
+  {
+    id: 'laboratory',
+    label: 'Laboratory',
+    path: '/laboratory',
+    icon: '🧪',
+    highlight: true
+  },
+  {
+    id: 'demo',
+    label: 'デモ',
+    path: '/demo',
+    icon: '🔍',
+    children: [
+      {
+        id: 'world-navigation-demo',
+        label: '世界別ナビゲーション',
+        path: '/demo/world-navigation'
+      }
+    ]
+  }
+];
 
-// Auth Pages
-import { SignInPage } from './pages/system/auth/SignInPage';
-import { SignUpPage } from './pages/system/auth/SignUpPage';
-import { ConfirmSignUpPage } from './pages/system/auth/ConfirmSignUpPage';
+/**
+ * 区画B用のナビゲーション項目
+ */
+const projectNifercheNavItems = [
+  {
+    id: 'pn-top',
+    label: 'Project Niferche',
+    path: '/project-niferche/top',
+    icon: '🏠'
+  },
+  {
+    id: 'main-story',
+    label: 'メインストーリー',
+    path: '/project-niferche/main-story',
+    icon: '📚',
+    children: [
+      {
+        id: 'main-story-chapter-1',
+        label: '序章: 始まりの鐘',
+        path: '/project-niferche/main-story/chapter-1'
+      },
+      {
+        id: 'main-story-chapter-2',
+        label: '第一章: Hodemeiの夜明け',
+        path: '/project-niferche/main-story/chapter-2'
+      },
+      {
+        id: 'main-story-chapter-3',
+        label: '第二章: Quxeの森の囁き (近日公開)',
+        path: '/project-niferche/main-story/chapter-3',
+        disabled: true
+      }
+    ]
+  },
+  {
+    id: 'side-story',
+    label: 'サイドストーリー',
+    path: '/project-niferche/side-story',
+    icon: '📖'
+  },
+  {
+    id: 'materials',
+    label: '設定資料',
+    path: '/project-niferche/materials',
+    icon: '🗺️',
+    children: [
+      {
+        id: 'materials-hodemei',
+        label: 'Hodemei',
+        path: '/project-niferche/materials/world/hodemei'
+      },
+      {
+        id: 'materials-quxe',
+        label: 'Quxe',
+        path: '/project-niferche/materials/world/quxe'
+      },
+      {
+        id: 'materials-alsarejia',
+        label: 'Alsarejia',
+        path: '/project-niferche/materials/world/alsarejia'
+      }
+    ]
+  },
+  {
+    id: 'characters',
+    label: '登場人物',
+    path: '/project-niferche/characters',
+    icon: '👥'
+  },
+  {
+    id: 'glossary',
+    label: '用語集',
+    path: '/project-niferche/glossary',
+    icon: '📝'
+  }
+];
 
-// Error / 404
-import { NotFoundPage } from './pages/NotFoundPage';
-import { ErrorPage } from './pages/ErrorPage';
+/**
+ * 区画C（Laboratory）用のナビゲーション項目
+ */
+const laboratoryNavItems = [
+  {
+    id: 'lab-home',
+    label: 'ラボラトリーホーム',
+    path: '/laboratory/home',
+    icon: '🏠'
+  },
+  {
+    id: 'lab-parallel',
+    label: 'Parallel',
+    path: '/laboratory/parallel',
+    icon: '🔄',
+    children: [
+      {
+        id: 'lab-parallel-stories',
+        label: 'パラレルストーリー',
+        path: '/laboratory/parallel/stories'
+      },
+      {
+        id: 'lab-parallel-worlds',
+        label: 'パラレルワールド',
+        path: '/laboratory/parallel/worlds'
+      }
+    ]
+  },
+  {
+    id: 'lab-lcb',
+    label: 'LCB',
+    path: '/laboratory/lcb',
+    icon: '🏛️',
+    children: [
+      {
+        id: 'lab-lcb-project',
+        label: 'プロジェクト概要',
+        path: '/laboratory/lcb/project'
+      },
+      {
+        id: 'lab-lcb-worldbuilding',
+        label: '世界観構築',
+        path: '/laboratory/lcb/worldbuilding'
+      }
+    ]
+  },
+  {
+    id: 'lab-experiments',
+    label: '実験',
+    path: '/laboratory/experiments',
+    icon: '🧪',
+    children: [
+      {
+        id: 'lab-experiments-game',
+        label: '2Dアドベンチャー',
+        path: '/laboratory/experiments/game'
+      },
+      {
+        id: 'lab-experiments-interactive',
+        label: 'インタラクティブ',
+        path: '/laboratory/experiments/interactive'
+      }
+    ]
+  },
+  {
+    id: 'back-to-main',
+    label: 'メインサイトに戻る',
+    path: '/',
+    icon: '🔙'
+  }
+];
 
-// Protected
-import { ProfilePage } from './pages/user/ProfilePage';
-import { FavoritesPage } from './pages/user/FavoritesPage';
-import ContentListPage from './pages/user/ContentListPage';
-import ContentDetailPage from './pages/user/ContentDetailPage';
-import ContentUploadPage from './pages/user/ContentUploadPage';
+/**
+ * デモ用のナビゲーション項目
+ */
+const demoNavItems = [
+  {
+    id: 'demo-home',
+    label: 'デモホーム',
+    path: '/demo',
+    icon: '🏠'
+  },
+  {
+    id: 'world-navigation-demo',
+    label: '世界別ナビゲーション',
+    path: '/demo/world-navigation',
+    icon: '🧭'
+  },
+  {
+    id: 'back-to-home',
+    label: 'メインサイトに戻る',
+    path: '/',
+    icon: '🔙'
+  }
+];
 
-import { ErrorBoundary } from './components/common/ErrorBoundary';
+/**
+ * アプリケーションのルートコンポーネント
+ */
+const App: React.FC = () => {
+  // サイドバーコンテンツのレンダリング
+  const renderSidebar = (navItems = homeNavItems) => (
+    <NavigationSystem
+      items={navItems}
+      variant="sidebar"
+      orientation="vertical"
+      collapsible={true}
+      depth={2}
+    />
+  );
 
-// ★ 新規追加ページ
-import { GalleryDetailPage } from './pages/gallery/GalleryDetailPage';        
-import { MaterialDetailPage } from './pages/materials/MaterialDetailPage';   
-import { AdminDashboardPage } from './pages/admin/AdminDashboardPage';       
+  // ヘッダーコンテンツのレンダリング
+  const renderHeader = (navItems = homeNavItems, title = "Project Niferche") => (
+    <div className="container">
+      <div className="flex justify-between items-center p-3">
+        <div className="text-lg font-bold">{title}</div>
+        <NavigationSystem
+          items={navItems.filter(item => !item.children).slice(0, 5)}
+          variant="tabs"
+          orientation="horizontal"
+          depth={1}
+        />
+      </div>
+    </div>
+  );
 
-function App() {
   return (
     <BrowserRouter>
-      <ThemeProvider theme={theme}>
-        <ErrorBoundary>
-          <Routes>
-
-            {/* Auth */}
-            <Route path="/auth" element={<AuthLayout />}>
-              <Route path="signin" element={<SignInPage />} />
-              <Route path="signup" element={<SignUpPage />} />
-              <Route path="confirm" element={<ConfirmSignUpPage />} />
-            </Route>
-
-            {/* Call */}
-            <Route element={<CallLayout />}>
-              <Route path="/call/about" element={<AboutPage />} />
-              <Route path="/call/philosophy" element={<PhilosophyPage />} />
-              <Route path="/call/news" element={<NewsPage />} />
-            </Route>
-
-            {/* Library */}
-            <Route element={<LibraryLayout />}>
-              <Route path="/library" element={<LibraryOverviewPage />} />
-              <Route path="/library/mainstory" element={<MainStory />} />
-              <Route path="/library/sidestory" element={<SideStory />} />
-              <Route path="/library/sidestorylist" element={<SideStoryListPage />} />
-              <Route path="/library/sidestory/detail/:storyId" element={<SideStoryDetailPage />} />
-              <Route path="/library/records" element={<RecordsPage />} />
-              <Route path="/library/page" element={<LibraryPage />} />
-            </Route>
-
-            {/* Laboratory */}
-            <Route
-              element={
-                <ThemeProvider theme={laboratoryTheme}>
-                  <LaboratoryLayout />
-                </ThemeProvider>
-              }
-            >
-              <Route path="/laboratory/about" element={<LaboratoryPage />} />
-              <Route path="/laboratory/observation" element={<ObservationPage />} />
-              <Route path="/laboratory/archive" element={<ArchivePage />} />
-              <Route path="/laboratory/guide" element={<GuidePage />} />
-              <Route path="/laboratory/ideas" element={<IdeaLibrary />} />
-            </Route>
-
-            {/* Materials */}
-            <Route element={<MaterialsRootLayout />}>
-              <Route path="/materials/about" element={<MaterialsAbout />} />
-              <Route path="/materials/common" element={<CommonSettings />} />
-              <Route path="/materials/quxe" element={<QuxeMaterials />} />
-              <Route path="/materials/hodemei" element={<HodemeiMaterials />} />
-              <Route path="/materials/alsarejia" element={<AlsarejiaMaterials />} />
-              {/* 詳細ルート */}
-              <Route 
-                path="/materials/:attribution/:world/:materialId" 
-                element={<MaterialDetailPage />} 
+      <ThemeProvider initialTheme="common">
+        <Routes>
+          {/* 区画A: Home */}
+          <Route 
+            path="/" 
+            element={
+              <BaseLayout
+                headerContent={renderHeader(homeNavItems)}
+                sidebarContent={renderSidebar(homeNavItems)}
+                showBreadcrumbs={true}
+                showFooter={true}
               />
-            </Route>
-
-            {/* Gallery */}
-            <Route element={<MainLayout />}>
-              <Route path="/gallery" element={<GalleryPage />} />
-              {/* ギャラリ詳細ルート */}
-              <Route path="/gallery/view/:galleryId" element={<GalleryDetailPage />} />
-
-              <Route path="/rights" element={<RightsPage />} />
-              <Route path="/terms" element={<TermsPage />} />
-              <Route path="/guidelines" element={<GuidelinesPage />} />
-            </Route>
-
-            {/* プロフィール・お気に入り・ユーザーコンテンツ */}
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/favorites" element={<FavoritesPage />} />
-            <Route path="/user/contents" element={<ContentListPage />} />
-            <Route path="/user/contents/:id" element={<ContentDetailPage />} />
-            <Route path="/user/contents/upload" element={<ContentUploadPage />} />
-            
-            {/* 管理者ページ */}
-            <Route path="/admin" element={<AdminDashboardPage />} />
-
-            {/* メイン */}
-            <Route path="/" element={<MainLayout />}>
-              <Route index element={<MainPage />} />
-            </Route>
-
-            {/* エラー */}
-            <Route path="/error" element={<ErrorPage />} />
-            <Route path="*" element={<NotFoundPage />} />
-
-          </Routes>
-        </ErrorBoundary>
+            } 
+          >
+            <Route index element={<HomePage />} />
+            <Route path="announcements" element={
+              <Suspense fallback={<LoadingFallback />}>
+                <AnnouncementsPage />
+              </Suspense>
+            } />
+            <Route path="introduction" element={
+              <Suspense fallback={<LoadingFallback />}>
+                <IntroductionPage />
+              </Suspense>
+            } />
+            <Route path="gallery" element={
+              <Suspense fallback={<LoadingFallback />}>
+                <GalleryPage />
+              </Suspense>
+            } />
+          </Route>
+          
+          {/* 区画B: Project Niferche */}
+          <Route 
+            path="/project-niferche/*" 
+            element={
+              <BaseLayout
+                headerContent={renderHeader(projectNifercheNavItems, "Project Niferche")}
+                sidebarContent={renderSidebar(projectNifercheNavItems)}
+                showBreadcrumbs={true}
+                showFooter={true}
+              />
+            }
+          >
+            <Route index element={<Navigate to="/project-niferche/top" replace />} />
+            <Route path="top" element={
+              <Suspense fallback={<LoadingFallback />}>
+                <ProjectNifercheMainPage />
+              </Suspense>
+            } />
+            <Route path="main-story" element={
+              <Suspense fallback={<LoadingFallback />}>
+                <MainStoryPage />
+              </Suspense>
+            } />
+            <Route path="main-story/:chapterId" element={
+              <Suspense fallback={<LoadingFallback />}>
+                <MainStoryPage />
+              </Suspense>
+            } />
+            <Route path="side-story" element={
+              <Suspense fallback={<LoadingFallback />}>
+                <SideStoryPage />
+              </Suspense>
+            } />
+            <Route path="side-story/:storyId" element={
+              <Suspense fallback={<LoadingFallback />}>
+                <SideStoryPage />
+              </Suspense>
+            } />
+            <Route path="materials" element={
+              <Suspense fallback={<LoadingFallback />}>
+                <MaterialsPage />
+              </Suspense>
+            } />
+            <Route path="materials/:materialId" element={
+              <Suspense fallback={<LoadingFallback />}>
+                <MaterialsPage />
+              </Suspense>
+            } />
+            <Route path="materials/world/:worldId" element={
+              <Suspense fallback={<LoadingFallback />}>
+                <MaterialsPage />
+              </Suspense>
+            } />
+          </Route>
+          
+          {/* 区画C: Laboratory */}
+          <Route 
+            path="/laboratory/*" 
+            element={
+              <BaseLayout
+                headerContent={renderHeader(laboratoryNavItems, "Laboratory")}
+                sidebarContent={renderSidebar(laboratoryNavItems)}
+                showBreadcrumbs={true}
+                showFooter={true}
+              />
+            } 
+          >
+            <Route index element={<Navigate to="/laboratory/home" replace />} />
+            <Route path="home" element={
+              <Suspense fallback={<LoadingFallback />}>
+                <LaboratoryPages.Home />
+              </Suspense>
+            } />
+            <Route path="parallel" element={
+              <Suspense fallback={<LoadingFallback />}>
+                <LaboratoryPages.Parallel />
+              </Suspense>
+            } />
+            <Route path="parallel/:section" element={
+              <Suspense fallback={<LoadingFallback />}>
+                <LaboratoryPages.Parallel />
+              </Suspense>
+            } />
+            <Route path="lcb" element={
+              <Suspense fallback={<LoadingFallback />}>
+                <LaboratoryPages.LCB />
+              </Suspense>
+            } />
+            <Route path="lcb/:section" element={
+              <Suspense fallback={<LoadingFallback />}>
+                <LaboratoryPages.LCB />
+              </Suspense>
+            } />
+            <Route path="experiments" element={<ExperimentsPage />} />
+            <Route path="experiments/game" element={
+              <Suspense fallback={<LoadingFallback />}>
+                <LaboratoryPages.Game />
+              </Suspense>
+            } />
+            <Route path="experiments/interactive" element={<InteractivePage />} />
+          </Route>
+          
+          {/* デモページ */}
+          <Route 
+            path="/demo" 
+            element={
+              <BaseLayout
+                headerContent={renderHeader(demoNavItems, "デモページ")}
+                sidebarContent={renderSidebar(demoNavItems)}
+                showBreadcrumbs={true}
+                showFooter={true}
+              />
+            }
+          >
+            <Route index element={<Navigate to="/demo/world-navigation" replace />} />
+            <Route path="world-navigation" element={
+              <Suspense fallback={<LoadingFallback />}>
+                <WorldNavigationDemo />
+              </Suspense>
+            } />
+          </Route>
+          
+          {/* 404ページ */}
+          <Route path="*" element={
+            <BaseLayout showFooter={true}>
+              <NotFoundPage />
+            </BaseLayout>
+          } />
+        </Routes>
       </ThemeProvider>
     </BrowserRouter>
   );
-}
+};
 
 export default App;

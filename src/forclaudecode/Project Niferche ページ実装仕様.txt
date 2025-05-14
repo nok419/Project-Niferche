@@ -1,0 +1,479 @@
+Project Niferche ページ実装仕様
+このドキュメントでは、Project Nifercheウェブサイトの各区画のページ実装の詳細を説明します。
+区画A: Home
+ホームページ (HomePage)
+
+目的: ウェブサイト全体の入口として機能し、各区画への導線を提供
+主要コンポーネント:
+
+HeroSection: サイト概要とメインナビゲーション
+AnnouncementList: 最新のお知らせ一覧
+FeaturedContent: 注目コンテンツの表示
+WorldsNavigation: 各世界へのクイックアクセス
+
+
+データ要件:
+
+お知らせデータ
+特集コンテンツデータ
+
+
+レスポンシブ考慮事項:
+
+モバイルではカード表示を縦に変更
+ナビゲーションをハンバーガーメニューに変換
+
+
+
+お知らせページ (AnnouncementsPage)
+
+目的: サイト全体のお知らせや更新情報を表示
+主要コンポーネント:
+
+AnnouncementFilters: カテゴリやタグによるフィルタリング
+AnnouncementList: お知らせ一覧
+AnnouncementDetail: 選択されたお知らせの詳細
+
+
+データ要件:
+
+お知らせの完全なリスト
+カテゴリとタグデータ
+
+
+レスポンシブ考慮事項:
+
+モバイルではリスト/詳細の切り替え表示
+
+
+
+はじめにページ (IntroductionPage)
+
+目的: プロジェクトの概要と利用ガイドを提供
+主要コンポーネント:
+
+IntroductionSection: プロジェクト概要
+GuideSection: 利用ガイド
+FAQSection: よくある質問
+
+
+データ要件:
+
+静的コンテンツ（更新頻度低）
+
+
+レスポンシブ考慮事項:
+
+テキストサイズの適切な調整
+セクション間の余白の最適化
+
+
+
+ギャラリーページ (GalleryPage)
+
+目的: 創作物やグッズなどの視覚的コンテンツを展示
+主要コンポーネント:
+
+GalleryFilters: カテゴリやタグによるフィルタリング
+GalleryGrid: 画像グリッド表示
+ImageViewer: フルスクリーン画像表示
+
+
+データ要件:
+
+画像メタデータ
+カテゴリとタグデータ
+
+
+レスポンシブ考慮事項:
+
+グリッド列数の動的調整
+タッチ操作の最適化
+
+
+
+マイページ (MyPage) - 将来実装
+
+目的: ユーザー固有の情報と設定を管理
+主要コンポーネント:
+
+ProfileSection: ユーザープロフィール
+FavoritesSection: お気に入りコンテンツ
+BadgesSection: 獲得バッジ
+SettingsSection: ユーザー設定
+
+
+データ要件:
+
+ユーザープロフィール
+お気に入りリスト
+バッジデータ
+設定データ
+
+
+認証要件:
+
+メンバーログイン必須
+
+
+レスポンシブ考慮事項:
+
+セクションの折りたたみ表示
+
+
+
+区画B: Project Niferche
+メインストーリーページ (MainStoryPage)
+
+目的: Project Nifercheのメインストーリーを提供
+主要コンポーネント:
+
+StoryNavigator: 章立てナビゲーション
+StoryReader: 物語本文表示
+WorldIndicator: 現在の世界表示
+
+
+データ要件:
+
+ストーリーコンテンツ
+章立て構造
+世界関連データ
+
+
+テーマ要件:
+
+現在の世界に応じたテーマ適用
+
+
+レスポンシブ考慮事項:
+
+読みやすさを優先した文字サイズと行間
+サイドナビのオン/オフ切り替え
+
+
+
+サイドストーリーページ (SideStoryPage)
+
+目的: メインストーリーを補完する追加ストーリーを提供
+主要コンポーネント:
+
+StoryFilters: 世界やテーマでのフィルタリング
+StoryGrid: サイドストーリーのカード表示
+StoryReader: 選択したストーリーの表示
+
+
+データ要件:
+
+サイドストーリーコンテンツ
+関連タグとメタデータ
+
+
+テーマ要件:
+
+ストーリーの世界に応じたテーマ適用
+
+
+レスポンシブ考慮事項:
+
+グリッド/リスト表示の切り替え
+
+
+
+設定資料ページ (MaterialsPage)
+
+目的: 世界観や登場人物などの設定資料を提供
+主要コンポーネント:
+
+MaterialCategories: カテゴリナビゲーション
+MaterialGrid: 資料カード表示
+MaterialViewer: 選択した資料の詳細表示
+
+
+データ要件:
+
+設定資料コンテンツ
+カテゴリと階層構造
+
+
+テーマ要件:
+
+資料の世界に応じたテーマ適用
+
+
+レスポンシブ考慮事項:
+
+モバイルでのタブナビゲーション最適化
+
+
+
+区画C: Laboratory Alsarejia
+ラボラトリーホーム (LaboratoryHomePage)
+
+目的: 実験的プロジェクトのハブとして機能
+主要コンポーネント:
+
+LaboratoryIntro: 概要説明
+ProjectCards: 各プロジェクトへの導線
+LatestUpdates: 最新の実験的コンテンツ
+
+
+データ要件:
+
+プロジェクト概要データ
+更新情報
+
+
+テーマ要件:
+
+Laboratory専用テーマ
+
+
+レスポンシブ考慮事項:
+
+カードレイアウトの適応的変更
+
+
+
+Parallelページ (ParallelPage)
+
+目的: Project Nifercheの二次創作を収集・展示
+主要コンポーネント:
+
+ContentFilters: 世界やタイプでのフィルタリング
+ContentGrid: 創作物のカード表示
+ContentViewer: 選択した創作物の詳細表示
+
+
+データ要件:
+
+創作物コンテンツ
+作者情報
+カテゴリとタグ
+
+
+テーマ要件:
+
+Laboratory+対象世界の混合テーマ
+
+
+認証・権限要件:
+
+コンテンツ投稿にはメンバーログイン必須
+
+
+レスポンシブ考慮事項:
+
+投稿フォームのモバイル最適化
+
+
+
+LCBページ (LCBPage)
+
+目的: 層状管理システムによる共同創作プラットフォーム
+主要コンポーネント:
+
+LayerExplorer: 層の探索と表示
+ContentCreator: 新コンテンツ作成
+VotingSystem: 投票機能
+
+
+データ要件:
+
+層状コンテンツ
+投票データ
+ユーザー寄与度
+
+
+テーマ要件:
+
+Laboratory専用テーマ+機能特化UI
+
+
+認証・権限要件:
+
+閲覧は全ユーザー可
+投稿・投票はメンバーログイン必須
+
+
+レスポンシブ考慮事項:
+
+複雑なUIの段階的簡略化
+
+
+
+Webゲームページ (WebGamePage) - 将来実装
+
+目的: ブラウザベースの2Dアドベンチャーゲームを提供
+主要コンポーネント:
+
+GameEngine: ゲームの実行環境
+GameControls: 操作UI
+GameSaveSystem: セーブ/ロード機能
+
+
+データ要件:
+
+ゲームスクリプト
+セーブデータ
+バッジシステム連携
+
+
+テーマ要件:
+
+ゲーム専用UI
+
+
+レスポンシブ考慮事項:
+
+タッチ/キーボード操作の切り替え
+画面サイズに応じたUI調整
+
+
+
+共通ページコンポーネント
+エラーページ (ErrorPage)
+
+目的: 404やその他のエラー状態を処理
+主要コンポーネント:
+
+ErrorMessage: エラー説明
+NavigationOptions: 復帰のための選択肢
+
+
+テーマ要件:
+
+現在の世界テーマを維持
+
+
+
+ローディングステート
+
+目的: データ取得中のユーザーフィードバック
+主要コンポーネント:
+
+LoadingSpinner/Skeleton: 読み込み表示
+
+
+テーマ要件:
+
+現在の世界テーマに合わせたアニメーション
+
+
+
+検索ページ/検索結果 (SearchPage)
+
+目的: サイト全体のコンテンツを検索
+主要コンポーネント:
+
+SearchBar: 検索入力
+FilterOptions: 検索範囲の絞り込み
+SearchResults: 結果表示
+
+
+データ要件:
+
+全コンテンツのインデックス
+
+
+レスポンシブ考慮事項:
+
+結果表示の適応的レイアウト
+
+
+
+実装アプローチ
+データフェッチングパターン
+typescript// 基本的なデータフェッチングカスタムフック
+function useData<T>(
+  fetchFunction: () => Promise<T>,
+  dependencies: any[] = []
+) {
+  const [data, setData] = useState<T | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    setLoading(true);
+
+    fetchFunction()
+      .then(result => {
+        if (isMounted) {
+          setData(result);
+          setError(null);
+        }
+      })
+      .catch(err => {
+        if (isMounted) {
+          setError(err);
+          setData(null);
+        }
+      })
+      .finally(() => {
+        if (isMounted) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, dependencies);
+
+  return { data, loading, error };
+}
+エラーハンドリングパターン
+typescript// エラーバウンダリコンポーネント
+class ErrorBoundary extends React.Component
+  { children: React.ReactNode, fallback: React.ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    // エラーロギングサービスへの送信など
+    console.error("Uncaught error:", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback;
+    }
+
+    return this.props.children;
+  }
+}
+レスポンシブレイアウトパターン
+typescript// レスポンシブコンテナの例
+const ResponsiveContainer = styled.div`
+  width: 100%;
+  padding: 0 var(--spacing-md);
+  margin: 0 auto;
+  
+  @media (min-width: ${breakpoints.sm}px) {
+    max-width: 540px;
+  }
+  
+  @media (min-width: ${breakpoints.md}px) {
+    max-width: 720px;
+  }
+  
+  @media (min-width: ${breakpoints.lg}px) {
+    max-width: 960px;
+  }
+  
+  @media (min-width: ${breakpoints.xl}px) {
+    max-width: 1140px;
+  }
+  
+  @media (min-width: ${breakpoints.xxl}px) {
+    max-width: 1320px;
+  }
+`;

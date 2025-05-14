@@ -1,0 +1,140 @@
+Project Niferche 共通コンポーネント仕様
+フォルダ構造
+src/
+├── assets/           # 静的アセット（画像、SVG、フォント）
+├── core/             # コアシステム
+│   ├── components/   # 基本コンポーネント 
+│   ├── hooks/        # コアフック
+│   ├── services/     # サービス層
+│   ├── context/      # Contextプロバイダー
+│   └── utils/        # ユーティリティ関数
+├── features/         # 機能単位のモジュール
+│   ├── auth/         # 認証関連
+│   ├── story/        # ストーリー（メイン/サイド）
+│   ├── materials/    # 設定資料
+│   ├── gallery/      # ギャラリー
+│   └── laboratory/   # 研究所（LCB/Parallel）
+│       ├── lcb/      # Layered Creative Base
+│       └── parallel/ # Parallel Projects
+├── layout/           # レイアウト
+│   ├── base/         # BaseLayout
+│   ├── navigation/   # ナビゲーション関連
+│   └── specific/     # 特化レイアウト
+├── pages/            # ページコンポーネント
+├── styles/           # グローバルスタイルとテーマ
+├── types/            # グローバル型定義
+├── config/           # 設定ファイル
+├── App.tsx           # アプリのエントリポイント
+└── main.tsx          # レンダリングエントリポイント
+コア共通コンポーネント詳細仕様
+1. UniversalCard
+汎用的なカードコンポーネントで、さまざまなコンテンツタイプに対応します。
+typescriptinterface UniversalCardProps {
+  id?: string;
+  title: string;
+  description?: string;
+  imageUrl?: string;
+  linkTo?: string;
+  tags?: string[];
+  world?: WorldType;
+  attribute?: AttributeType;
+  size?: 'small' | 'medium' | 'large';
+  variant?: 'story' | 'material' | 'gallery' | 'laboratory';
+  onClick?: (id: string) => void;
+  renderHeader?: () => React.ReactNode;
+  renderFooter?: () => React.ReactNode;
+  renderContent?: () => React.ReactNode;
+  isAvailable?: boolean;
+  // 拡張性のための追加プロパティ
+}
+要件:
+
+最小構成でも見栄え良く表示（画像やテキストがない場合）
+世界観に応じたスタイルバリエーション
+レスポンシブ対応（モバイルでの表示最適化）
+カスタムヘッダー/フッター/コンテンツ領域のサポート
+アクセシビリティ対応
+
+2. BaseLayout
+サイト全体のベースとなるレイアウトコンポーネント。
+typescriptinterface BaseLayoutProps {
+  headerContent?: React.ReactNode;
+  footerContent?: React.ReactNode;
+  sidebarContent?: React.ReactNode;
+  backgroundColor?: string;
+  worldTheme?: WorldType;
+  maxWidth?: string | number;
+  padding?: string | number;
+  showBreadcrumbs?: boolean;
+  showFooter?: boolean;
+  children?: React.ReactNode;
+}
+要件:
+
+固定ヘッダー/フッター
+コンフィギュラブルなサイドバー（モバイルでは適切に変換）
+世界観テーマの適用
+パンくずリスト（オプション）
+レスポンシブ対応
+
+3. NavigationSystem
+サイト内のナビゲーションを担当するコンポーネント。
+typescriptinterface NavigationProps {
+  currentPath: string;
+  items: NavigationItem[];
+  variant?: 'sidebar' | 'dropdown' | 'tabs' | 'cards';
+  collapsible?: boolean;
+  orientation?: 'horizontal' | 'vertical';
+  depth?: number; // 表示する階層の深さ
+  onNavigate?: (path: string) => void;
+}
+
+interface NavigationItem {
+  id: string;
+  label: string;
+  path: string;
+  icon?: string;
+  children?: NavigationItem[];
+  disabled?: boolean;
+  highlight?: boolean;
+}
+要件:
+
+複数の表示バリエーション
+レスポンシブ対応（モバイルでの適切な変換）
+階層ナビゲーションのサポート
+アクティブ項目のハイライト
+キーボードナビゲーション対応
+
+4. 共通フック・コンテキスト
+useTheme
+現在のテーマを取得し操作するためのフック
+typescriptinterface ThemeContextValue {
+  currentTheme: WorldType;
+  setTheme: (theme: WorldType) => void;
+  isDarkMode: boolean;
+  toggleDarkMode: () => void;
+}
+useResponsive
+レスポンシブデザインのためのフック
+typescriptinterface ResponsiveReturn {
+  isMobile: boolean;
+  isTablet: boolean;
+  isDesktop: boolean;
+  currentBreakpoint: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+}
+useNavigation
+ナビゲーション状態を管理するためのフック
+typescriptinterface NavigationContextValue {
+  currentPath: string;
+  navigate: (path: string) => void;
+  breadcrumbs: { label: string; path: string }[];
+  previousPath: string | null;
+}
+実装ガイドライン
+
+すべてのコンポーネントはTypeScriptで厳密に型付けする
+コンポーネントはStorybook対応を考慮する（将来的に追加予定）
+テスタビリティを考慮した設計（テスト用属性の追加など）
+コンポーネントはモバイルファーストで設計する
+拡張性を最大化するためプロップドリリングを避け、コンテキストを適切に活用する

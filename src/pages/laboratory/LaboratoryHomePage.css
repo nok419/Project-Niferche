@@ -1,0 +1,229 @@
+/* src/pages/laboratory/LaboratoryHomePage.css */
+
+.laboratory-home {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.laboratory-home__header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.laboratory-home__title {
+  font-size: var(--font-size-xxl);
+  color: var(--laboratory-primary);
+  margin-bottom: 1rem;
+}
+
+.laboratory-home__description {
+  font-size: var(--font-size-md);
+  color: var(--text-secondary);
+  max-width: 800px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.laboratory-home__welcome {
+  display: flex;
+  gap: 2rem;
+  margin: 3rem 0;
+  align-items: center;
+}
+
+.laboratory-home__welcome-text {
+  flex: 1;
+}
+
+.laboratory-home__welcome-text h2 {
+  font-size: var(--font-size-xl);
+  color: var(--laboratory-primary);
+  margin-bottom: 1rem;
+}
+
+.laboratory-home__welcome-text p {
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.laboratory-home__welcome-image {
+  flex: 1;
+  max-width: 500px;
+}
+
+.laboratory-home__welcome-image img {
+  width: 100%;
+  height: auto;
+  border-radius: var(--border-radius-md);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.laboratory-home__section-title {
+  font-size: var(--font-size-lg);
+  color: var(--laboratory-primary);
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid rgba(var(--laboratory-primary-rgb), 0.2);
+}
+
+.laboratory-home__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.laboratory-home__card-link {
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.3s ease;
+}
+
+.laboratory-home__card-link:hover {
+  transform: translateY(-5px);
+}
+
+.laboratory-home__updates {
+  margin: 3rem 0;
+}
+
+.laboratory-home__updates-list {
+  background: rgba(var(--laboratory-primary-rgb), 0.05);
+  border-radius: var(--border-radius-md);
+  padding: 1.5rem;
+}
+
+.laboratory-home__update-item {
+  display: flex;
+  align-items: center;
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(var(--laboratory-primary-rgb), 0.1);
+}
+
+.laboratory-home__update-item:last-child {
+  border-bottom: none;
+}
+
+.laboratory-home__update-date {
+  flex: 0 0 100px;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.laboratory-home__update-category {
+  flex: 0 0 80px;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--border-radius-sm);
+  text-align: center;
+  margin-right: 1rem;
+}
+
+.laboratory-home__update-category:matches(.laboratory-home__update-category) {
+  background-color: rgba(var(--laboratory-primary-rgb), 0.2);
+  color: var(--laboratory-primary);
+}
+
+.laboratory-home__update-title {
+  font-weight: 500;
+}
+
+.laboratory-home__participation {
+  margin: 3rem 0;
+  background: rgba(var(--laboratory-primary-rgb), 0.1);
+  padding: 2rem;
+  border-radius: var(--border-radius-lg);
+  text-align: center;
+}
+
+.laboratory-home__participation p {
+  max-width: 800px;
+  margin: 0 auto 1.5rem;
+  line-height: 1.6;
+}
+
+.laboratory-home__buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.laboratory-home__button {
+  padding: 0.75rem 1.5rem;
+  font-size: var(--font-size-md);
+  font-weight: 500;
+  color: white;
+  background-color: var(--laboratory-primary);
+  border: none;
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.laboratory-home__button:hover {
+  background-color: var(--laboratory-accent);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.laboratory-home__button--secondary {
+  background-color: transparent;
+  color: var(--laboratory-primary);
+  border: 1px solid var(--laboratory-primary);
+}
+
+.laboratory-home__button--secondary:hover {
+  background-color: rgba(var(--laboratory-primary-rgb), 0.1);
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .laboratory-home {
+    padding: 1rem;
+  }
+  
+  .laboratory-home__welcome {
+    flex-direction: column;
+  }
+  
+  .laboratory-home__welcome-image {
+    order: -1;
+    max-width: 100%;
+    margin-bottom: 1.5rem;
+  }
+  
+  .laboratory-home__cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .laboratory-home__header {
+    margin-bottom: 1.5rem;
+  }
+  
+  .laboratory-home__title {
+    font-size: var(--font-size-xl);
+  }
+  
+  .laboratory-home__description {
+    font-size: var(--font-size-sm);
+  }
+  
+  .laboratory-home__update-item {
+    flex-wrap: wrap;
+  }
+  
+  .laboratory-home__update-date {
+    flex: 0 0 auto;
+    margin-right: 1rem;
+  }
+  
+  .laboratory-home__update-title {
+    flex: 0 0 100%;
+    margin-top: 0.5rem;
+  }
+}

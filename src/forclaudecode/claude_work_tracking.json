@@ -1,0 +1,380 @@
+{
+  "project": "Project-Niferche",
+  "lastUpdated": "2025-05-04",
+  "phases": {
+    "phase1": {
+      "name": "基本構造とコアコンポーネント",
+      "status": "completed",
+      "progress": 100,
+      "tasks": [
+        {
+          "id": "1.1",
+          "name": "新しいフォルダ構造のセットアップ",
+          "status": "completed",
+          "subtasks": [
+            { "id": "1.1.1", "name": "src/assets ディレクトリ作成", "status": "completed" },
+            { "id": "1.1.2", "name": "src/core ディレクトリ作成", "status": "completed" },
+            { "id": "1.1.3", "name": "src/features ディレクトリ作成", "status": "completed" },
+            { "id": "1.1.4", "name": "src/layout ディレクトリ作成", "status": "completed" },
+            { "id": "1.1.5", "name": "src/pages ディレクトリ作成", "status": "completed" },
+            { "id": "1.1.6", "name": "src/styles ディレクトリ作成", "status": "completed" }
+          ]
+        },
+        {
+          "id": "1.2",
+          "name": "テーマシステムの基盤実装",
+          "status": "completed",
+          "subtasks": [
+            { "id": "1.2.1", "name": "CSS変数によるテーマ定義", "status": "completed" },
+            { "id": "1.2.2", "name": "テーマ切り替え機能の実装", "status": "completed" },
+            { "id": "1.2.3", "name": "ThemeProvider実装", "status": "completed" },
+            { "id": "1.2.4", "name": "useThemeフック実装", "status": "completed" }
+          ]
+        },
+        {
+          "id": "1.3",
+          "name": "コアコンポーネントの実装",
+          "status": "completed",
+          "subtasks": [
+            { "id": "1.3.1", "name": "UniversalCardコンポーネント", "status": "completed" },
+            { "id": "1.3.2", "name": "BaseLayoutコンポーネント", "status": "completed" },
+            { "id": "1.3.3", "name": "NavigationSystemコンポーネント", "status": "completed" }
+          ]
+        },
+        {
+          "id": "1.4",
+          "name": "共通フックとユーティリティの実装",
+          "status": "completed",
+          "subtasks": [
+            { "id": "1.4.1", "name": "useResponsiveフック", "status": "completed" },
+            { "id": "1.4.2", "name": "useNavigationフック", "status": "completed" },
+            { "id": "1.4.3", "name": "データフェッチング用ユーティリティ", "status": "completed" }
+          ]
+        }
+      ]
+    },
+    "phase2": {
+      "name": "テーマシステムと世界観表現",
+      "status": "in_progress",
+      "progress": 80,
+      "tasks": [
+        {
+          "id": "2.1",
+          "name": "各世界観のテーマ詳細実装",
+          "status": "completed",
+          "subtasks": [
+            { "id": "2.1.1", "name": "Hodemeiテーマの完全実装", "status": "completed" },
+            { "id": "2.1.2", "name": "Quxeテーマの完全実装", "status": "completed" },
+            { "id": "2.1.3", "name": "Alsarejiaテーマの完全実装", "status": "completed" },
+            { "id": "2.1.4", "name": "Laboratoryテーマの完全実装", "status": "completed" }
+          ]
+        },
+        {
+          "id": "2.2",
+          "name": "アニメーションとトランジションの実装",
+          "status": "in_progress",
+          "subtasks": [
+            { "id": "2.2.1", "name": "世界観ごとのアニメーション定義", "status": "in_progress" },
+            { "id": "2.2.2", "name": "共通トランジション効果", "status": "completed" },
+            { "id": "2.2.3", "name": "アクセシビリティ対応", "status": "completed" }
+          ]
+        },
+        {
+          "id": "2.3",
+          "name": "視覚的要素の強化",
+          "status": "in_progress",
+          "subtasks": [
+            { "id": "2.3.1", "name": "アイコンセットの実装/選定", "status": "in_progress" },
+            { "id": "2.3.2", "name": "装飾要素の実装", "status": "in_progress" },
+            { "id": "2.3.3", "name": "タイポグラフィの最適化", "status": "completed" }
+          ]
+        },
+        {
+          "id": "2.4",
+          "name": "レスポンシブ対応の詳細実装",
+          "status": "in_progress",
+          "subtasks": [
+            { "id": "2.4.1", "name": "モバイル特有の要素最適化", "status": "completed" },
+            { "id": "2.4.2", "name": "タブレット向け最適化", "status": "completed" },
+            { "id": "2.4.3", "name": "デスクトップ向け拡張機能", "status": "in_progress" }
+          ]
+        }
+      ]
+    },
+    "phase3": {
+      "name": "区画ごとの主要ページ実装",
+      "status": "in_progress",
+      "progress": 85,
+      "subphases": {
+        "phase3_1": {
+          "name": "Home区画の実装",
+          "status": "completed",
+          "tasks": [
+            {
+              "id": "3.1.1",
+              "name": "ホームページ",
+              "status": "completed",
+              "subtasks": [
+                { "id": "3.1.1.1", "name": "HeroSectionコンポーネント", "status": "completed" },
+                { "id": "3.1.1.2", "name": "AnnouncementListコンポーネント", "status": "completed" },
+                { "id": "3.1.1.3", "name": "WorldsNavigationコンポーネント", "status": "completed" }
+              ]
+            },
+            {
+              "id": "3.1.2",
+              "name": "お知らせページ",
+              "status": "completed",
+              "subtasks": [
+                { "id": "3.1.2.1", "name": "AnnouncementFiltersコンポーネント", "status": "completed" },
+                { "id": "3.1.2.2", "name": "AnnouncementListコンポーネント", "status": "completed" },
+                { "id": "3.1.2.3", "name": "AnnouncementDetailコンポーネント", "status": "completed" }
+              ]
+            },
+            {
+              "id": "3.1.3",
+              "name": "ギャラリーページ",
+              "status": "completed",
+              "subtasks": [
+                { "id": "3.1.3.1", "name": "GalleryFiltersコンポーネント", "status": "completed" },
+                { "id": "3.1.3.2", "name": "GalleryGridコンポーネント", "status": "completed" },
+                { "id": "3.1.3.3", "name": "ImageViewerコンポーネント", "status": "completed" }
+              ]
+            }
+          ]
+        },
+        "phase3_2": {
+          "name": "Project Niferche区画の実装",
+          "status": "completed",
+          "tasks": [
+            {
+              "id": "3.2.1",
+              "name": "メインストーリーページ",
+              "status": "completed",
+              "subtasks": [
+                { "id": "3.2.1.1", "name": "StoryNavigatorコンポーネント", "status": "completed" },
+                { "id": "3.2.1.2", "name": "StoryReaderコンポーネント", "status": "completed" },
+                { "id": "3.2.1.3", "name": "WorldIndicatorコンポーネント", "status": "completed" }
+              ]
+            },
+            {
+              "id": "3.2.2",
+              "name": "サイドストーリーページ",
+              "status": "completed",
+              "subtasks": [
+                { "id": "3.2.2.1", "name": "StoryFiltersコンポーネント", "status": "completed" },
+                { "id": "3.2.2.2", "name": "StoryGridコンポーネント", "status": "completed" },
+                { "id": "3.2.2.3", "name": "StoryReaderコンポーネント", "status": "completed" }
+              ]
+            },
+            {
+              "id": "3.2.3",
+              "name": "設定資料ページ",
+              "status": "completed",
+              "subtasks": [
+                { "id": "3.2.3.1", "name": "MaterialCategoriesコンポーネント", "status": "completed" },
+                { "id": "3.2.3.2", "name": "MaterialGridコンポーネント", "status": "completed" },
+                { "id": "3.2.3.3", "name": "MaterialViewerコンポーネント", "status": "completed" }
+              ]
+            },
+            {
+              "id": "3.2.4",
+              "name": "世界別ナビゲーション",
+              "status": "completed",
+              "subtasks": [
+                { "id": "3.2.4.1", "name": "WorldNavigationコンポーネント", "status": "completed" },
+                { "id": "3.2.4.2", "name": "世界別ナビゲーションのデモページ", "status": "completed" },
+                { "id": "3.2.4.3", "name": "既存ページへの統合", "status": "completed" }
+              ]
+            }
+          ]
+        },
+        "phase3_3": {
+          "name": "Laboratory区画の基本実装",
+          "status": "pending",
+          "tasks": [
+            {
+              "id": "3.3.1",
+              "name": "ラボラトリーホーム",
+              "status": "pending",
+              "subtasks": [
+                { "id": "3.3.1.1", "name": "LaboratoryIntroコンポーネント", "status": "pending" },
+                { "id": "3.3.1.2", "name": "ProjectCardsコンポーネント", "status": "pending" },
+                { "id": "3.3.1.3", "name": "LatestUpdatesコンポーネント", "status": "pending" }
+              ]
+            },
+            {
+              "id": "3.3.2",
+              "name": "Parallelページ（基本機能）",
+              "status": "pending",
+              "subtasks": [
+                { "id": "3.3.2.1", "name": "ContentFiltersコンポーネント", "status": "pending" },
+                { "id": "3.3.2.2", "name": "ContentGridコンポーネント", "status": "pending" },
+                { "id": "3.3.2.3", "name": "ContentViewerコンポーネント", "status": "pending" }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "phase4": {
+      "name": "ユーザー関連機能の実装",
+      "status": "pending",
+      "progress": 0,
+      "tasks": [
+        {
+          "id": "4.1",
+          "name": "認証システムの実装",
+          "status": "pending",
+          "subtasks": [
+            { "id": "4.1.1", "name": "サインインページ", "status": "pending" },
+            { "id": "4.1.2", "name": "サインアップページ", "status": "pending" },
+            { "id": "4.1.3", "name": "メール確認ページ", "status": "pending" },
+            { "id": "4.1.4", "name": "パスワードリセットページ", "status": "pending" }
+          ]
+        },
+        {
+          "id": "4.2",
+          "name": "ユーザープロフィール機能",
+          "status": "pending",
+          "subtasks": [
+            { "id": "4.2.1", "name": "プロフィールページ", "status": "pending" },
+            { "id": "4.2.2", "name": "設定ページ", "status": "pending" },
+            { "id": "4.2.3", "name": "お気に入り管理", "status": "pending" }
+          ]
+        },
+        {
+          "id": "4.3",
+          "name": "バッジシステム",
+          "status": "pending",
+          "subtasks": [
+            { "id": "4.3.1", "name": "バッジ表示コンポーネント", "status": "pending" },
+            { "id": "4.3.2", "name": "バッジ進捗管理", "status": "pending" },
+            { "id": "4.3.3", "name": "達成通知システム", "status": "pending" }
+          ]
+        },
+        {
+          "id": "4.4",
+          "name": "パーソナライズド機能",
+          "status": "pending",
+          "subtasks": [
+            { "id": "4.4.1", "name": "お気に入りコンテンツの表示", "status": "pending" },
+            { "id": "4.4.2", "name": "最近閲覧したコンテンツの記録", "status": "pending" },
+            { "id": "4.4.3", "name": "パーソナライズされた推奨コンテンツ", "status": "pending" }
+          ]
+        }
+      ]
+    },
+    "phase5": {
+      "name": "拡張機能と最適化",
+      "status": "pending",
+      "progress": 0,
+      "tasks": [
+        {
+          "id": "5.1",
+          "name": "LCB完全実装",
+          "status": "pending",
+          "subtasks": [
+            { "id": "5.1.1", "name": "LayerExplorerコンポーネント", "status": "pending" },
+            { "id": "5.1.2", "name": "ContentCreatorコンポーネント", "status": "pending" },
+            { "id": "5.1.3", "name": "VotingSystemコンポーネント", "status": "pending" }
+          ]
+        },
+        {
+          "id": "5.2",
+          "name": "Webゲーム基盤実装",
+          "status": "pending",
+          "subtasks": [
+            { "id": "5.2.1", "name": "GameEngineコンポーネント", "status": "pending" },
+            { "id": "5.2.2", "name": "GameControlsコンポーネント", "status": "pending" },
+            { "id": "5.2.3", "name": "GameSaveSystemコンポーネント", "status": "pending" }
+          ]
+        },
+        {
+          "id": "5.3",
+          "name": "検索システム強化",
+          "status": "pending",
+          "subtasks": [
+            { "id": "5.3.1", "name": "全文検索機能", "status": "pending" },
+            { "id": "5.3.2", "name": "フィルタリング強化", "status": "pending" },
+            { "id": "5.3.3", "name": "検索結果最適化", "status": "pending" }
+          ]
+        },
+        {
+          "id": "5.4",
+          "name": "パフォーマンス最適化",
+          "status": "pending",
+          "subtasks": [
+            { "id": "5.4.1", "name": "コード分割と遅延ロード", "status": "pending" },
+            { "id": "5.4.2", "name": "画像最適化", "status": "pending" },
+            { "id": "5.4.3", "name": "キャッシング戦略", "status": "pending" }
+          ]
+        }
+      ]
+    },
+    "continuousTasks": {
+      "name": "クロスフェーズの継続的作業",
+      "tasks": [
+        {
+          "id": "C.1",
+          "name": "ドキュメンテーション",
+          "status": "ongoing",
+          "subtasks": [
+            { "id": "C.1.1", "name": "コンポーネント仕様書", "status": "ongoing" },
+            { "id": "C.1.2", "name": "開発者向けガイド", "status": "ongoing" },
+            { "id": "C.1.3", "name": "ユーザーガイド", "status": "ongoing" }
+          ]
+        },
+        {
+          "id": "C.2",
+          "name": "テスト",
+          "status": "ongoing",
+          "subtasks": [
+            { "id": "C.2.1", "name": "ユニットテスト", "status": "ongoing" },
+            { "id": "C.2.2", "name": "統合テスト", "status": "ongoing" },
+            { "id": "C.2.3", "name": "ユーザビリティテスト", "status": "ongoing" }
+          ]
+        },
+        {
+          "id": "C.3",
+          "name": "アクセシビリティ対応",
+          "status": "ongoing",
+          "subtasks": [
+            { "id": "C.3.1", "name": "WCAG基準への準拠", "status": "ongoing" },
+            { "id": "C.3.2", "name": "キーボード操作のサポート", "status": "ongoing" },
+            { "id": "C.3.3", "name": "スクリーンリーダー対応", "status": "ongoing" },
+            { "id": "C.3.4", "name": "reduced-motion対応", "status": "ongoing" }
+          ]
+        },
+        {
+          "id": "C.4",
+          "name": "モックデータ管理",
+          "status": "ongoing",
+          "subtasks": [
+            { "id": "C.4.1", "name": "モックデータの作成と更新", "status": "ongoing" },
+            { "id": "C.4.2", "name": "データ構造の整合性確保", "status": "ongoing" },
+            { "id": "C.4.3", "name": "バックエンド連携の準備", "status": "ongoing" }
+          ]
+        }
+      ]
+    }
+  },
+  "conversations": [],
+  "currentPhase": "phase3",
+  "currentTask": "3.2.4",
+  "completedTasks": [
+    "1.1", "1.2", "1.3", "1.4", 
+    "2.1", 
+    "3.1.1", "3.1.2", "3.1.3", 
+    "3.2.1", "3.2.2", "3.2.3", "3.2.4"
+  ],
+  "pendingDecisions": [],
+  "dependencies": {
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "typescript": "5.2.2",
+    "react-router-dom": "6.20.0",
+    "aws-amplify": "6.0.0",
+    "@aws-amplify/ui-react": "latest",
+    "react-helmet-async": "2.0.3"
+  }
+}

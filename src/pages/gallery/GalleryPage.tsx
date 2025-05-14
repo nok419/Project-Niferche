@@ -1,148 +1,127 @@
-// src/pages/gallery/GalleryPage.tsx
-import { useEffect, useState } from 'react';
-import {
-  View,
-  Heading,
-  ToggleButtonGroup,
-  ToggleButton,
-  Collection,
-  Button,
-} from '@aws-amplify/ui-react';
+import React, { useState } from 'react';
+import { MOCK_CONTENTS } from '../../forclaudecode/mock_data';
+import { UniversalCard } from '../../core/components/UniversalCard';
+import { useResponsive } from '../../core/hooks/useResponsive';
+import './GalleryPage.css';
 
-import { AdvancedFilterPanel } from '../../components/common/AdvancedFilterPanel';
-import { SkeletonList } from '../../components/common/SkeletonList';
-import { ErrorAlert } from '../../components/common/ErrorAlert';
-import { LibraryListViewItem } from '../../components/common/LibraryListViewItem';
-import { ContentCard } from '../../components/common/ContentCard';
-import { useInfiniteContents } from '../../hooks/useInfiniteContents';
+// フィルタータイプ
+type GalleryFilter = 'all' | 'hodemei' | 'quxe' | 'alsarejia';
 
-interface GalleryItem {
-  id: string;
-  path: string;
-  title: string;
-  description?: string;
-  category: string;
-  tags: string[];
-  isAvailable: boolean;
+// フィルターコンポーネント
+interface IFilterProps {
+  activeFilter: GalleryFilter;
+  onFilterChange: (filter: GalleryFilter) => void;
 }
 
-export const GalleryPage = () => {
-  const [filterCondition, setFilterCondition] = useState({
-    keyword: '',
-    world: 'all',
-    tags: [] as string[],
-  });
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-
-  const {
-    items,
-    loadMore,
-    hasMore,
-    loading,
-    error,
-    resetItems,
-  } = useInfiniteContents();
-
-  useEffect(() => {
-    resetItems();
-    loadMore({
-      filter: {
-        // e.g. category eq "illustration" など
-      },
-      limit: 6,
-    });
-  }, [filterCondition, resetItems, loadMore]);
-
-  const mappedItems: GalleryItem[] = items.map((item) => ({
-    id: item.id,
-    path: '/images/sc.jpg',  // ダミー
-    title: item.title ?? 'No Title',
-    description: item.description,
-    category: item.primaryCategory ?? 'illustration',
-    tags: item.tags ?? [],
-    isAvailable: true,
-  }));
-
+const GalleryFilter: React.FC<IFilterProps> = ({ activeFilter, onFilterChange }) => {
+  const filters = [
+    { id: 'all', label: 'すべて' },
+    { id: 'hodemei', label: 'Hodemei' },
+    { id: 'quxe', label: 'Quxe' },
+    { id: 'alsarejia', label: 'Alsarejia' }
+  ];
+  
   return (
-    <View width="100%" minHeight="100vh" padding="1rem">
-      <Heading level={1} marginBottom="1rem">
-        ギャラリー
-      </Heading>
-
-      <AdvancedFilterPanel
-        availableTags={['キャラクター', '風景', 'Quxe', 'Alsarejia']}
-        availableWorlds={['QUXE', 'HODEMEI', 'ALSAREJIA']}
-        onChange={(newFilter) => setFilterCondition(newFilter)}
-      />
-
-      <ToggleButtonGroup
-        value={viewMode}
-        isExclusive
-        onChange={(value) => setViewMode(value as 'grid' | 'list')}
-        margin="1rem 0"
-      >
-        <ToggleButton value="grid">グリッド</ToggleButton>
-        <ToggleButton value="list">リスト</ToggleButton>
-      </ToggleButtonGroup>
-
-      {error && <ErrorAlert errorMessage={error.message || 'エラーが発生しました'} onDismiss={() => {}} />}
-
-      {loading && items.length === 0 ? (
-        <SkeletonList count={4} />
-      ) : (
-        <>
-          {viewMode === 'grid' && (
-            <Collection
-              type="grid"
-              items={mappedItems}
-              gap="medium"
-              templateColumns={{
-                base: '1fr',
-                medium: '1fr 1fr',
-                large: '1fr 1fr 1fr',
-              }}
-            >
-              {(item) => (
-                <ContentCard
-                  key={item.id}
-                  title={item.title}
-                  description={item.description}
-                  imagePath={item.path}
-                  linkTo={`/gallery/view/${item.id}`}
-                />
-              )}
-            </Collection>
-          )}
-
-          {viewMode === 'list' && (
-            <Collection
-              type="list"
-              items={mappedItems}
-              gap="small"
-            >
-              {(item) => (
-                <LibraryListViewItem
-                  key={item.id}
-                  id={item.id}
-                  title={item.title}
-                  description={item.description}
-                  isAvailable={item.isAvailable}
-                  linkTo={`/gallery/view/${item.id}`}
-                  category={item.category}
-                  tags={item.tags}
-                />
-              )}
-            </Collection>
-          )}
-        </>
-      )}
-
-      {hasMore && !loading && (
-        <Button onClick={() => loadMore()} marginTop="1rem">
-          さらに読み込む
-        </Button>
-      )}
-      {loading && items.length > 0 && <SkeletonList count={2} />}
-    </View>
+    <div className="gallery-filter">
+      {filters.map(filter => (
+        <button
+          key={filter.id}
+          className={`filter-button ${activeFilter === filter.id ? 'active' : ''} ${filter.id}`}
+          onClick={() => onFilterChange(filter.id as GalleryFilter)}
+        >
+          {filter.label}
+        </button>
+      ))}
+    </div>
   );
 };
+
+// ギャラリーヘッダーコンポーネント
+const GalleryHeader: React.FC = () => (
+  <header className="gallery-header">
+    <h1>ギャラリー</h1>
+    <p className="gallery-description">
+      Project Nifercheの世界を彩るイラスト、コンセプトアート、写真などの視覚的コンテンツをご覧いただけます。
+      世界ごとのユニークな雰囲気をお楽しみください。
+    </p>
+  </header>
+);
+
+// ギャラリーページコンポーネント
+const GalleryPage: React.FC = () => {
+  const [activeFilter, setActiveFilter] = useState<GalleryFilter>('all');
+  const { isDesktop, isTablet } = useResponsive();
+  
+  // イメージタイプのコンテンツのみを取得し、フィルターを適用
+  const galleryItems = MOCK_CONTENTS.filter(content => 
+    content.type === 'image' && (activeFilter === 'all' || content.world === activeFilter)
+  );
+  
+  // レスポンシブなグリッドの列数を計算
+  const getGridColumns = () => {
+    if (isDesktop) return 3;
+    if (isTablet) return 2;
+    return 1;
+  };
+  
+  return (
+    <div className="gallery-page">
+      <GalleryHeader />
+      
+      <GalleryFilter 
+        activeFilter={activeFilter} 
+        onFilterChange={setActiveFilter} 
+      />
+      
+      {galleryItems.length > 0 ? (
+        <div 
+          className="gallery-grid" 
+          style={{ gridTemplateColumns: `repeat(${getGridColumns()}, 1fr)` }}
+        >
+          {galleryItems.map(item => (
+            <UniversalCard
+              key={item.id}
+              title={item.title}
+              description={item.description}
+              imageUrl={item.imageUrl || '/images/fallback.jpg'}
+              tags={item.tags}
+              world={item.world}
+              size="large"
+              variant="gallery"
+              renderFooter={() => (
+                <div className="universal-card__footer">
+                  {`${item.author} • ${new Date(item.createdAt).toLocaleDateString('ja-JP')}`}
+                </div>
+              )}
+              onClick={() => console.log(`Clicked gallery item: ${item.id}`)}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="empty-state">
+          <p>表示できるギャラリーアイテムがありません。</p>
+          <button 
+            className="reset-button"
+            onClick={() => setActiveFilter('all')}
+          >
+            フィルターをリセット
+          </button>
+        </div>
+      )}
+      
+      <div className="gallery-info">
+        <h2>ギャラリーについて</h2>
+        <p>
+          ここに表示されているすべての作品はProject Nifercheの公式イラストです。
+          権利や利用に関する詳細は、<a href="/system/rights" className="info-link">権利表記</a>ページをご覧ください。
+        </p>
+        <p>
+          Laboratoryセクションでは、皆様の創作作品も投稿いただけます。
+          詳しくは<a href="/laboratory" className="info-link">Laboratory</a>をご覧ください。
+        </p>
+      </div>
+    </div>
+  );
+};
+
+export default GalleryPage;
