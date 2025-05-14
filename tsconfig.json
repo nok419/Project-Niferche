@@ -6,20 +6,28 @@
     "module": "ESNext",
     "skipLibCheck": false,
     "esModuleInterop": true,
-
+    
     /* Bundler mode */
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-
+    
+    /* Additional TypeScript 5.8 options */
+    "verbatimModuleSyntax": true,
+    "allowJs": true,
+    "forceConsistentCasingInFileNames": true,
+    
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noUncheckedIndexedAccess": true
   },
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]
