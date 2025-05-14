@@ -34,19 +34,19 @@
 
 ### AWS Amplify関連の更新
 
-AWS Amplify関連パッケージの整理と最適化:
-- **aws-amplify**: 6.0.0 → 6.0.16
-- **@aws-amplify/ui-react**: 6.0.0 → 6.1.5
-- **@aws-amplify/backend**: 1.16.1 → 1.18.2
-- **@aws-amplify/backend-cli**: 0.9.7 → 0.11.0
-- **@aws-amplify/cli**: グローバルパッケージとして削除（ローカル依存関係から除外）
+AWS Amplify関連パッケージの最新化:
+- **aws-amplify**: 6.0.0 → 6.14.4
+- **@aws-amplify/ui-react**: 6.0.0 → 6.11.2
+- **@aws-amplify/backend**: 1.16.1 (最新の安定バージョン)
+- **@aws-amplify/backend-cli**: 0.9.7 → 1.7.2 (最新の安定バージョン)
+- **@aws-amplify/cli**: グローバルパッケージとして使用（ローカル依存関係から除外）
 
 ### ESLint更新
 
 リンティングツールの更新:
 - **@typescript-eslint/eslint-plugin**: 7.4.0 → 8.0.0
 - **@typescript-eslint/parser**: 7.4.0 → 8.0.0
-- **eslint**: ESLint v8.57.0を維持（eslint-plugin-react-hooks との互換性のため）
+- **eslint**: eslint-plugin-react-hooks との互換性のため v8.57.0 を使用
 
 ## 依存関係の最適化
 
