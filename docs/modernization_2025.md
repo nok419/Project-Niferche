@@ -43,10 +43,10 @@ AWS Amplify関連パッケージの整理と最適化:
 
 ### ESLint更新
 
-リンティングツールの最新化:
-- **eslint**: 8.57.0 → 9.0.0
+リンティングツールの更新:
 - **@typescript-eslint/eslint-plugin**: 7.4.0 → 8.0.0
 - **@typescript-eslint/parser**: 7.4.0 → 8.0.0
+- **eslint**: ESLint v8.57.0を維持（eslint-plugin-react-hooks との互換性のため）
 
 ## 依存関係の最適化
 
