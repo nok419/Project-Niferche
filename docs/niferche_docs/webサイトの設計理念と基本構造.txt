@@ -1,0 +1,275 @@
+設計理念と基本構造
+設計思想
+json{
+  "設計思想": {
+    "全体概要": "Project NifercheのWebフロントエンドはReact(typescript)によるSPA構成。AWS Amplify Gen2でのバックエンド連携（ユーザー認証・GraphQL・Storage）を採用し、堅牢かつ拡張性のあるアーキテクチャを構築。コンポーネントの再利用・レイアウトの抽象化・Context/Hooksによる状態管理など、保守性と拡張性を意識したモジュール分割を実現している。",
+    "方針": [
+      "「世界観の閲覧」「設定資料の表示」「ユーザー投稿/ギャラリー機能」などのユースケースに応じて、「pages/」「components/」「theme/」などを明確に分割し、機能単位の責務を区分。",
+      "React Routerを用いた複数レイアウト構成 (MainLayout, CallLayout, LaboratoryLayout, LibraryLayout, MaterialsRootLayout など) によるページのレイアウト差別化を実現。",
+      "SessionContextで認証状態をグローバル管理し、ProtectedRouteコンポーネントでアクセス制御を行うセキュリティ設計。",
+      "AWS Amplify UIライブラリをベースにしつつ、独自のtheme設計を適用することでブランド性と統一性を両立。",
+      "Mockデータを活用した開発と本番APIとの円滑な接続のため、services/層とhooks/層で実装を分離。"
+    ]
+  }
+}
+技術スタック
+json{
+  "技術スタック": {
+    "フロントエンド": [
+      "React v18",
+      "TypeScript",
+      "React Router v6",
+      "AWS Amplify UI React v6.0.0以上",
+      "Vite (ビルド・ローカル開発環境)"
+    ],
+    "バックエンド": [
+      "AWS Amplify Gen2（Auth, Data, Storage）",
+      "GraphQL API（Amplify DataのdefineData機能）",
+      "S3 (Amplify Storage) - パスベースのアクセス制御を実装",
+      "Cognito (Amplify Auth) - カスタム認証フロー設定済み",
+      "DynamoDB (GraphQL APIのデータストア) - 型定義完了"
+    ],
+    "状態管理": [
+      "React Context API (SessionContext, BadgeContext)",
+      "カスタムフック (useContent, useInfiniteContents, useBadges)"
+    ],
+    "UI/UX": [
+      "複数テーマ対応（niferche-theme, laboratory-theme, materials-theme）",
+      "レスポンシブデザイン（ブレークポイント: base, medium, large）", 
+      "アクセシビリティ対応コンポーネント"
+    ],
+    "その他": [
+      "react-helmet-async（SEO・メタタグ制御）",
+      "モジュラー型アーキテクチャ（機能ごとの分離設計）",
+      "モバイルファースト・レスポンシブデザイン"
+    ]
+  }
+}
+主要な機能
+json{
+  "主要な機能": {
+    "世界観表現": [
+      "複数世界（Hodemei, Quxe, Alsarejia）の表現に特化したテーマ設計",
+      "各世界の特性を反映したUIとレイアウト",
+      "世界観ごとのテーマカラーと視覚言語の統一"
+    ],
+    "ユーザー認証": [
+      "SessionContextを用いた認証状態のグローバル管理",
+      "ProtectedRouteコンポーネントによるアクセス制御",
+      "権限レベルに応じた機能制限（AccessLevel enum）",
+      "モック認証システムの実装（将来的にAmplify Auth連携）"
+    ],
+    "コンテンツ表示": [
+      "メイン/サイドストーリーのリッチテキスト表示（StoryViewer）",
+      "設定資料の階層的表示（Materials系コンポーネント）",
+      "ギャラリー機能（グリッド/リスト切替表示）",
+      "無限スクロール対応コンテンツローディング"
+    ],
+    "設定資料管理": [
+      "世界別・カテゴリ別の資料整理",
+      "高度なフィルタリング（AdvancedFilterPanel）",
+      "DocumentCard/LibraryListViewItemによる統一的な表示形式",
+      "モーダル詳細表示（DetailModal）"
+    ],
+    "レイアウトシステム": [
+      "目的別レイアウト（MainLayout, CallLayout, LibraryLayout, LaboratoryLayout, MaterialsRootLayout）",
+      "共通ヘッダー・フッター（NavigationHeader）",
+      "レスポンシブ対応ナビゲーション（モバイル/デスクトップ）",
+      "パンくずリスト（BreadcrumbNav）"
+    ],
+    "インタラクション": [
+      "コンテンツカード（ContentCard）によるインタラクティブな表示",
+      "モーダルダイアログ（DetailModal）によるコンテンツ詳細表示",
+      "お気に入り機能（FavoriteButton）",
+      "バッジ獲得通知システム（BadgeNotification）"
+    ],
+    "管理者機能": [
+      "管理者ダッシュボード（AdminDashboardPage）",
+      "ユーザー認証情報に基づく権限管理",
+      "コンテンツ管理・編集機能"
+    ]
+  }
+}
+実装状況
+json{
+  "実装状況": {
+    "フロントエンド": "基本的なUI・UXフローは完成。各世界のテーマ設計、ページレイアウト、コンポーネント分割などの基盤が整備されている。",
+    "コンポーネント": "基本的なUI部品（ContentCard, LibraryListViewItem, AdvancedFilterPanel, DetailModal等）が完成済み。再利用性の高いコンポーネントライブラリとして機能している。",
+    "ページ構成": "主要ページ（Call, Library, Laboratory, Materials, Gallery等）は実装済み。各ページは対応するレイアウトコンポーネント内にマウントされる設計となっている。",
+    "状態管理": "SessionContext, BadgeContextなどで基本的な状態管理を実装。ただし、バックエンド連携部分はモックデータを使用している状態。",
+    "レスポンシブデザイン": "モバイルファーストの設計で、ブレークポイントに応じたレイアウト変更を実装。特にNavigationHeaderはモバイル/デスクトップで表示切替。",
+    "テーマ設計": "基本テーマ（niferche-theme）と専用テーマ（laboratory-theme, materials-theme）を実装済み。それぞれの世界観に合わせた視覚言語を表現。",
+    "アクセス制御": "ProtectedRouteコンポーネントとAccessLevel enumによる権限管理の基盤を実装。ユーザーロールに応じた機能制限が可能。",
+    "AWS連携": {
+      "Auth": "resource.ts定義完了。サインイン・サインアップのUIフロー実装済み（モックデータ使用）。",
+      "Data": "GraphQLスキーマ定義（Content, UserProfile, Badge等）完了。DynamoDBテーブル構造設計済み。",
+      "Storage": "S3バケット設定とパスベースのアクセス制御ポリシーを定義済み。ファイル読み取りの基本機能を実装。"
+    },
+    "コンテンツ表示": "StoryViewerやContentDisplayコンポーネントによるリッチテキスト表示を実装。モックデータでの動作確認済み。",
+    "フィルタリング": "AdvancedFilterPanelを用いた複合条件検索のUI部分を実装。実際のバックエンド連携は未実装。"
+  }
+}
+今後のタスク・改善が必要な点
+json{
+  "今後のタスク・改善が必要な点": [
+    {
+      "タスク": "AWS Amplifyの本番環境デプロイと連携",
+      "詳細": "定義済みのAuth/Data/Storageリソースを実際にAWS環境にデプロイし、フロントエンドとの連携を確立する。環境変数の設定やプロビジョニングの実行。",
+      "優先度": "高",
+      "作業見積": "2-3週間"
+    },
+    {
+      "タスク": "モックデータから実APIへの移行",
+      "詳細": "現在のMockStorageServiceやuseContentフックをAmplify APIに接続。実データでの動作検証と必要に応じた調整。",
+      "優先度": "高",
+      "作業見積": "2週間"
+    },
+    {
+      "タスク": "認証・認可フローの完成",
+      "詳細": "Cognitoを用いた本格的な認証システムの導入。ユーザー登録、パスワードリセット、属性管理などの完全実装。",
+      "優先度": "高",
+      "作業見積": "1-2週間"
+    },
+    {
+      "タスク": "コンテンツ投稿・編集機能の実装",
+      "詳細": "ユーザーによるコンテンツ作成・編集機能の実装。ファイルアップロード、リッチテキストエディタ、タグ付けなどの機能を含む。",
+      "優先度": "中",
+      "作業見積": "3-4週間"
+    },
+    {
+      "タスク": "検索・フィルタリング機能の高度化",
+      "詳細": "ElasticsearchやAppSync Searchを用いた高度な検索機能の実装。ファセット検索、インクリメンタル検索などの導入。",
+      "優先度": "中",
+      "作業見積": "2-3週間"
+    },
+    {
+      "タスク": "パフォーマンス最適化",
+      "詳細": "コード分割（Code Splitting）、メモ化（React.memo, useMemo, useCallback）、画像最適化などによるパフォーマンス向上。",
+      "優先度": "中",
+      "作業見積": "1-2週間"
+    },
+    {
+      "タスク": "UI/UXの洗練",
+      "詳細": "アニメーション・トランジションの追加、インタラクション改善、フィードバック機構強化などによるUX向上。",
+      "優先度": "中",
+      "作業見積": "2-3週間"
+    },
+    {
+      "タスク": "テスト整備とCI/CD構築",
+      "詳細": "単体テスト、統合テスト、E2Eテストの整備とGitHub ActionsやAmplify Consoleを用いたCI/CDパイプラインの構築。",
+      "優先度": "中",
+      "作業見積": "2-4週間"
+    },
+    {
+      "タスク": "多言語対応（i18n）",
+      "詳細": "React-i18nextなどのライブラリを用いた国際化対応。翻訳ファイルの整備と言語切替機能の実装。",
+      "優先度": "低",
+      "作業見積": "2-3週間"
+    },
+    {
+      "タスク": "アクセシビリティ対応強化",
+      "詳細": "WAI-ARIAの完全準拠、キーボードナビゲーション改善、スクリーンリーダー対応などアクセシビリティの向上。",
+      "優先度": "低",
+      "作業見積": "1-2週間"
+    },
+    {
+      "タスク": "ブロックチェーン連携（LCB投票システム）",
+      "詳細": "投票権管理のためのブロックチェーン連携機能の開発。スマートコントラクト設計と連携APIの実装。",
+      "優先度": "低",
+      "作業見積": "4-8週間"
+    }
+  ]
+}
+コードマップ
+json{
+  "コードマップ": {
+    "トップレベル構成": [
+      "src/ - フロントエンドのメインソースコード",
+      "├── App.tsx - ルーティング構成のエントリポイント",
+      "├── main.tsx - アプリケーションのブートストラップ",
+      "├── index.css - グローバルスタイル",
+      "├── components/ - 再利用可能なUIコンポーネント",
+      "├── pages/ - 各ページのコンポーネント",
+      "├── contexts/ - React Context (状態管理)",
+      "├── hooks/ - カスタムReact Hooks",
+      "├── services/ - APIやストレージとの連携",
+      "├── theme/ - テーマ定義とスタイル",
+      "├── types/ - TypeScript型定義",
+      "├── utils/ - ユーティリティ関数",
+      "└── assets/ - 静的アセット",
+      "amplify/ - AWSバックエンド定義",
+      "├── auth/ - Cognito認証設定",
+      "├── data/ - GraphQLスキーマ定義",
+      "├── storage/ - S3ストレージ設定",
+      "└── backend.ts - バックエンド統合エントリポイント"
+    ],
+    "コンポーネント階層": {
+      "layout": "レイアウト関連コンポーネント（MainLayout, CallLayout, LibraryLayout, LaboratoryLayout, MaterialsRootLayout, AuthLayout）",
+      "common": "共通UI部品（ContentCard, DetailModal, LibraryListViewItem, LoadingSpinner, ErrorAlert, AdvancedFilterPanel, BreadcrumbNav, FavoriteButton等）",
+      "content": "コンテンツ表示系（StoryViewer, ContentDisplay, LazyContent）",
+      "materials": "設定資料系（MaterialsLayout, DocumentCard, DocumentFilter）",
+      "user": "ユーザー関連（UserMenu）",
+      "badges": "バッジシステム関連（BadgeNotification）",
+      "auth": "認証関連（ProtectedRoute）"
+    },
+    "ページ構成": {
+      "MainPage": "トップページ（LCB/Project Nifercheの概要）",
+      "call/": "理念・お知らせ等（AboutPage, PhilosophyPage, NewsPage）",
+      "library/": "ストーリーコンテンツ（MainStory, SideStory, LibraryOverviewPage等）",
+      "laboratory/": "研究施設関連（LaboratoryPage, ObservationPage, GuidePage, IdeaLibrary等）",
+      "materials/": "設定資料（MaterialsAbout, CommonSettings, QuxeMaterials, HodemeiMaterials, AlsarejiaMaterials等）",
+      "gallery/": "イラスト等（GalleryPage, GalleryDetailPage）",
+      "system/": "システム関連（RightsPage, TermsPage, GuidelinesPage, auth/）",
+      "user/": "ユーザーページ（ProfilePage, FavoritesPage）",
+      "admin/": "管理ページ（AdminDashboardPage）"
+    },
+    "状態管理": {
+      "contexts/SessionContext.tsx": "ユーザーセッション管理（ログイン状態、ユーザー情報）",
+      "contexts/BadgeContext.tsx": "バッジシステム管理（獲得バッジ、進捗状況）",
+      "hooks/useContent.tsx": "コンテンツ操作（取得、作成、更新）",
+      "hooks/useInfiniteContents.tsx": "無限スクロール対応コンテンツ取得",
+      "hooks/useBadges.ts": "バッジ関連操作"
+    },
+    "バックエンド定義": {
+      "amplify/auth/resource.ts": "Cognito認証設定（ユーザープール、属性、パスワードポリシー等）",
+      "amplify/data/resource.ts": "GraphQLスキーマ定義（Content, Comment, UserProfile, Badge, BadgeProgress等）",
+      "amplify/storage/resource.ts": "S3ストレージ設定（パスベースアクセス制御、ライフサイクル等）",
+      "amplify/backend.ts": "バックエンド統合エントリポイント"
+    }
+  }
+}
+LCB実装ロードマップ
+json{
+  "LCB実装ロードマップ": {
+    "フェーズ1（基盤構築）": [
+      "フロントエンド基盤の完成（現在完了）",
+      "AWS Amplifyによるバックエンド連携（進行中）",
+      "認証・認可システムの本格実装",
+      "基本的なコンテンツ管理機能の実装"
+    ],
+    "フェーズ2（コア機能拡充）": [
+      "コンテンツの層状管理システム構築（表層/下層分離機能）",
+      "投稿・編集・共有機能の強化",
+      "高度な検索・フィルタリング機能",
+      "バッジシステムの本格運用"
+    ],
+    "フェーズ3（社会インフラ構築）": [
+      "ブロックチェーンによる投票・評価システムのプロトタイプ開発",
+      "コミュニティ機能（コメント、フォロー、通知等）の実装",
+      "多言語対応と国際化",
+      "アクセシビリティの強化"
+    ],
+    "フェーズ4（長期運用基盤）": [
+      "ブロックチェーン基盤の本番展開とコミュニティ運営",
+      "コンテンツIPとしての展開と事業化",
+      "外部サービス連携API拡充",
+      "長期アーカイブと永続的保存システムの構築"
+    ],
+    "留意点": [
+      "各フェーズで「コミュニティフィードバック」を取り入れ、ユーザー視点を反映",
+      "透明性の高い運営と定期的な情報発信",
+      "エネルギー効率の良いブロックチェーン技術（Layer2等）の採用",
+      "長期的な持続可能性を考慮した設計と実装"
+    ]
+  }
+}

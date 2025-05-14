@@ -12,48 +12,49 @@ export const auth = defineAuth({
   loginWith: {
     email: {
       verificationEmailSubject: 'Project Niferche - メールアドレス確認',
-      verificationEmailBody: (code: string) => 
-        `Project Nifercheへようこそ。\n認証コード：${code}\nこのコードの有効期限は15分です。`,
-      verificationEmailStyle: 'CODE'
+      verificationEmailStyle: 'CODE',
+      verificationEmailBody: (createCode) => {
+        const code = createCode();
+        return `Project Nifercheへようこそ。\n認証コード：${code}\nこのコードの有効期限は15分です。`;
+      }
     }
   },
   
   // ユーザー属性定義
   userAttributes: {
-    // 表示名（必須）
+    // 表示名
     nickname: {
-      mutable: true,
-      required: true
+      mutable: true
     },
-    // メールアドレス（必須）
+    // メールアドレス
     email: {
-      mutable: true,
-      required: true
+      mutable: true
     },
     // ユーザー名（オプション）
     preferredUsername: {
-      mutable: true,
-      required: false
+      mutable: true
     },
     // プロフィール情報（オプション）
     profile: {
-      mutable: true,
-      required: false
+      mutable: true
     },
-    // 区画アクセス権限（カスタム属性）
-    'custom:sectionAccess': {
-      mutable: true,
-      required: false
-    },
-    // ユーザーロール（カスタム属性）
-    'custom:userRole': {
-      mutable: true,
-      required: false
-    },
-    // Laboratory固有ロール（カスタム属性）
-    'custom:laboratoryRole': {
-      mutable: true,
-      required: false
+    // カスタム属性
+    custom: {
+      // 区画アクセス権限
+      sectionAccess: {
+        type: "string",
+        mutable: true
+      },
+      // ユーザーロール
+      userRole: {
+        type: "string",
+        mutable: true
+      },
+      // Laboratory固有ロール
+      laboratoryRole: {
+        type: "string",
+        mutable: true
+      }
     }
   },
   
@@ -61,7 +62,10 @@ export const auth = defineAuth({
   multifactor: {
     mode: 'OPTIONAL',
     sms: {
-      smsMessage: (code) => `認証コード: ${code}`
+      smsMessage: (createCode) => {
+        const code = createCode();
+        return `認証コード: ${code}`;
+      }
     }
   },
   
@@ -76,12 +80,14 @@ export const auth = defineAuth({
   
   // アカウント回復オプション
   accountRecovery: 'EMAIL_ONLY',
-  
-  // 検証メッセージ設定
-  verificationMessages: {
-    email: {
-      subject: 'Project Niferche - メールアドレス確認',
-      message: (code: string) => `Project Nifercheへようこそ。\n認証コード：${code}\nこのコードの有効期限は15分です。`
-    }
-  }
+
+  // ユーザーグループを定義
+  groups: [
+    'ADMIN',
+    'CONTENT_MANAGER',
+    'CONTENT_CREATOR',
+    'LABORATORY_ADMIN',
+    'LABORATORY_USER',
+    'USER'
+  ]
 });

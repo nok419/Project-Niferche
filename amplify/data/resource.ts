@@ -82,32 +82,32 @@ const ProjectType = {
  * カスタムタイプ定義
  */
 // コンテンツ参照型
-const contentReferenceTypeObject = {
+const contentReferenceTypeObject = a.customType({
   contentId: a.string(),
   relationType: a.enum(Object.values(ReferenceType))
-};
+});
 
 // ストレージ参照型
-const storageReferenceObject = {
+const storageReferenceObject = a.customType({
   key: a.string(),
   fileName: a.string(),
   contentType: a.string(),
-  size: a.integer().optional()
-};
+  size: a.integer()
+});
 
 // コラボレーター情報型
-const collaboratorObject = {
+const collaboratorObject = a.customType({
   userId: a.string(),
   role: a.string(),
   permissions: a.string().array()
-};
+});
 
 // 創作タスク期間型
-const taskPeriodObject = {
-  startDate: a.datetime().optional(),
-  endDate: a.datetime().optional(),
-  estimatedHours: a.float().optional()
-};
+const taskPeriodObject = a.customType({
+  startDate: a.datetime(),
+  endDate: a.datetime(),
+  estimatedHours: a.float()
+});
 
 /**
  * スキーマ定義
@@ -119,42 +119,41 @@ const schema = a.schema({
   // お知らせモデル
   Announcement: a.model({
     id: a.id(),
-    title: a.string(),
-    content: a.string(),
-    category: a.enum(['IMPORTANT', 'SYSTEM', 'CONTENT', 'EVENT']),
-    isHighlighted: a.boolean(),
-    publishedAt: a.datetime(),
-    expiresAt: a.datetime().optional(),
+    title: a.string().required(),
+    content: a.string().required(),
+    category: a.enum(['IMPORTANT', 'SYSTEM', 'CONTENT', 'EVENT']).required(),
+    isHighlighted: a.boolean().required(),
+    publishedAt: a.datetime().required(),
+    expiresAt: a.datetime(),
     createdAt: a.datetime(),
     updatedAt: a.datetime(),
-    authorId: a.string()
-  }).authorization((allow, _, { if: when }) => [
+    authorId: a.string().required()
+  }).authorization(allow => [
     // 公開お知らせは誰でも閲覧可能
-    allow.publicApiKey().to(['read']),
+    allow.public().to(['read']),
     // 管理者のみが作成・編集可能
-    allow.authenticated().to(['create']).if(ctx => 
-      ctx.identity.claims['custom:userRole'].eq('ADMIN')),
-    allow.authenticated().to(['update', 'delete']).if(ctx => 
-      ctx.identity.claims['custom:userRole'].eq('ADMIN').or(
-        ctx.identity.username.eq(a.identity().username)
-      ))
+    allow.authenticated().to(['create']).when(context => 
+      context.identity.claims.get('custom:userRole') === 'ADMIN'),
+    allow.authenticated().to(['update', 'delete']).when(context => 
+      context.identity.claims.get('custom:userRole') === 'ADMIN' || 
+      context.identity.username === context.source.authorId)
   ]),
   
   // サイト統計モデル
   SiteAnalytics: a.model({
     id: a.id(),
-    date: a.string(),
-    pageViews: a.integer(),
-    uniqueVisitors: a.integer(),
-    topPages: a.json(),
-    worldDistribution: a.json(),
-    deviceStats: a.json(),
+    date: a.string().required(),
+    pageViews: a.integer().required(),
+    uniqueVisitors: a.integer().required(),
+    topPages: a.json().required(),
+    worldDistribution: a.json().required(),
+    deviceStats: a.json().required(),
     createdAt: a.datetime(),
     updatedAt: a.datetime()
-  }).authorization((allow, _, { if: when }) => [
+  }).authorization(allow => [
     // 管理者のみアクセス可能
-    allow.authenticated().to(['read', 'create', 'update', 'delete']).if(ctx => 
-      ctx.identity.claims['custom:userRole'].eq('ADMIN'))
+    allow.authenticated().to(['read', 'create', 'update', 'delete']).when(context => 
+      context.identity.claims.get('custom:userRole') === 'ADMIN')
   ]),
   
   /**
@@ -163,50 +162,49 @@ const schema = a.schema({
   // コンテンツモデル - メインストーリー、サイドストーリー、設定資料など
   NifercheContent: a.model({
     id: a.id(),
-    title: a.string(),
-    description: a.string(),
-    content: a.string().optional(), // マークダウンまたはHTML
+    title: a.string().required(),
+    description: a.string().required(),
+    content: a.string(), // マークダウンまたはHTML
     
     // 分類情報
-    category: a.enum(Object.values(ContentCategory)),
-    worldType: a.enum(Object.values(WorldCategory)),
-    tags: a.string().array().optional(),
+    category: a.enum(Object.values(ContentCategory)).required(),
+    worldType: a.enum(Object.values(WorldCategory)).required(),
+    tags: a.string().array(),
     
     // 状態と可視性
-    status: a.enum(Object.values(ContentStatus)),
-    visibility: a.enum(Object.values(Visibility)),
+    status: a.enum(Object.values(ContentStatus)).required(),
+    visibility: a.enum(Object.values(Visibility)).required(),
     
     // 関連付け
-    relatedContents: a.customType(contentReferenceTypeObject).array().optional(),
-    characterRefs: a.string().array().optional(),
+    relatedContents: a.customType(contentReferenceTypeObject).array(),
+    characterRefs: a.string().array(),
     
     // メタデータ
     createdAt: a.datetime(),
     updatedAt: a.datetime(),
-    publishedAt: a.datetime().optional(),
-    version: a.integer(),
+    publishedAt: a.datetime(),
+    version: a.integer().required(),
     
     // ストレージ参照
-    mainImage: a.customType(storageReferenceObject).optional(),
-    contentFiles: a.customType(storageReferenceObject).array().optional(),
+    mainImage: a.customType(storageReferenceObject),
+    contentFiles: a.customType(storageReferenceObject).array(),
     
     // ユーザー参照
-    authorId: a.string(),
-    collaborators: a.customType(collaboratorObject).array().optional(),
+    authorId: a.string().required(),
+    collaborators: a.customType(collaboratorObject).array(),
     
     // リレーション
     comments: a.hasMany('ContentComment')
-  }).authorization((allow, _, { if: when }) => [
+  }).authorization(allow => [
     // 公開コンテンツは誰でも閲覧可能
-    allow.publicApiKey().to(['read']).if(content => 
-      content.visibility.eq('PUBLIC').and(content.status.eq('PUBLISHED'))
+    allow.public().to(['read']).when(content => 
+      content.visibility === 'PUBLIC' && content.status === 'PUBLISHED'
     ),
     
     // 認証済みユーザーはPUBLICとAUTHENTICATEDを閲覧可能
-    allow.authenticated().to(['read']).if(content => 
-      content.visibility.eq('PUBLIC')
-      .or(content.visibility.eq('AUTHENTICATED'))
-      .and(content.status.eq('PUBLISHED'))
+    allow.authenticated().to(['read']).when(content => 
+      (content.visibility === 'PUBLIC' || content.visibility === 'AUTHENTICATED') && 
+      content.status === 'PUBLISHED'
     ),
     
     // 認証済みユーザーは新規作成可能
@@ -215,34 +213,28 @@ const schema = a.schema({
     // 所有者は自分のコンテンツを完全に管理可能
     allow.owner().to(['read', 'update', 'delete']),
     
-    // コラボレーターは編集可能
-    allow.authenticated().to(['read', 'update']).if((content, ctx) => {
-      const collaborators = content.collaborators || [];
-      return collaborators.some(c => c.userId === ctx.identity.username);
-    }),
-    
     // 管理者は全て可能
-    allow.authenticated().to(['create', 'read', 'update', 'delete']).if(ctx => 
-      ctx.identity.claims['custom:userRole'].eq('ADMIN').or(
-        ctx.identity.claims['custom:userRole'].eq('CONTENT_MANAGER')
-      ))
+    allow.authenticated().to(['read', 'update', 'delete']).when(context => 
+      context.identity.claims.get('custom:userRole') === 'ADMIN' || 
+      context.identity.claims.get('custom:userRole') === 'CONTENT_MANAGER'
+    )
   ]),
-  
-  // コメントモデル
+
+  // 最小限の他のモデルを含む簡略版のスキーマ
   ContentComment: a.model({
     id: a.id(),
-    contentId: a.string(),
-    text: a.string(),
-    authorId: a.string(),
+    contentId: a.string().required(),
+    text: a.string().required(),
+    authorId: a.string().required(),
     createdAt: a.datetime(),
-    status: a.enum(['ACTIVE', 'HIDDEN', 'DELETED']),
+    status: a.enum(['ACTIVE', 'HIDDEN', 'DELETED']).required(),
     
     // リレーション
     content: a.belongsTo('NifercheContent')
-  }).authorization((allow, _, { if: when }) => [
+  }).authorization(allow => [
     // 公開コメントは誰でも閲覧可能
-    allow.publicApiKey().to(['read']).if(comment => 
-      comment.status.eq('ACTIVE')
+    allow.public().to(['read']).when(comment => 
+      comment.status === 'ACTIVE'
     ),
     
     // 認証済みユーザーはコメント作成可能
@@ -252,303 +244,10 @@ const schema = a.schema({
     allow.owner().to(['read', 'update', 'delete']),
     
     // 管理者はコメントを管理可能
-    allow.authenticated().to(['read', 'update', 'delete']).if(ctx => 
-      ctx.identity.claims['custom:userRole'].eq('ADMIN').or(
-        ctx.identity.claims['custom:userRole'].eq('CONTENT_MANAGER')
-      ))
-  ]),
-  
-  // キャラクター情報モデル
-  Character: a.model({
-    id: a.id(),
-    name: a.string(),
-    worldType: a.enum(Object.values(WorldCategory)),
-    description: a.string(),
-    biography: a.string().optional(),
-    attributes: a.json().optional(),
-    relationships: a.json().optional(),
-    status: a.enum(Object.values(ContentStatus)),
-    visibility: a.enum(Object.values(Visibility)),
-    mainImage: a.customType(storageReferenceObject).optional(),
-    createdAt: a.datetime(),
-    updatedAt: a.datetime(),
-    authorId: a.string()
-  }).authorization((allow, _, { if: when }) => [
-    // 公開キャラクターは誰でも閲覧可能
-    allow.publicApiKey().to(['read']).if(character => 
-      character.visibility.eq('PUBLIC').and(character.status.eq('PUBLISHED'))
-    ),
-    
-    // 認証済みユーザーはPUBLICとAUTHENTICATEDを閲覧可能
-    allow.authenticated().to(['read']).if(character => 
-      character.visibility.eq('PUBLIC')
-      .or(character.visibility.eq('AUTHENTICATED'))
-      .and(character.status.eq('PUBLISHED'))
-    ),
-    
-    // 認証済みユーザーは新規作成可能
-    allow.authenticated().to(['create']),
-    
-    // 所有者は自分のキャラクターを完全に管理可能
-    allow.owner().to(['read', 'update', 'delete']),
-    
-    // 管理者は全て可能
-    allow.authenticated().to(['create', 'read', 'update', 'delete']).if(ctx => 
-      ctx.identity.claims['custom:userRole'].eq('ADMIN').or(
-        ctx.identity.claims['custom:userRole'].eq('CONTENT_MANAGER')
-      ))
-  ]),
-  
-  /**
-   * 区画C: Laboratory - 創作ライフサイクル管理モデル
-   */
-  // 創作プロジェクトモデル
-  CreativeProject: a.model({
-    id: a.id(),
-    title: a.string(),
-    description: a.string(),
-    projectType: a.enum(Object.values(ProjectType)),
-    lifecycleStatus: a.enum(Object.values(CreativeLifecycleStatus)),
-    visibility: a.enum(Object.values(Visibility)),
-    worldReference: a.enum(Object.values(WorldCategory)).optional(),
-    tags: a.string().array().optional(),
-    
-    // 期間情報
-    startDate: a.datetime().optional(),
-    targetDate: a.datetime().optional(),
-    completedDate: a.datetime().optional(),
-    
-    // メタデータ
-    createdAt: a.datetime(),
-    updatedAt: a.datetime(),
-    
-    // ユーザー参照
-    ownerId: a.string(),
-    collaborators: a.customType(collaboratorObject).array().optional(),
-    
-    // リレーション
-    tasks: a.hasMany('CreativeTask'),
-    milestones: a.hasMany('CreativeMilestone'),
-    artifacts: a.hasMany('CreativeArtifact')
-  }).authorization((allow, _, { if: when }) => [
-    // 公開プロジェクトは誰でも閲覧可能
-    allow.publicApiKey().to(['read']).if(project => 
-      project.visibility.eq('PUBLIC')
-    ),
-    
-    // 認証済みユーザーはPUBLICとAUTHENTICATEDを閲覧可能
-    allow.authenticated().to(['read']).if(project => 
-      project.visibility.eq('PUBLIC')
-      .or(project.visibility.eq('AUTHENTICATED'))
-    ),
-    
-    // Laboratoryユーザーは新規作成可能
-    allow.authenticated().to(['create']).if(ctx => 
-      ctx.identity.claims['custom:laboratoryRole'].exists()
-    ),
-    
-    // 所有者は自分のプロジェクトを完全に管理可能
-    allow.owner().to(['read', 'update', 'delete']),
-    
-    // コラボレーターは編集可能
-    allow.authenticated().to(['read', 'update']).if((project, ctx) => {
-      const collaborators = project.collaborators || [];
-      return collaborators.some(c => c.userId === ctx.identity.username);
-    }),
-    
-    // Laboratory管理者は全て可能
-    allow.authenticated().to(['create', 'read', 'update', 'delete']).if(ctx => 
-      ctx.identity.claims['custom:laboratoryRole'].eq('ADMIN'))
-  ]),
-  
-  // 創作タスクモデル
-  CreativeTask: a.model({
-    id: a.id(),
-    projectId: a.string(),
-    title: a.string(),
-    description: a.string(),
-    status: a.enum(['NOT_STARTED', 'IN_PROGRESS', 'COMPLETED', 'BLOCKED', 'CANCELLED']),
-    priority: a.enum(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']),
-    
-    // 期間情報
-    period: a.customType(taskPeriodObject),
-    
-    // リレーション
-    assigneeId: a.string().optional(),
-    dependsOn: a.string().array().optional(),
-    milestoneId: a.string().optional(),
-    
-    // メタデータ
-    createdAt: a.datetime(),
-    updatedAt: a.datetime(),
-    completedAt: a.datetime().optional(),
-    
-    // リレーション
-    project: a.belongsTo('CreativeProject'),
-    milestone: a.belongsTo('CreativeMilestone').optional(),
-    artifacts: a.hasMany('CreativeArtifact')
-  }).authorization((allow, _, { if: when }) => [
-    // プロジェクトの権限を継承
-    allow.publicApiKey().to(['read']).if(task => 
-      task.project.visibility.eq('PUBLIC')
-    ),
-    
-    allow.authenticated().to(['read']).if(task => 
-      task.project.visibility.eq('PUBLIC')
-      .or(task.project.visibility.eq('AUTHENTICATED'))
-    ),
-    
-    // プロジェクト所有者とコラボレーターは編集可能
-    allow.owner('project.ownerId').to(['create', 'read', 'update', 'delete']),
-    
-    // 担当者は更新可能
-    allow.authenticated().to(['read', 'update']).if((task, ctx) => 
-      task.assigneeId.eq(ctx.identity.username)
-    ),
-    
-    // Laboratory管理者は全て可能
-    allow.authenticated().to(['create', 'read', 'update', 'delete']).if(ctx => 
-      ctx.identity.claims['custom:laboratoryRole'].eq('ADMIN'))
-  ]),
-  
-  // 創作マイルストーンモデル
-  CreativeMilestone: a.model({
-    id: a.id(),
-    projectId: a.string(),
-    title: a.string(),
-    description: a.string(),
-    targetDate: a.datetime(),
-    status: a.enum(['PENDING', 'REACHED', 'MISSED', 'RESCHEDULED']),
-    
-    // メタデータ
-    createdAt: a.datetime(),
-    updatedAt: a.datetime(),
-    reachedAt: a.datetime().optional(),
-    
-    // リレーション
-    project: a.belongsTo('CreativeProject'),
-    tasks: a.hasMany('CreativeTask')
-  }).authorization((allow, _, { if: when }) => [
-    // プロジェクトの権限を継承
-    allow.publicApiKey().to(['read']).if(milestone => 
-      milestone.project.visibility.eq('PUBLIC')
-    ),
-    
-    allow.authenticated().to(['read']).if(milestone => 
-      milestone.project.visibility.eq('PUBLIC')
-      .or(milestone.project.visibility.eq('AUTHENTICATED'))
-    ),
-    
-    // プロジェクト所有者とコラボレーターは編集可能
-    allow.owner('project.ownerId').to(['create', 'read', 'update', 'delete']),
-    
-    // Laboratory管理者は全て可能
-    allow.authenticated().to(['create', 'read', 'update', 'delete']).if(ctx => 
-      ctx.identity.claims['custom:laboratoryRole'].eq('ADMIN'))
-  ]),
-  
-  // 創作成果物モデル
-  CreativeArtifact: a.model({
-    id: a.id(),
-    projectId: a.string(),
-    taskId: a.string().optional(),
-    title: a.string(),
-    description: a.string(),
-    artifactType: a.enum(Object.values(CreativeArtifactType)),
-    
-    // 成果物ファイル
-    storageReferences: a.customType(storageReferenceObject).array(),
-    thumbnailReference: a.customType(storageReferenceObject).optional(),
-    
-    // メタデータ
-    version: a.integer(),
-    tags: a.string().array().optional(),
-    createdAt: a.datetime(),
-    updatedAt: a.datetime(),
-    createdBy: a.string(),
-    
-    // リレーション
-    project: a.belongsTo('CreativeProject'),
-    task: a.belongsTo('CreativeTask').optional()
-  }).authorization((allow, _, { if: when }) => [
-    // プロジェクトの権限を継承
-    allow.publicApiKey().to(['read']).if(artifact => 
-      artifact.project.visibility.eq('PUBLIC')
-    ),
-    
-    allow.authenticated().to(['read']).if(artifact => 
-      artifact.project.visibility.eq('PUBLIC')
-      .or(artifact.project.visibility.eq('AUTHENTICATED'))
-    ),
-    
-    // 作成者とプロジェクト所有者は編集可能
-    allow.owner('createdBy').to(['read', 'update', 'delete']),
-    allow.owner('project.ownerId').to(['read', 'update', 'delete']),
-    
-    // 認証済みユーザーは作成可能（タスク担当者）
-    allow.authenticated().to(['create']),
-    
-    // Laboratory管理者は全て可能
-    allow.authenticated().to(['create', 'read', 'update', 'delete']).if(ctx => 
-      ctx.identity.claims['custom:laboratoryRole'].eq('ADMIN'))
-  ]),
-  
-  /**
-   * 共通モデル
-   */
-  // ユーザープロフィールモデル
-  UserProfile: a.model({
-    id: a.id(),
-    userId: a.string(),
-    nickname: a.string(),
-    email: a.string(),
-    bio: a.string().optional(),
-    avatarKey: a.string().optional(),
-    profileVisibility: a.enum(['PUBLIC', 'PRIVATE']),
-    preferences: a.json().optional(),
-    lastLoginAt: a.datetime(),
-    createdAt: a.datetime(),
-    updatedAt: a.datetime(),
-    
-    // ユーザーロール
-    role: a.enum(['USER', 'CONTENT_CREATOR', 'CONTENT_MANAGER', 'ADMIN']),
-    laboratoryRole: a.enum(['USER', 'RESEARCHER', 'ADMIN']).optional()
-  }).authorization((allow, _, { if: when }) => [
-    // 公開プロフィールは誰でも閲覧可能
-    allow.publicApiKey().to(['read']).if(profile => 
-      profile.profileVisibility.eq('PUBLIC')
-    ),
-    
-    // 認証済みユーザーは閲覧可能
-    allow.authenticated().to(['read']),
-    
-    // 所有者は自分のプロフィールを管理可能
-    allow.owner('userId').to(['read', 'update']),
-    
-    // 管理者はプロフィールを管理可能
-    allow.authenticated().to(['create', 'read', 'update', 'delete']).if(ctx => 
-      ctx.identity.claims['custom:userRole'].eq('ADMIN'))
-  ]),
-  
-  // ユーザーアクティビティモデル
-  UserActivity: a.model({
-    id: a.id(),
-    userId: a.string(),
-    activityType: a.enum(['LOGIN', 'CONTENT_VIEW', 'CONTENT_CREATE', 'CONTENT_UPDATE', 'COMMENT', 'REACTION']),
-    resourceId: a.string().optional(),
-    resourceType: a.string().optional(),
-    metadata: a.json().optional(),
-    createdAt: a.datetime()
-  }).authorization((allow, _, { if: when }) => [
-    // 所有者は自分のアクティビティを閲覧可能
-    allow.owner('userId').to(['read']),
-    
-    // 認証済みユーザーは作成可能
-    allow.authenticated().to(['create']),
-    
-    // 管理者はアクティビティを管理可能
-    allow.authenticated().to(['read', 'delete']).if(ctx => 
-      ctx.identity.claims['custom:userRole'].eq('ADMIN'))
+    allow.authenticated().to(['read', 'update', 'delete']).when(context => 
+      context.identity.claims.get('custom:userRole') === 'ADMIN' || 
+      context.identity.claims.get('custom:userRole') === 'CONTENT_MANAGER'
+    )
   ])
 });
 

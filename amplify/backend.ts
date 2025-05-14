@@ -3,6 +3,27 @@ import { defineBackend } from '@aws-amplify/backend';
 import { auth } from './auth/resource';
 import { data } from './data/resource';
 import { storage } from './storage/resource';
+import { defineParam } from '@aws-amplify/backend';
+
+/**
+ * 共有パラメータ定義
+ */
+// ストレージ設定
+const storageBucketName = defineParam('storageBucketName', 'niferche-content');
+const awsRegion = defineParam('awsRegion', 'ap-northeast-1');
+
+// セクション区分
+const sectionA = defineParam('sectionA', 'site');
+const sectionB = defineParam('sectionB', 'niferche');
+const sectionC = defineParam('sectionC', 'laboratory');
+
+// 世界設定
+const worldTypes = defineParam('worldTypes', ['COMMON', 'HODEMEI', 'QUXE', 'ALSAREJIA']);
+
+// セキュリティ設定
+const mfaEnabled = defineParam('mfaEnabled', true);
+const sessionDuration = defineParam('sessionDuration', 86400); // 24時間（秒単位）
+const refreshTokenValidity = defineParam('refreshTokenValidity', 30); // 30日（日単位）
 
 /**
  * バックエンド統合定義
@@ -14,51 +35,6 @@ const backend = defineBackend({
   auth,
   data,
   storage
-});
-
-// 環境変数と設定情報の出力
-backend.addOutput({
-  // ストレージ設定
-  storage: {
-    bucket_name: 'niferche-content',
-    aws_region: 'ap-northeast-1'
-  },
-  
-  // データ関連情報
-  data: {
-    // セクション区分
-    section_info: {
-      section_a: 'site',
-      section_b: 'niferche',
-      section_c: 'laboratory'
-    },
-    
-    // 世界設定
-    world_types: [
-      'COMMON',
-      'HODEMEI',
-      'QUXE',
-      'ALSAREJIA'
-    ]
-  },
-  
-  // 認証関連情報
-  auth: {
-    // ユーザーグループ
-    user_groups: [
-      'ADMIN',
-      'CONTENT_MANAGER',
-      'CONTENT_CREATOR',
-      'LABORATORY_ADMIN',
-      'LABORATORY_USER',
-      'USER'
-    ],
-    
-    // セキュリティ設定
-    mfa_enabled: true,
-    session_duration: 86400, // 24時間（秒単位）
-    refresh_token_validity: 30 // 30日（日単位）
-  }
 });
 
 // バックエンドリソースのエクスポート

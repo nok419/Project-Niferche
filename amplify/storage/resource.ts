@@ -15,22 +15,22 @@ export const storage = defineStorage({
      */
     // サイト管理用ファイル
     'site/announcements/*': [
-      allow.guest.to(['read']),
-      allow.authenticated().to(['read']).if(ctx => 
-        ctx.identity.claims['custom:userRole'].exists()
+      allow.guest().to(['read']),
+      allow.authenticated().to(['read']).when(context => 
+        context.identity.claims.has('custom:userRole')
       ),
-      allow.authenticated().to(['write', 'delete']).if(ctx => 
-        ctx.identity.claims['custom:userRole'].eq('ADMIN')
+      allow.authenticated().to(['write', 'delete']).when(context => 
+        context.identity.claims.get('custom:userRole') === 'ADMIN'
       )
     ],
     'site/analytics/*': [
-      allow.authenticated().to(['read', 'write', 'delete']).if(ctx => 
-        ctx.identity.claims['custom:userRole'].eq('ADMIN')
+      allow.authenticated().to(['read', 'write', 'delete']).when(context => 
+        context.identity.claims.get('custom:userRole') === 'ADMIN'
       )
     ],
     'site/system/*': [
-      allow.authenticated().to(['read', 'write', 'delete']).if(ctx => 
-        ctx.identity.claims['custom:userRole'].eq('ADMIN')
+      allow.authenticated().to(['read', 'write', 'delete']).when(context => 
+        context.identity.claims.get('custom:userRole') === 'ADMIN'
       )
     ],
     
@@ -39,83 +39,76 @@ export const storage = defineStorage({
      */
     // メインストーリー（公式コンテンツ）
     'niferche/official/main-story/*': [
-      allow.guest.to(['read']),
-      allow.authenticated().to(['write', 'delete']).if(ctx => 
-        ctx.identity.claims['custom:userRole'].eq('ADMIN').or(
-          ctx.identity.claims['custom:userRole'].eq('CONTENT_MANAGER')
-        )
+      allow.guest().to(['read']),
+      allow.authenticated().to(['write', 'delete']).when(context => 
+        context.identity.claims.get('custom:userRole') === 'ADMIN' || 
+        context.identity.claims.get('custom:userRole') === 'CONTENT_MANAGER'
       )
     ],
     
     // サイドストーリー（公式コンテンツ）
     'niferche/official/side-story/*': [
-      allow.guest.to(['read']),
-      allow.authenticated().to(['write', 'delete']).if(ctx => 
-        ctx.identity.claims['custom:userRole'].eq('ADMIN').or(
-          ctx.identity.claims['custom:userRole'].eq('CONTENT_MANAGER')
-        )
+      allow.guest().to(['read']),
+      allow.authenticated().to(['write', 'delete']).when(context => 
+        context.identity.claims.get('custom:userRole') === 'ADMIN' || 
+        context.identity.claims.get('custom:userRole') === 'CONTENT_MANAGER'
       )
     ],
     
     // 設定資料（世界ごと、公式コンテンツ）
     'niferche/official/materials/common/*': [
-      allow.guest.to(['read']),
-      allow.authenticated().to(['write', 'delete']).if(ctx => 
-        ctx.identity.claims['custom:userRole'].eq('ADMIN').or(
-          ctx.identity.claims['custom:userRole'].eq('CONTENT_MANAGER')
-        )
+      allow.guest().to(['read']),
+      allow.authenticated().to(['write', 'delete']).when(context => 
+        context.identity.claims.get('custom:userRole') === 'ADMIN' || 
+        context.identity.claims.get('custom:userRole') === 'CONTENT_MANAGER'
       )
     ],
     'niferche/official/materials/hodemei/*': [
-      allow.guest.to(['read']),
-      allow.authenticated().to(['write', 'delete']).if(ctx => 
-        ctx.identity.claims['custom:userRole'].eq('ADMIN').or(
-          ctx.identity.claims['custom:userRole'].eq('CONTENT_MANAGER')
-        )
+      allow.guest().to(['read']),
+      allow.authenticated().to(['write', 'delete']).when(context => 
+        context.identity.claims.get('custom:userRole') === 'ADMIN' || 
+        context.identity.claims.get('custom:userRole') === 'CONTENT_MANAGER'
       )
     ],
     'niferche/official/materials/quxe/*': [
-      allow.guest.to(['read']),
-      allow.authenticated().to(['write', 'delete']).if(ctx => 
-        ctx.identity.claims['custom:userRole'].eq('ADMIN').or(
-          ctx.identity.claims['custom:userRole'].eq('CONTENT_MANAGER')
-        )
+      allow.guest().to(['read']),
+      allow.authenticated().to(['write', 'delete']).when(context => 
+        context.identity.claims.get('custom:userRole') === 'ADMIN' || 
+        context.identity.claims.get('custom:userRole') === 'CONTENT_MANAGER'
       )
     ],
     'niferche/official/materials/alsarejia/*': [
-      allow.guest.to(['read']),
-      allow.authenticated().to(['write', 'delete']).if(ctx => 
-        ctx.identity.claims['custom:userRole'].eq('ADMIN').or(
-          ctx.identity.claims['custom:userRole'].eq('CONTENT_MANAGER')
-        )
+      allow.guest().to(['read']),
+      allow.authenticated().to(['write', 'delete']).when(context => 
+        context.identity.claims.get('custom:userRole') === 'ADMIN' || 
+        context.identity.claims.get('custom:userRole') === 'CONTENT_MANAGER'
       )
     ],
     
     // キャラクター情報（公式コンテンツ）
     'niferche/official/characters/*': [
-      allow.guest.to(['read']),
-      allow.authenticated().to(['write', 'delete']).if(ctx => 
-        ctx.identity.claims['custom:userRole'].eq('ADMIN').or(
-          ctx.identity.claims['custom:userRole'].eq('CONTENT_MANAGER')
-        )
+      allow.guest().to(['read']),
+      allow.authenticated().to(['write', 'delete']).when(context => 
+        context.identity.claims.get('custom:userRole') === 'ADMIN' || 
+        context.identity.claims.get('custom:userRole') === 'CONTENT_MANAGER'
       )
     ],
     
     // ユーザー作成コンテンツ（公開）
-    'niferche/user/{entity_id}/public/*': [
-      allow.guest.to(['read']),
-      allow.entity('identity').to(['read', 'write', 'delete'])
+    'niferche/user/{identity_id}/public/*': [
+      allow.guest().to(['read']),
+      allow.owner().to(['read', 'write', 'delete'])
     ],
     
     // ユーザー作成コンテンツ（認証済みユーザーのみ閲覧可能）
-    'niferche/user/{entity_id}/authenticated/*': [
+    'niferche/user/{identity_id}/authenticated/*': [
       allow.authenticated().to(['read']),
-      allow.entity('identity').to(['read', 'write', 'delete'])
+      allow.owner().to(['read', 'write', 'delete'])
     ],
     
     // ユーザー作成コンテンツ（非公開）
-    'niferche/user/{entity_id}/private/*': [
-      allow.entity('identity').to(['read', 'write', 'delete'])
+    'niferche/user/{identity_id}/private/*': [
+      allow.owner().to(['read', 'write', 'delete'])
     ],
     
     /**
@@ -123,51 +116,50 @@ export const storage = defineStorage({
      */
     // 公開プロジェクト
     'laboratory/projects/public/*': [
-      allow.guest.to(['read']),
-      allow.authenticated().to(['write']).if(ctx => 
-        ctx.identity.claims['custom:laboratoryRole'].exists()
+      allow.guest().to(['read']),
+      allow.authenticated().to(['write']).when(context => 
+        context.identity.claims.has('custom:laboratoryRole')
       ),
-      allow.authenticated().to(['delete']).if(ctx => 
-        ctx.identity.claims['custom:laboratoryRole'].eq('ADMIN')
+      allow.authenticated().to(['delete']).when(context => 
+        context.identity.claims.get('custom:laboratoryRole') === 'ADMIN'
       )
     ],
     
     // 認証済みユーザー向けプロジェクト
     'laboratory/projects/authenticated/*': [
       allow.authenticated().to(['read']),
-      allow.authenticated().to(['write']).if(ctx => 
-        ctx.identity.claims['custom:laboratoryRole'].exists()
+      allow.authenticated().to(['write']).when(context => 
+        context.identity.claims.has('custom:laboratoryRole')
       ),
-      allow.authenticated().to(['delete']).if(ctx => 
-        ctx.identity.claims['custom:laboratoryRole'].eq('ADMIN')
+      allow.authenticated().to(['delete']).when(context => 
+        context.identity.claims.get('custom:laboratoryRole') === 'ADMIN'
       )
     ],
     
     // ユーザー固有のプロジェクト
-    'laboratory/user/{entity_id}/*': [
-      allow.entity('identity').to(['read', 'write', 'delete']),
-      allow.authenticated().to(['read']).if(ctx => 
-        ctx.identity.claims['custom:laboratoryRole'].eq('ADMIN')
+    'laboratory/user/{identity_id}/*': [
+      allow.owner().to(['read', 'write', 'delete']),
+      allow.authenticated().to(['read']).when(context => 
+        context.identity.claims.get('custom:laboratoryRole') === 'ADMIN'
       )
     ],
     
     // 創作タスク成果物
-    'laboratory/artifacts/{entity_id}/*': [
-      allow.entity('identity').to(['read', 'write', 'delete']),
-      allow.authenticated().to(['read']).if((_, ctx) => {
-        // プロジェクトのコラボレーターもアクセス可能（実際の実装ではリレーションをチェック）
-        return ctx.identity.claims['custom:laboratoryRole'].exists();
-      })
+    'laboratory/artifacts/{identity_id}/*': [
+      allow.owner().to(['read', 'write', 'delete']),
+      allow.authenticated().to(['read']).when(context => 
+        context.identity.claims.has('custom:laboratoryRole')
+      )
     ],
     
     // Laboratory実験コンテンツ
     'laboratory/experiments/*': [
-      allow.guest.to(['read']),
-      allow.authenticated().to(['write']).if(ctx => 
-        ctx.identity.claims['custom:laboratoryRole'].exists()
+      allow.guest().to(['read']),
+      allow.authenticated().to(['write']).when(context => 
+        context.identity.claims.has('custom:laboratoryRole')
       ),
-      allow.authenticated().to(['delete']).if(ctx => 
-        ctx.identity.claims['custom:laboratoryRole'].eq('ADMIN')
+      allow.authenticated().to(['delete']).when(context => 
+        context.identity.claims.get('custom:laboratoryRole') === 'ADMIN'
       )
     ],
     
@@ -176,51 +168,49 @@ export const storage = defineStorage({
      */
     // 共有アセット
     'assets/shared/*': [
-      allow.guest.to(['read']),
-      allow.authenticated().to(['write']).if(ctx => 
-        ctx.identity.claims['custom:userRole'].eq('CONTENT_CREATOR').or(
-          ctx.identity.claims['custom:userRole'].eq('CONTENT_MANAGER').or(
-            ctx.identity.claims['custom:userRole'].eq('ADMIN')
-          )
-        )
+      allow.guest().to(['read']),
+      allow.authenticated().to(['write']).when(context => 
+        context.identity.claims.get('custom:userRole') === 'CONTENT_CREATOR' || 
+        context.identity.claims.get('custom:userRole') === 'CONTENT_MANAGER' || 
+        context.identity.claims.get('custom:userRole') === 'ADMIN'
       ),
-      allow.authenticated().to(['delete']).if(ctx => 
-        ctx.identity.claims['custom:userRole'].eq('ADMIN')
+      allow.authenticated().to(['delete']).when(context => 
+        context.identity.claims.get('custom:userRole') === 'ADMIN'
       )
     ],
     
     // 公開画像
     'assets/images/*': [
-      allow.guest.to(['read']),
+      allow.guest().to(['read']),
       allow.authenticated().to(['write']),
-      allow.authenticated().to(['delete']).if(ctx => 
-        ctx.identity.claims['custom:userRole'].eq('ADMIN')
+      allow.authenticated().to(['delete']).when(context => 
+        context.identity.claims.get('custom:userRole') === 'ADMIN'
       )
     ],
     
     // プロフィール画像
-    'profiles/{entity_id}/*': [
-      allow.guest.to(['read']),
-      allow.entity('identity').to(['read', 'write']),
-      allow.authenticated().to(['delete']).if(ctx => 
-        ctx.identity.claims['custom:userRole'].eq('ADMIN')
+    'profiles/{identity_id}/*': [
+      allow.guest().to(['read']),
+      allow.owner().to(['read', 'write']),
+      allow.authenticated().to(['delete']).when(context => 
+        context.identity.claims.get('custom:userRole') === 'ADMIN'
       )
     ],
     
     // 一時ファイル（48時間後に自動削除）
-    'temp/{entity_id}/*': [
-      allow.entity('identity').to(['read', 'write']),
-      allow.authenticated().to(['read', 'delete']).if(ctx => 
-        ctx.identity.claims['custom:userRole'].eq('ADMIN')
+    'temp/{identity_id}/*': [
+      allow.owner().to(['read', 'write']),
+      allow.authenticated().to(['read', 'delete']).when(context => 
+        context.identity.claims.get('custom:userRole') === 'ADMIN'
       )
     ],
     
     // サムネイル
     'thumbnails/*': [
-      allow.guest.to(['read']),
+      allow.guest().to(['read']),
       allow.authenticated().to(['write']),
-      allow.authenticated().to(['delete']).if(ctx => 
-        ctx.identity.claims['custom:userRole'].eq('ADMIN')
+      allow.authenticated().to(['delete']).when(context => 
+        context.identity.claims.get('custom:userRole') === 'ADMIN'
       )
     ]
   })
