@@ -8,10 +8,11 @@
 2. [依存関係の最適化](#依存関係の最適化)
 3. [TypeScriptの強化](#typescriptの強化)
 4. [ビルドシステムの最適化](#ビルドシステムの最適化)
-5. [AWS Amplify Gen 2の強化](#aws-amplify-gen-2の強化)
-6. [セキュリティの強化](#セキュリティの強化)
-7. [パフォーマンスの最適化](#パフォーマンスの最適化)
-8. [改善されたメンテナンス性](#改善されたメンテナンス性)
+5. [テスト環境の整備](#テスト環境の整備)
+6. [AWS Amplify Gen 2の強化](#aws-amplify-gen-2の強化)
+7. [セキュリティの強化](#セキュリティの強化)
+8. [パフォーマンスの最適化](#パフォーマンスの最適化)
+9. [改善されたメンテナンス性](#改善されたメンテナンス性)
 
 ## パッケージとライブラリの更新
 
@@ -33,13 +34,27 @@
 
 ### AWS Amplify関連の更新
 
+AWS Amplify関連パッケージの整理と最適化:
 - **aws-amplify**: 6.0.0 → 6.0.16
 - **@aws-amplify/ui-react**: 6.0.0 → 6.1.5
 - **@aws-amplify/backend**: 1.16.1 → 1.18.2
 - **@aws-amplify/backend-cli**: 0.9.7 → 0.11.0
-- **@aws-amplify/cli**: 12.13.1 → 13.0.0
+- **@aws-amplify/cli**: グローバルパッケージとして削除（ローカル依存関係から除外）
+
+### ESLint更新
+
+リンティングツールの最新化:
+- **eslint**: 8.57.0 → 9.0.0
+- **@typescript-eslint/eslint-plugin**: 7.4.0 → 8.0.0
+- **@typescript-eslint/parser**: 7.4.0 → 8.0.0
 
 ## 依存関係の最適化
+
+### 依存関係の整理
+
+- **@types/cookie**: dependenciesからdevDependenciesに移動
+- **AWS Amplify CLI**: グローバルパッケージとして使用するため依存関係から削除
+- **テスト関連パッケージの追加**: vitest, @testing-library関連パッケージ
 
 ### 廃止パッケージの解決
 
@@ -61,24 +76,18 @@
   - TypeScriptのネイティブサポート
   - パフォーマンスの向上
 
-### resolutionsとoverridesの追加
+### overrides設定の統合
 
-パッケージ解決の競合を避けるため、`package.json`に以下の設定を追加：
+`resolutions`と`overrides`を統合して重複を排除:
 
 ```json
-"resolutions": {
+"overrides": {
   "glob": "^10.3.10",
   "rimraf": "^5.0.5",
   "@babel/plugin-transform-class-properties": "^7.23.3",
   "inflight": "^2.0.1"
-},
-"overrides": {
-  "glob": "^10.3.10",
-  "rimraf": "^5.0.5"
 }
 ```
-
-これにより、深い依存関係内でも最新バージョンのパッケージが使用されます。
 
 ## TypeScriptの強化
 
@@ -134,6 +143,55 @@
       'aws-vendor': ['aws-amplify']
     }
     ```
+
+## テスト環境の整備
+
+### Vitestの導入
+
+最新のテストフレームワーク導入:
+
+```json
+"scripts": {
+  "test": "vitest run",
+  "test:watch": "vitest",
+  "test:coverage": "vitest run --coverage"
+}
+```
+
+### テスト設定の追加
+
+`vitest.config.ts`で以下の機能を設定:
+- JSDOMを使用したブラウザ環境のシミュレーション
+- テストカバレッジレポートの生成
+- パスエイリアスのサポート
+
+### Testing Libraryの統合
+
+React Testing Libraryとの統合により、コンポーネントテストを簡素化:
+
+```typescript
+// src/test/setup.ts
+import { expect, afterEach } from 'vitest';
+import { cleanup } from '@testing-library/react';
+import matchers from '@testing-library/jest-dom/matchers';
+
+// RTL のカスタムマッチャーを vitest で使用できるようにする
+expect.extend(matchers);
+```
+
+### AWS Amplifyのモック
+
+テスト実行時にAWS Amplify関連の外部依存を適切にモック化:
+
+```typescript
+vi.mock('aws-amplify', () => {
+  return {
+    Amplify: {
+      configure: vi.fn(),
+    },
+  };
+});
+```
 
 ## AWS Amplify Gen 2の強化
 
@@ -304,7 +362,10 @@ const reportWebVitals = (metric: any) => {
   "typecheck": "tsc --noEmit",
   "lint": "eslint src --ext .ts,.tsx",
   "lint:fix": "eslint src --ext .ts,.tsx --fix",
-  "preview": "vite preview"
+  "preview": "vite preview",
+  "test": "vitest run",
+  "test:watch": "vitest",
+  "test:coverage": "vitest run --coverage"
 }
 ```
 
@@ -320,4 +381,4 @@ const reportWebVitals = (metric: any) => {
 
 ---
 
-これらの更新により、Project Nifercheはセキュリティ、パフォーマンス、保守性が大幅に向上し、2025年以降のWeb開発標準に適合するようになりました。依存関係の警告が解消され、最新のフレームワークとツールの利点を最大限に活用できるようになっています。
+これらの更新により、Project Nifercheはセキュリティ、パフォーマンス、保守性が大幅に向上し、2025年以降のWeb開発標準に適合するようになりました。依存関係の警告が解消され、テスト環境が整備され、最新のフレームワークとツールの利点を最大限に活用できるようになっています。

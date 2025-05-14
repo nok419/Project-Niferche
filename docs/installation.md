@@ -23,9 +23,15 @@ cd Project-Niferche
 npm install
 ```
 
-注意: 最初のインストール時に表示される警告は、`package.json`の`resolutions`および`overrides`セクションによって解決されています。
+注意: 最初のインストール時に表示される警告は、`package.json`の`overrides`セクションによって解決されています。
 
-### 3. 環境変数の設定
+### 3. AWS Amplify CLI のインストール (グローバル)
+
+```bash
+npm install -g @aws-amplify/cli
+```
+
+### 4. 環境変数の設定
 
 必要に応じて`.env`ファイルを作成し、環境変数を設定します：
 
@@ -34,7 +40,7 @@ npm install
 VITE_STORAGE_BUCKET=niferche-content-dev
 ```
 
-### 4. Amplify バックエンドのセットアップ
+### 5. Amplify バックエンドのセットアップ
 
 #### Amplifyへのログイン
 
@@ -69,7 +75,7 @@ npx amplify env add
 npx amplify push
 ```
 
-### 5. 開発サーバーの起動
+### 6. 開発サーバーの起動
 
 ```bash
 npm run dev
@@ -77,40 +83,63 @@ npm run dev
 
 アプリケーションは `http://localhost:3000` で実行されます。
 
-## 本番環境用ビルド
+## スクリプト一覧
 
-最適化されたビルドを作成するには：
+プロジェクトには以下のnpmスクリプトが用意されています：
+
+| スクリプト | 説明 |
+|-----------|------|
+| `npm run dev` | 開発サーバーを起動 |
+| `npm run build` | 本番用ビルドを作成 |
+| `npm run preview` | ビルド結果をプレビュー |
+| `npm run typecheck` | TypeScriptの型チェックのみを実行 |
+| `npm run lint` | ESLintでコードをリント |
+| `npm run lint:fix` | ESLintでコードを自動修正 |
+| `npm run test` | Vitestでテストを実行 |
+| `npm run test:watch` | テストをウォッチモードで実行 |
+| `npm run test:coverage` | テストカバレッジレポートを生成 |
+
+## テスト環境の使用方法
+
+### 単体テストの実行
 
 ```bash
-npm run build
+npm run test
 ```
 
-ビルド結果をプレビューするには：
+### テストファイルの作成
 
-```bash
-npm run preview
+`src/**/*.test.{ts,tsx}`の命名規則でテストファイルを作成します。
+
+例：
+```typescript
+// src/components/Button/Button.test.tsx
+import { describe, it, expect } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import Button from './Button';
+
+describe('Button', () => {
+  it('renders correctly', () => {
+    render(<Button>Click me</Button>);
+    expect(screen.getByText('Click me')).toBeInTheDocument();
+  });
+});
 ```
 
-## TypeScript型チェック
+### コンポーネントのテスト
 
-型チェックのみを実行するには：
+React Testing Libraryとjest-domマッチャーを使用できます：
 
-```bash
-npm run typecheck
-```
+```typescript
+import { render, screen, fireEvent } from '@testing-library/react';
 
-## リンティング
-
-コードのリントを実行するには：
-
-```bash
-npm run lint
-```
-
-リント問題の自動修正を試みるには：
-
-```bash
-npm run lint:fix
+// クリックイベントのテスト
+it('handles click events', () => {
+  const handleClick = vi.fn();
+  render(<Button onClick={handleClick}>Click me</Button>);
+  fireEvent.click(screen.getByText('Click me'));
+  expect(handleClick).toHaveBeenCalledTimes(1);
+});
 ```
 
 ## トラブルシューティング
@@ -148,8 +177,20 @@ npm run typecheck
 
 エラーに基づいてコードを修正してください。
 
+### テスト関連の問題
+
+テスト環境の問題が発生した場合：
+
+```bash
+# Testing Libraryの追加インストール
+npm install --save-dev @testing-library/react @testing-library/jest-dom
+```
+
 ## 追加リソース
 
 - [Project Niferche ドキュメント](./niferche_docs)
 - [AWS Amplify Gen 2 ドキュメント](https://docs.amplify.aws/)
 - [モダナイゼーション詳細](./modernization_2025.md)
+- [React 19 ドキュメント](https://react.dev/)
+- [Vitest ドキュメント](https://vitest.dev/)
+- [Testing Library ドキュメント](https://testing-library.com/docs/)
